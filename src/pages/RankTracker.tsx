@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown } from "lucide-react";
-import { dummyRankings } from "../assets/assets";
+import { useApp } from "../context/AppConext";
+import toast from "react-hot-toast";
 
 interface KeywordItem {
     _id: string;
@@ -14,7 +15,8 @@ interface KeywordItem {
     bestPosition: number | null;
     positionChange: number;
     active: boolean;
-    lastChecked: string | null;
+    updatedAt: string;
+    createdAt: string;
     status: string;
     competitors: { position: number; url: string; domain: string; title: string; snippet: string }[];
 }
@@ -32,40 +34,69 @@ export default function RankTracker() {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
+    const { getKeywords, addKeyword, deleteKeyword, toggleKeyword, refreshKeyword } = useApp();
 
     const fetchKeywords = async () => {
-        setTimeout(() => {
-            setKeywords(dummyRankings);
-            setLoading(false);
-        }, 1000);
+        setLoading(true);
+        const res = await getKeywords();
+        if (res.success) {
+            setKeywords(res.data || []);
+        } else {
+            toast.error(res.message || "Failed to load keywords");
+        }
+        setLoading(false);
     };
 
-    const handleAdd = async (e: React.SubmitEvent) => {
+    const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
         setAdding(true);
-        setTimeout(() => {
+        setAddError("");
+        const res = await addKeyword(newKeyword, newUrl, "US");
+        if (res.success) {
+            toast.success("Keyword added!");
             setShowAddModal(false);
-            setAdding(false);
-        }, 1000);
+            setNewKeyword("");
+            setNewUrl("");
+            fetchKeywords();
+        } else {
+            setAddError(res.message || "Failed to add keyword");
+        }
+        setAdding(false);
     };
 
     const handleRefresh = async (id: string) => {
         setRefreshing(id);
-        setTimeout(() => {
-            setRefreshing(null);
-        }, 1000);
+        const res = await refreshKeyword(id);
+        if (res.success) {
+            toast.success("Refresh initiated!");
+            fetchKeywords();
+        } else {
+            toast.error(res.message || "Failed to refresh");
+        }
+        setRefreshing(null);
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm("Delete this keyword tracking?")) return;
         setDeleting(id);
-        setTimeout(() => {
-            setDeleting(null);
-        }, 1000);
+        const res = await deleteKeyword(id);
+        if (res.success) {
+            toast.success("Keyword deleted");
+            fetchKeywords();
+        } else {
+            toast.error(res.message || "Failed to delete");
+        }
+        setDeleting(null);
     };
 
     const handleToggle = async (id: string) => {
-        console.log(id);
+        const res = await toggleKeyword(id);
+        if (res.success) {
+            toast.success(res.message || "Tracking toggled");
+            fetchKeywords();
+        } else {
+            toast.error(res.message || "Failed to toggle");
+        }
     };
 
     const getPositionBadge = (pos: number | null) => {
@@ -224,10 +255,10 @@ export default function RankTracker() {
                                                 <span className="text-sm text-muted-foreground truncate">{kw.domain}</span>
                                                 {kw.currentPage && <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Page {kw.currentPage}</span>}
                                             </div>
-                                            {kw.lastChecked && (
+                                            {kw.updatedAt && (
                                                 <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                                                     <Clock size={10} />
-                                                    Last checked: {new Date(kw.lastChecked).toLocaleString()}
+                                                    Last checked: {new Date(kw.updatedAt).toLocaleString()}
                                                 </div>
                                             )}
                                         </div>

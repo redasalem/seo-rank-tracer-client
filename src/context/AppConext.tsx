@@ -19,6 +19,11 @@ interface AppContextType {
     login: (email: string, password: string) => Promise<{ success: boolean, message?: string }>
     register: (name: string, email: string, password: string) => Promise<{ success: boolean, message?: string }>
     logout: () => void;
+    addKeyword: (keyword: string, url: string, country: string) => Promise<{ success: boolean, message?: string }>;
+    getKeywords: () => Promise<{ success: boolean, data?: any[], message?: string }>;
+    deleteKeyword: (id: string) => Promise<{ success: boolean, message?: string }>;
+    toggleKeyword: (id: string) => Promise<{ success: boolean, message?: string, active?: boolean }>;
+    refreshKeyword: (id: string) => Promise<{ success: boolean, message?: string }>;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -52,41 +57,131 @@ export function AddProvider({ children }: { children: ReactNode }) {
             return;
         }
         try {
-            const { data } = await api.get('/api/auth/user')
-            if (data.success) {
-                setUser(data.user);
+            const { data } = await api.get('/api/auth/getCurrentUser');
+            if (data && data.user) {
+                setUser({
+                    id: data.user.id || data.user._id,
+                    name: data.user.name,
+                    email: data.user.email,
+                    plan: data.user.plan,
+                    analysisCount: data.user.analysisCount
+                });
             }
-
         } catch (error) {
             localStorage.removeItem('token');
             settoken(null);
             setUser(null);
-
-
         }
         setloading(false);
-
-    }
+    };
 
     useEffect(() => {
         loadUser();
-    }, [])
+    }, []);
 
-    const login = async ()=>{
+    const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+        try {
+            const { data } = await api.post('/api/auth/login', { email, password });
+            if (data && data.token) {
+                localStorage.setItem("token", data.token);
+                settoken(data.token);
+                if (data.user) {
+                    setUser({
+                        id: data.user.id || data.user._id,
+                        name: data.user.name,
+                        email: data.user.email,
+                        plan: data.user.plan,
+                        analysisCount: data.user.analysisCount
+                    });
+                }
+                return { success: true, message: data.message };
+            }
+            return { success: false, message: data.message || "Failed to login" };
+        } catch (error: any) {
+            const msg = error.response?.data?.message || "An error occurred during login";
+            return { success: false, message: msg };
+        }
+    };
 
-    }
+    const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+        try {
+            const { data } = await api.post('/api/auth/register', { name, email, password });
+            if (data && data.token) {
+                localStorage.setItem("token", data.token);
+                settoken(data.token);
+                if (data.user) {
+                    setUser({
+                        id: data.user.id || data.user._id,
+                        name: data.user.name,
+                        email: data.user.email,
+                        plan: data.user.plan,
+                        analysisCount: data.user.analysisCount
+                    });
+                }
+                return { success: true, message: data.message };
+            }
+            return { success: false, message: data.message || "Failed to register" };
+        } catch (error: any) {
+            const msg = error.response?.data?.message || "An error occurred during registration";
+            return { success: false, message: msg };
+        }
+    };
 
-    const register = async ()=>{
-        
-    }
+    const addKeyword = async (keyword: string, url: string, country: string) => {
+        try {
+            const { data } = await api.post('/api/rank/add', { keyword, url, country });
+            return { success: true, message: data.message };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to add keyword" };
+        }
+    };
 
-    const logout = async ()=>{
-        
-    }
+    const getKeywords = async () => {
+        try {
+            const { data } = await api.get('/api/rank');
+            return { success: true, data: data.keywords };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to fetch keywords" };
+        }
+    };
 
+    const deleteKeyword = async (id: string) => {
+        try {
+            const { data } = await api.delete(`/api/rank/${id}`);
+            return { success: true, message: data.message };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to delete keyword" };
+        }
+    };
 
+    const toggleKeyword = async (id: string) => {
+        try {
+            const { data } = await api.put(`/api/rank/${id}/toggle`);
+            return { success: true, message: data.message, active: data.active };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to toggle keyword" };
+        }
+    };
 
-    const value = { user, token, loading, api, login, register, logout }
+    const refreshKeyword = async (id: string) => {
+        try {
+            const { data } = await api.post(`/api/rank/${id}/refresh`);
+            return { success: true, message: data.message };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to refresh keyword" };
+        }
+    };
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        settoken(null);
+        setUser(null);
+        api.post('/api/auth/logout').catch(err => {
+            console.error("Logout backend request failed:", err);
+        });
+    };
+
+    const value = { user, token, loading, api, login, register, logout, addKeyword, getKeywords, deleteKeyword, toggleKeyword, refreshKeyword };
 
     return <AppContext.Provider value={value}>
         {children}

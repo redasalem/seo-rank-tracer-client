@@ -1,5 +1,14 @@
+export const Type = {
+    STRING: "STRING",
+    NUMBER: "NUMBER",
+    INTEGER: "INTEGER",
+    BOOLEAN: "BOOLEAN",
+    ARRAY: "ARRAY",
+    OBJECT: "OBJECT"
+} as const;
+
 // Response schema for structured SEO analysis
-const seoAnalysisSchema = {
+export const seoAnalysisSchema = {
     type: Type.OBJECT,
     properties: {
         overallScore: { type: Type.INTEGER },
@@ -49,7 +58,7 @@ const seoAnalysisSchema = {
 
 
 // Prompt for getting SEO Analysis structured data from AI
-const prompt = `You are an expert SEO analyst. Analyze the following website data and provide a comprehensive SEO audit.
+export const getSeoPrompt = (scrapedData: any) => `You are an expert SEO analyst. Analyze the following website data and provide a comprehensive SEO audit.
 
 Website URL: ${scrapedData.url}
 Load Time: ${scrapedData.loadTime}ms

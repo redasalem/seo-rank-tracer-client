@@ -1,16 +1,42 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Lock, Loader2, ChartNoAxesColumnIcon, User2Icon } from "lucide-react";
+import { useApp } from "../context/AppConext";
+import toast from "react-hot-toast";
 
 export default function Login({ state }: { state: string }) {
     const [isLoginState, setIsLoginState] = useState(state === "login");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { login, register } = useApp();
 
-    const handleSubmit = async (e: React.SubmitEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+
+        try {
+            if (isLoginState) {
+                const res = await login(email, password);
+                if (res.success) {
+                    toast.success("Welcome back!");
+                } else {
+                    toast.error(res.message || "Failed to login");
+                }
+            } else {
+                const res = await register(name, email, password);
+                if (res.success) {
+                    toast.success("Account created successfully!");
+                } else {
+                    toast.error(res.message || "Failed to register");
+                }
+            }
+        } catch (err: any) {
+            toast.error("An unexpected error occurred");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
