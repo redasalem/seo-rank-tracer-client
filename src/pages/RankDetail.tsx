@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Target, Globe, Clock, TrendingUp, TrendingDown, Minus, RefreshCw, AlertCircle, ExternalLink, Trophy, Users, Calendar, Loader2 } from "lucide-react";
-import { dummyWebsiteRanking } from "../assets/assets";
+import { useApp } from "../context/AppConext";
+import toast from "react-hot-toast";
 
 interface RankHistoryEntry {
     date: string;
@@ -32,7 +33,7 @@ interface TrackingData {
     rankHistory: RankHistoryEntry[];
     competitors: Competitor[];
     active: boolean;
-    lastChecked: string | null;
+    updatedAt: string;
     status: string;
     createdAt: string;
 }
@@ -44,21 +45,30 @@ export default function RankDetail() {
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
     const chartRef = useRef<HTMLCanvasElement>(null);
+    const { api, refreshKeyword } = useApp();
 
     const fetchTracking = async () => {
-        setTimeout(() => {
-            setTracking(dummyWebsiteRanking);
-            setLoading(false);
-        }, 1000);
+        try {
+            const { data } = await api.get(`/api/rank/${id}`);
+            setTracking(data.keyword);
+        } catch (error) {
+            toast.error("Failed to load keyword details");
+        }
+        setLoading(false);
     };
 
     const handleRefresh = async () => {
         if (!tracking) return;
         setRefreshing(true);
-        setTimeout(() => {
-            setTracking(dummyWebsiteRanking);
-            setRefreshing(false);
-        }, 1000);
+        const res = await refreshKeyword(tracking._id);
+        if (res.success) {
+            toast.success("Refresh started!");
+            // إعادة جلب البيانات بعد ثوانٍ ليتاح للـ Scraper وقت للعمل
+            setTimeout(() => fetchTracking(), 3000);
+        } else {
+            toast.error(res.message || "Failed to refresh");
+        }
+        setRefreshing(false);
     };
 
     const drawChart = () => {
@@ -315,7 +325,7 @@ export default function RankDetail() {
                             Data Points
                         </p>
                         <p className="text-3xl font-bold text-accent">{tracking.rankHistory.length}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{tracking.lastChecked ? `Last: ${new Date(tracking.lastChecked).toLocaleDateString()}` : "Never checked"}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{tracking.updatedAt ? `Last: ${new Date(tracking.updatedAt).toLocaleDateString()}` : "Never checked"}</p>
                     </div>
                 </div>
 

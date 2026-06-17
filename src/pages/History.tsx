@@ -1,64 +1,74 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Clock, Trash2, ExternalLink, Search, AlertCircle, Loader2, Filter, ArrowUpDown } from "lucide-react";
-import ScoreGauge from "../components/ScoreGauge";
-import { dummyAnalysisData } from "../assets/assets";
+import { Clock, Trash2, ExternalLink, Search, Target, Loader2, ArrowUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useApp } from "../context/AppConext";
+import toast from "react-hot-toast";
 
-interface AnalysisItem {
+interface KeywordSummary {
     _id: string;
+    keyword: string;
+    domain: string;
     url: string;
-    overallScore: number;
+    currentPosition: number | null;
+    bestPosition: number | null;
+    positionChange: number;
     status: string;
+    active: boolean;
+    updatedAt: string;
     createdAt: string;
-    categories: {
-        seo: number;
-        performance: number;
-        accessibility: number;
-        bestPractices: number;
-    };
 }
 
 export default function History() {
-    const [analyses, setAnalyses] = useState<AnalysisItem[]>([]);
+    const { getKeywords, deleteKeyword } = useApp();
+    const [keywords, setKeywords] = useState<KeywordSummary[]>([]);
     const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
 
-    const fetchAnalyses = async () => {
+    const fetchKeywords = async () => {
         setLoading(true);
-        setTimeout(() => {
-            setAnalyses(dummyAnalysisData);
-            setTotalPages(1);
-            setLoading(false);
-        }, 1000);
+        const res = await getKeywords();
+        if (res.success) {
+            setKeywords(res.data || []);
+        }
+        setLoading(false);
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Delete this analysis?")) return;
+    const handleDelete = async (id: string, keywordText: string) => {
+        if (!confirm(`Are you sure you want to delete tracking for "${keywordText}"?`)) return;
+        
         setDeleting(id);
-        setTimeout(() => {
-            setDeleting(null);
-        }, 1000);
+        const res = await deleteKeyword(id);
+        if (res.success) {
+            setKeywords((prev) => prev.filter((k) => k._id !== id));
+            toast.success("Keyword removed");
+        } else {
+            toast.error(res.message || "Failed to delete");
+        }
+        setDeleting(null);
     };
 
-    const getScoreClass = (s: number) => {
-        if (s >= 80) return "score-good";
-        if (s >= 50) return "score-medium";
-        return "score-poor";
+    const getPositionColor = (pos: number | null) => {
+        if (pos === null) return "text-muted-foreground bg-muted";
+        if (pos <= 3) return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
+        if (pos <= 10) return "text-primary bg-primary/10 border-primary/20";
+        return "text-accent bg-accent/10 border-accent/20";
     };
 
-    let processedData = [...analyses];
+    const getChangeIndicator = (change: number) => {
+        if (change > 0) return { icon: <TrendingUp size={14} />, text: `+${change}`, class: "text-emerald-500" };
+        if (change < 0) return { icon: <TrendingDown size={14} />, text: `${Math.abs(change)}`, class: "text-danger" };
+        return { icon: <Minus size={14} />, text: "—", class: "text-muted-foreground" };
+    };
+
+    let processedData = [...keywords];
 
     if (searchQuery) {
-        processedData = processedData.filter((a) => a.url.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-
-    if (statusFilter !== "all") {
-        processedData = processedData.filter((a) => a.status === statusFilter);
+        processedData = processedData.filter((k) => 
+            k.keyword.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            k.domain.toLowerCase().includes(searchQuery.toLowerCase())
+        );
     }
 
     processedData.sort((a, b) => {
@@ -66,17 +76,22 @@ export default function History() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         } else if (sortBy === "oldest") {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        } else if (sortBy === "score_high") {
-            return b.overallScore - a.overallScore;
-        } else if (sortBy === "score_low") {
-            return a.overallScore - b.overallScore;
+        } else if (sortBy === "highest_rank") {
+            // Nulls at the bottom
+            if (a.currentPosition === null) return 1;
+            if (b.currentPosition === null) return -1;
+            return a.currentPosition - b.currentPosition;
+        } else if (sortBy === "lowest_rank") {
+            if (a.currentPosition === null) return 1;
+            if (b.currentPosition === null) return -1;
+            return b.currentPosition - a.currentPosition;
         }
         return 0;
     });
 
     useEffect(() => {
-        (async () => await fetchAnalyses())();
-    }, [page]);
+        fetchKeywords();
+    }, []);
 
     return (
         <div className="min-h-screen pt-16 md:pt-24 bg-background">
@@ -85,12 +100,12 @@ export default function History() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
-                            Analysis <span className="gradient-text">History</span>
+                            Keywords <span className="gradient-text">History</span>
                         </h1>
-                        <p className="text-muted-foreground text-sm mt-1">View and manage all your past SEO analyses.</p>
+                        <p className="text-muted-foreground text-sm mt-1">Manage all your tracked keywords and view their current rankings.</p>
                     </div>
-                    <Link to="/analyze" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity self-start" style={{ color: "var(--background)" }}>
-                        New Analysis
+                    <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity self-start" style={{ color: "var(--background)" }}>
+                        Track New Keyword
                     </Link>
                 </div>
 
@@ -98,44 +113,17 @@ export default function History() {
                 <div className="mb-6 flex flex-col md:flex-row gap-3" style={{ animationDelay: "100ms" }}>
                     <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
                         <Search size={18} className="text-muted-foreground" />
-                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by URL..." className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="history-search-input" />
+                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by keyword or domain..." className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="history-search-input" />
                     </div>
 
-                    <div className="flex gap-3">
-                        <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2">
-                            <Filter size={16} className="text-muted-foreground" />
-                            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
-                                <option value="all" className="bg-background">
-                                    All Status
-                                </option>
-                                <option value="completed" className="bg-background">
-                                    Completed
-                                </option>
-                                <option value="processing" className="bg-background">
-                                    Processing
-                                </option>
-                                <option value="failed" className="bg-background">
-                                    Failed
-                                </option>
-                            </select>
-                        </div>
-                        <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2">
-                            <ArrowUpDown size={16} className="text-muted-foreground" />
-                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
-                                <option value="newest" className="bg-background">
-                                    Newest First
-                                </option>
-                                <option value="oldest" className="bg-background">
-                                    Oldest First
-                                </option>
-                                <option value="score_high" className="bg-background">
-                                    Highest Score
-                                </option>
-                                <option value="score_low" className="bg-background">
-                                    Lowest Score
-                                </option>
-                            </select>
-                        </div>
+                    <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2">
+                        <ArrowUpDown size={16} className="text-muted-foreground" />
+                        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
+                            <option value="newest" className="bg-background">Newest First</option>
+                            <option value="oldest" className="bg-background">Oldest First</option>
+                            <option value="highest_rank" className="bg-background">Highest Rank (#1)</option>
+                            <option value="lowest_rank" className="bg-background">Lowest Rank</option>
+                        </select>
                     </div>
                 </div>
 
@@ -146,93 +134,64 @@ export default function History() {
                     </div>
                 ) : processedData.length === 0 ? (
                     <div className="glass rounded-2xl p-12 text-center">
-                        <Search size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{searchQuery ? "No matching analyses" : "No analyses yet"}</h3>
-                        <p className="text-sm text-muted-foreground">{searchQuery ? "Try a different search term." : "Run your first SEO analysis to see it here."}</p>
+                        <Target size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{searchQuery ? "No matching keywords" : "No keywords yet"}</h3>
+                        <p className="text-sm text-muted-foreground mb-6">{searchQuery ? "Try a different search term." : "Start tracking your first keyword to see it here."}</p>
+                        {!searchQuery && (
+                            <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity inline-block" style={{ color: "var(--background)" }}>
+                                Go to Rank Tracker
+                            </Link>
+                        )}
                     </div>
                 ) : (
                     <div className="space-y-3" style={{ animationDelay: "200ms" }}>
-                        {processedData.map((a) => (
-                            <div key={a._id} className="glass rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-muted/50 transition-all group">
-                                {/* Score */}
+                        {processedData.map((k) => {
+                            const change = getChangeIndicator(k.positionChange);
+                            
+                            return (
+                            <div key={k._id} className="glass rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-muted/50 transition-all group">
+                                {/* Rank Badge */}
                                 <div className="shrink-0">
-                                    {a.status === "completed" ? (
-                                        <ScoreGauge score={a.overallScore} size={52} strokeWidth={4} />
-                                    ) : a.status === "processing" ? (
-                                        <div className="w-[52px] h-[52px] rounded-full glass flex items-center justify-center">
-                                            <Loader2 size={20} className="text-primary animate-spin" />
-                                        </div>
-                                    ) : (
-                                        <div className="w-[52px] h-[52px] rounded-full glass flex items-center justify-center">
-                                            <AlertCircle size={20} className="text-danger" />
-                                        </div>
-                                    )}
+                                    <div className={`w-14 h-14 rounded-2xl border flex flex-col items-center justify-center ${getPositionColor(k.currentPosition)}`}>
+                                        <span className="text-[10px] uppercase font-bold opacity-70">Rank</span>
+                                        <span className="text-xl font-bold leading-tight">{k.currentPosition ? `#${k.currentPosition}` : "-"}</span>
+                                    </div>
                                 </div>
 
-                                {/* URL + Meta */}
+                                {/* Keyword Info */}
                                 <div className="flex-1 min-w-0">
-                                    <Link to={`/report/${a._id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors truncate block">
-                                        {(() => {
-                                            try {
-                                                return new URL(a.url).hostname;
-                                            } catch {
-                                                return a.url;
-                                            }
-                                        })()}
+                                    <Link to={`/rank/${k._id}`} className="text-base font-semibold text-foreground hover:text-primary transition-colors truncate block">
+                                        "{k.keyword}"
                                     </Link>
-                                    <p className="text-xs text-muted-foreground truncate mt-0.5">{a.url}</p>
-                                    <div className="flex items-center gap-3 mt-1.5">
+                                    <p className="text-xs text-muted-foreground truncate mt-0.5">{k.domain}</p>
+                                    
+                                    <div className="flex items-center gap-4 mt-2">
                                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                                             <Clock size={12} />
-                                            {new Date(a.createdAt).toLocaleDateString()}
+                                            {new Date(k.updatedAt).toLocaleDateString()}
                                         </span>
-                                        <span className={`text-xs px-2 py-0.5 rounded-full ${a.status === "completed" ? "bg-success/10 text-success" : a.status === "processing" ? "bg-primary/10 text-primary" : "bg-danger/10 text-danger"}`}>{a.status}</span>
+                                        
+                                        <span className={`text-xs flex items-center gap-1 font-medium ${change.class}`}>
+                                            {change.icon} {change.text}
+                                        </span>
+
+                                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${k.status === "success" ? "bg-emerald-500/10 text-emerald-500" : k.status === "pending" ? "bg-primary/10 text-primary" : "bg-danger/10 text-danger"}`}>
+                                            {k.status}
+                                        </span>
                                     </div>
                                 </div>
-
-                                {/* Category scores */}
-                                {a.status === "completed" && (
-                                    <div className="hidden lg:grid grid-cols-4 gap-4">
-                                        {[
-                                            { label: "SEO", value: a.categories.seo },
-                                            { label: "Perf", value: a.categories.performance },
-                                            { label: "A11y", value: a.categories.accessibility },
-                                            { label: "BP", value: a.categories.bestPractices },
-                                        ].map((c) => (
-                                            <div key={c.label} className="text-center w-12">
-                                                <p className={`text-sm font-bold ${getScoreClass(c.value)}`}>{c.value}</p>
-                                                <p className="text-[10px] text-muted-foreground">{c.label}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-2 shrink-0">
-                                    <Link to={`/report/${a._id}`} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all" title="View Report">
+                                    <Link to={`/rank/${k._id}`} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all" title="View Details">
                                         <ExternalLink size={16} />
                                     </Link>
-                                    <button onClick={() => handleDelete(a._id)} disabled={deleting === a._id} className="p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all disabled:opacity-50" title="Delete">
-                                        {deleting === a._id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                    <button onClick={() => handleDelete(k._id, k.keyword)} disabled={deleting === k._id} className="p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all disabled:opacity-50" title="Delete Tracking">
+                                        {deleting === k._id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                                     </button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-2 mt-8">
-                        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-4 py-2 rounded-xl glass text-sm text-foreground disabled:opacity-30 hover:bg-muted/50 transition-all">
-                            Previous
-                        </button>
-                        <span className="px-4 py-2 text-sm text-muted-foreground">
-                            Page {page} of {totalPages}
-                        </span>
-                        <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-4 py-2 rounded-xl glass text-sm text-foreground disabled:opacity-30 hover:bg-muted/50 transition-all">
-                            Next
-                        </button>
+                        )})}
                     </div>
                 )}
             </div>

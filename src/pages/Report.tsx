@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import ScoreGauge from "../components/ScoreGauge";
 import IssueCard from "../components/IssueCard";
 import { ArrowLeft, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search } from "lucide-react";
-import { dummyWebsiteAnalysis } from "../assets/assets";
+import { useApp } from "../context/AppConext";
 
 interface AnalysisData {
     _id: string;
@@ -57,16 +57,23 @@ interface AnalysisData {
 
 export default function Report() {
     const { id } = useParams();
+    const { getAnalysis } = useApp();
     const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error] = useState("");
+    const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("overview");
 
     const fetchAnalysis = async () => {
-        setTimeout(() => {
-            setAnalysis(dummyWebsiteAnalysis);
-            setLoading(false);
-        }, 1500);
+        if (!id) return;
+        setLoading(true);
+        const res = await getAnalysis(id);
+        
+        if (res.success && res.data) {
+            setAnalysis(res.data);
+        } else {
+            setError(res.message || "Analysis not found");
+        }
+        setLoading(false);
     };
 
     const getScoreClass = (s: number) => {

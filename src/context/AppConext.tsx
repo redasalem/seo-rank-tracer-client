@@ -19,11 +19,13 @@ interface AppContextType {
     login: (email: string, password: string) => Promise<{ success: boolean, message?: string }>
     register: (name: string, email: string, password: string) => Promise<{ success: boolean, message?: string }>
     logout: () => void;
-    addKeyword: (keyword: string, url: string, country: string) => Promise<{ success: boolean, message?: string }>;
-    getKeywords: () => Promise<{ success: boolean, data?: any[], message?: string }>;
-    deleteKeyword: (id: string) => Promise<{ success: boolean, message?: string }>;
-    toggleKeyword: (id: string) => Promise<{ success: boolean, message?: string, active?: boolean }>;
-    refreshKeyword: (id: string) => Promise<{ success: boolean, message?: string }>;
+    addKeyword: (data: any) => Promise<{ success: boolean; message?: string; tracking?: any }>;
+    getKeywords: () => Promise<{ success: boolean; data?: any[] }>;
+    deleteKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
+    toggleKeyword: (id: string) => Promise<{ success: boolean; message?: string, active?: boolean }>;
+    refreshKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
+    startAnalysis: (url: string) => Promise<{ success: boolean; message?: string; analysisId?: string }>;
+    getAnalysis: (id: string) => Promise<{ success: boolean; data?: any; message?: string }>;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -127,10 +129,10 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const addKeyword = async (keyword: string, url: string, country: string) => {
+    const addKeyword = async (keywordData: any) => {
         try {
-            const { data } = await api.post('/api/rank/add', { keyword, url, country });
-            return { success: true, message: data.message };
+            const { data } = await api.post('/api/rank/add', keywordData);
+            return { success: true, message: data.message, tracking: data.tracking };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Failed to add keyword" };
         }
@@ -172,6 +174,24 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const startAnalysis = async (url: string) => {
+        try {
+            const { data } = await api.post("/api/analysis/start", { url });
+            return { success: true, message: data.message, analysisId: data.analysisId };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to start analysis" };
+        }
+    };
+
+    const getAnalysis = async (id: string) => {
+        try {
+            const { data } = await api.get(`/api/analysis/${id}`);
+            return { success: true, data: data.analysis };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to get analysis report" };
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         settoken(null);
@@ -181,7 +201,22 @@ export function AddProvider({ children }: { children: ReactNode }) {
         });
     };
 
-    const value = { user, token, loading, api, login, register, logout, addKeyword, getKeywords, deleteKeyword, toggleKeyword, refreshKeyword };
+    const value = { 
+        user, 
+        token, 
+        loading, 
+        api, 
+        login, 
+        register, 
+        logout, 
+        addKeyword, 
+        getKeywords, 
+        deleteKeyword, 
+        toggleKeyword, 
+        refreshKeyword,
+        startAnalysis,
+        getAnalysis 
+    };
 
     return <AppContext.Provider value={value}>
         {children}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { SearchIcon, GlobeIcon, FileSearchIcon, BrainIcon, CheckCircleIcon, AlertCircle, Loader2, ArrowRightIcon } from "lucide-react";
+import { useApp } from "../context/AppConext";
 
 const STEPS = [
     { icon: <GlobeIcon size={22} />, label: "Connecting to browser", desc: "Creating cloud browser session..." },
@@ -12,6 +13,7 @@ const STEPS = [
 ];
 
 export default function Analyze() {
+    const { startAnalysis, getAnalysis } = useApp();
     const [url, setUrl] = useState("");
     const [analyzing, setAnalyzing] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
@@ -27,18 +29,34 @@ export default function Analyze() {
 
         setError("");
         setAnalyzing(true);
-        setCurrentStep(0);
+        setCurrentStep(0); // Connecting
 
-        setTimeout(() => setCurrentStep(1), 1000);
-        setTimeout(() => setCurrentStep(2), 3000);
-        setTimeout(() => setCurrentStep(3), 6000);
+        // Simulate step progression purely for UI feeling while waiting
+        const stepInterval = setInterval(() => {
+            setCurrentStep((prev) => Math.min(prev + 1, 2));
+        }, 3000);
+
+        // 1. Start Analysis (This will block until finished because of Vercel changes)
+        const startRes = await startAnalysis(targetUrl);
+        clearInterval(stepInterval);
+        
+        if (!startRes.success || !startRes.analysisId) {
+            setError(startRes.message || "Failed to complete analysis");
+            setAnalyzing(false);
+            return;
+        }
+
+        // 2. Success, move to final step and redirect
+        setCurrentStep(3); // Report Ready
+        
+        // Small delay before redirecting
         setTimeout(() => {
             setAnalyzing(false);
-            navigate(`/report/id123`);
-        }, 8000);
+            navigate(`/report/${startRes.analysisId}`);
+        }, 1000);
     };
 
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         handleAnalyze();
     };
