@@ -13,7 +13,7 @@ const STEPS = [
 ];
 
 export default function Analyze() {
-    const { startAnalysis, getAnalysis } = useApp();
+    const { startAnalysis } = useApp();
     const [url, setUrl] = useState("");
     const [analyzing, setAnalyzing] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);

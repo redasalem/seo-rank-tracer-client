@@ -42,7 +42,7 @@ export default function RankTracker() {
         if (res.success) {
             setKeywords(res.data || []);
         } else {
-            toast.error(res.message || "Failed to load keywords");
+            toast.error("Failed to load keywords");
         }
         setLoading(false);
     };
@@ -51,7 +51,7 @@ export default function RankTracker() {
         e.preventDefault();
         setAdding(true);
         setAddError("");
-        const res = await addKeyword(newKeyword, newUrl, "US");
+        const res = await addKeyword({ keyword: newKeyword, url: newUrl, country: "US" });
         if (res.success) {
             toast.success("Keyword added!");
             setShowAddModal(false);

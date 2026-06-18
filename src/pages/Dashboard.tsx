@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { SearchIcon, ArrowRightIcon, BarChart3Icon, GlobeIcon, TrendingUpIcon, Target, Trophy } from "lucide-react";
+import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy } from "lucide-react";
 import { useApp } from "../context/AppConext";
 
 interface KeywordSummary {
