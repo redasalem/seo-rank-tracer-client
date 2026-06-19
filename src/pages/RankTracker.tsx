@@ -275,14 +275,14 @@ export default function RankTracker() {
                                     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                                         {/* Rank badge */}
                                         <div className="flex items-center gap-4 lg:w-32 shrink-0">
-                                            {kw.status === "checking" ? (
+                                            {kw.status === "pending" ? (
                                                 <div className="w-16 h-16 rounded-xl glass flex items-center justify-center">
                                                     <Loader2 size={24} className="text-primary animate-spin" />
                                                 </div>
                                             ) : (
                                                 <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-lg font-bold ${posBadge.class}`}>{kw.currentPosition ? `#${kw.currentPosition}` : "—"}</div>
                                             )}
-                                            {kw.status === "completed" && kw.currentPosition && (
+                                            {kw.status === "success" && kw.currentPosition && (
                                                 <div className="text-center mt-1">
                                                     <div className={`flex items-center justify-center gap-1 text-sm font-medium ${change.class}`}>
                                                         {change.icon}
@@ -311,7 +311,7 @@ export default function RankTracker() {
                                         </div>
 
                                         {/* Stats */}
-                                        {kw.status === "completed" && (
+                                        {kw.status === "success" && (
                                             <div className="hidden md:flex items-center gap-5">
                                                 <div className="text-center">
                                                     <p className="text-sm font-bold text-primary">{kw.bestPosition || "—"}</p>
@@ -329,7 +329,7 @@ export default function RankTracker() {
                                             <Link to={`/rank/${kw._id}`} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all" title="View Details">
                                                 <ExternalLink size={16} />
                                             </Link>
-                                            <button onClick={() => handleRefresh(kw._id)} disabled={refreshing === kw._id || kw.status === "checking"} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all disabled:opacity-30" title="Refresh Ranking">
+                                            <button onClick={() => handleRefresh(kw._id)} disabled={refreshing === kw._id || kw.status === "pending"} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all disabled:opacity-30" title="Refresh Ranking">
                                                 <RefreshCw size={16} className={refreshing === kw._id ? "animate-spin" : ""} />
                                             </button>
                                             <button

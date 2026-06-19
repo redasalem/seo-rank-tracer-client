@@ -282,7 +282,7 @@ export default function RankDetail() {
                                 </a>
                             </div>
                         </div>
-                        <button onClick={handleRefresh} disabled={refreshing || tracking.status === "checking"} className="glass px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-muted/50 transition-all disabled:opacity-50 self-start text-foreground">
+                        <button onClick={handleRefresh} disabled={refreshing || tracking.status === "pending"} className="glass px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-muted/50 transition-all disabled:opacity-50 self-start text-foreground">
                             <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
                             {t("rankDetail.header.refreshNow")}
                         </button>
@@ -296,7 +296,7 @@ export default function RankDetail() {
                             <Target size={14} />
                             {t("rankDetail.stats.currentPos")}
                         </p>
-                        {tracking.status === "checking" ? <Loader2 size={32} className="animate-spin mx-auto text-primary" /> : <p className={`text-4xl font-bold ${getPositionColor(tracking.currentPosition)}`}>{tracking.currentPosition ? `#${tracking.currentPosition}` : t("rankDetail.stats.notRanked")}</p>}
+                        {tracking.status === "pending" ? <Loader2 size={32} className="animate-spin mx-auto text-primary" /> : <p className={`text-4xl font-bold ${getPositionColor(tracking.currentPosition)}`}>{tracking.currentPosition ? `#${tracking.currentPosition}` : t("rankDetail.stats.notRanked")}</p>}
                         {tracking.currentPage && <p className="text-xs text-muted-foreground mt-1">{t("rankDetail.stats.page")} {tracking.currentPage}</p>}
                     </div>
 
