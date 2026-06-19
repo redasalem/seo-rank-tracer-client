@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Lock, Loader2, ChartNoAxesColumnIcon, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 

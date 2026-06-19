@@ -19,7 +19,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "react-hot-toast";
-import { useApp } from "./context/AppConext";
+import { useApp } from "./context/AppContext";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 
@@ -37,6 +37,7 @@ export default function App() {
 
     return (
         <ErrorBoundary>
+            <div className="mesh-bg"></div>
             <Toaster />
             {!hideNavbar && <Navbar />}
             <Routes>

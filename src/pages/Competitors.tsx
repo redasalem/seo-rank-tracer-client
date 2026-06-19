@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Users, Target, BarChart2, ExternalLink, ArrowRight, ArrowLeft, TrendingUp, ShieldAlert, AlertCircle } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

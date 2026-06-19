@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import { vi } from 'vitest';
 
 // Mock the App context to avoid auth errors during UI testing
-vi.mock('../context/AppConext', () => ({
+vi.mock('../context/AppContext', () => ({
     useApp: () => ({
         user: null, // Simulate logged-out state
         logout: vi.fn(),

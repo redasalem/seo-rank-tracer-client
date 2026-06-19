@@ -2,9 +2,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { Search, BarChart3, History, LogOut, Menu, X, Target, Sun, Moon, ChartNoAxesColumnIcon, Settings as SettingsIcon, Users, Languages, Shield } from "lucide-react";
 import { useState } from "react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import NotificationBell from "./NotificationBell";
 import { useTranslation } from "react-i18next";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function Navbar() {
     const { t, i18n } = useTranslation();
@@ -13,6 +14,13 @@ export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    // Scroll animation for Navbar
+    const { scrollY } = useScroll();
+    const navWidth = useTransform(scrollY, [0, 100], ["100%", "90%"]);
+    const navY = useTransform(scrollY, [0, 100], [0, 15]);
+    const navBorderRadius = useTransform(scrollY, [0, 100], ["0px", "9999px"]);
+    const navPadding = useTransform(scrollY, [0, 100], ["0px", "10px"]);
 
     const handleLogout = () => {
         logout();
@@ -34,8 +42,16 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="fixed top-0 w-full bg-background/70 backdrop-blur-lg z-50 no-print">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="fixed top-0 left-0 w-full z-50 flex justify-center pointer-events-none no-print">
+        <motion.nav 
+            style={{ 
+                width: navWidth, 
+                y: navY, 
+                borderRadius: navBorderRadius,
+            }}
+            className="pointer-events-auto bg-background/60 backdrop-blur-xl border border-border shadow-sm transition-colors duration-300 overflow-hidden"
+        >
+            <motion.div style={{ padding: navPadding }} className="max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group">
@@ -115,7 +131,7 @@ export default function Navbar() {
                         </button>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Mobile menu */}
             {mobileOpen && (
@@ -177,6 +193,7 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
-        </nav>
+        </motion.nav>
+        </div>
     );
 }

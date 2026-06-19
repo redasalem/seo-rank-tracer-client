@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { User, Lock, CreditCard, Save } from "lucide-react";

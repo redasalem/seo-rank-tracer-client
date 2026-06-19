@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import ScoreGauge from "../components/ScoreGauge";
 import IssueCard from "../components/IssueCard";
 import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import html2pdf from "html2pdf.js";
 

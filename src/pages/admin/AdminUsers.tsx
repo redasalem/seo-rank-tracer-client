@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useApp } from "../../context/AppConext";
+import { useApp } from "../../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Search, ChevronLeft, ChevronRight, Crown, Shield, ShieldOff } from "lucide-react";
 

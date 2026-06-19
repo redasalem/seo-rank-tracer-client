@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Clock, Trash2, ExternalLink, Search, Target, Loader2, ArrowUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 

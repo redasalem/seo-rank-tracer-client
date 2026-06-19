@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { CheckCircle2, XCircle, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 
 export default function VerifyEmail() {

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy, Activity, ArrowUpCircle, Loader2 } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
@@ -62,8 +63,21 @@ export default function Dashboard() {
         return null;
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    };
+
     return (
-        <div className="min-h-screen pt-16 md:pt-24 bg-background">
+        <div className="min-h-screen pt-16 md:pt-24 bg-transparent">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 {/* Header */}
                 <div className="mb-8">
@@ -88,8 +102,13 @@ export default function Dashboard() {
                 </form>
 
                 {/* KPIs / Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                <motion.div 
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
+                >
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                             <Target size={22} />
                         </div>
@@ -97,8 +116,8 @@ export default function Dashboard() {
                             <p className="text-2xl font-bold text-foreground">{stats?.totalKeywords || 0}</p>
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.keywordsTracked")}</p>
                         </div>
-                    </div>
-                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                             <TrendingUpIcon size={22} />
                         </div>
@@ -106,8 +125,8 @@ export default function Dashboard() {
                             <p className="text-2xl font-bold text-emerald-500">{stats?.inTop10 || 0}</p>
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.inTop10")}</p>
                         </div>
-                    </div>
-                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
                             <Trophy size={22} />
                         </div>
@@ -115,8 +134,8 @@ export default function Dashboard() {
                             <p className={`text-2xl font-bold ${getPositionColor(stats?.bestPosition)}`}>{stats?.bestPosition ? `#${stats.bestPosition}` : "—"}</p>
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.bestRanking")}</p>
                         </div>
-                    </div>
-                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                             <Activity size={22} />
                         </div>
@@ -124,8 +143,8 @@ export default function Dashboard() {
                             <p className="text-2xl font-bold text-foreground">{stats?.averageRank ? `#${stats.averageRank}` : "—"}</p>
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.averageRank")}</p>
                         </div>
-                    </div>
-                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                             <ArrowUpCircle size={22} />
                         </div>
@@ -133,17 +152,24 @@ export default function Dashboard() {
                             <p className="text-lg font-bold text-emerald-500 truncate">{stats?.biggestImprover && stats.biggestImprover.positionChange > 0 ? `+${stats.biggestImprover.positionChange}` : "—"}</p>
                             <p className="text-xs text-muted-foreground truncate" title={stats?.biggestImprover ? stats.biggestImprover.keyword : ""}>{stats?.biggestImprover && stats.biggestImprover.positionChange > 0 ? stats.biggestImprover.keyword : t("dashboard.stats.biggestImprover")}</p>
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
 
                 {/* Charts Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10"
+                >
                     {/* Line Chart */}
                     <div className="glass rounded-2xl p-6 lg:col-span-2">
                         <h2 className="text-lg font-semibold text-foreground mb-6">{t("dashboard.charts.trendTitle")}</h2>
                         {loading ? (
-                            <div className="h-[250px] flex items-center justify-center">
-                                <Loader2 className="animate-spin text-primary size-8" />
+                            <div className="h-[250px] flex items-end justify-between gap-2 px-2 pb-4">
+                                {[1,2,3,4,5,6,7].map((i) => (
+                                    <div key={i} className="w-full bg-muted/50 rounded-t-md animate-pulse" style={{ height: `${Math.random() * 60 + 20}%`, animationDelay: `${i * 0.1}s` }}></div>
+                                ))}
                             </div>
                         ) : !stats?.historyData || stats.historyData.length < 2 ? (
                             <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
@@ -169,7 +195,7 @@ export default function Dashboard() {
                         <h2 className="text-lg font-semibold text-foreground mb-6">{t("dashboard.charts.distTitle")}</h2>
                         {loading ? (
                             <div className="h-[250px] flex items-center justify-center">
-                                <Loader2 className="animate-spin text-primary size-8" />
+                                <div className="w-48 h-48 rounded-full border-[16px] border-muted/50 animate-pulse"></div>
                             </div>
                         ) : !stats?.rankDistribution || stats.rankDistribution.length === 0 ? (
                             <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
@@ -197,10 +223,14 @@ export default function Dashboard() {
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Recent Keywords */}
-                <div style={{ animationDelay: "300ms" }}>
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                >
                     <div className="flex items-center justify-between mb-5">
                         <h2 className="text-lg font-semibold text-foreground">{t("dashboard.keywords.title")}</h2>
                         {stats?.recentKeywords && stats.recentKeywords.length > 0 && (
@@ -211,8 +241,17 @@ export default function Dashboard() {
                     </div>
 
                     {loading ? (
-                        <div className="flex items-center justify-center py-30">
-                            <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        <div className="space-y-3">
+                            {[1,2,3].map((i) => (
+                                <div key={i} className="glass rounded-xl p-4 flex items-center gap-4 animate-pulse">
+                                    <div className="w-12 h-12 rounded-xl bg-muted/80 shrink-0"></div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-muted/80 rounded w-1/3"></div>
+                                        <div className="h-3 bg-muted/80 rounded w-1/4"></div>
+                                    </div>
+                                    <div className="w-8 h-4 bg-muted/80 rounded"></div>
+                                </div>
+                            ))}
                         </div>
                     ) : !stats?.recentKeywords || stats.recentKeywords.length === 0 ? (
                         <div className="glass rounded-2xl p-12 text-center">
@@ -244,7 +283,7 @@ export default function Dashboard() {
                             })}
                         </div>
                     )}
-                </div>
+                </motion.div>
             </div>
         </div>
     );

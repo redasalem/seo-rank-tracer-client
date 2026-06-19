@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell, Check, TrendingUp, TrendingDown, Info, AlertTriangle } from "lucide-react";
-import { useApp } from "../context/AppConext";
+import { useApp } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 interface Notification {
