@@ -8,7 +8,7 @@ import { AddProvider } from "./context/AppContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
-        <ThemeProvider>
+        <ThemeProvider defaultTheme="dark">
             <AddProvider>
                 <App />
             </AddProvider>
