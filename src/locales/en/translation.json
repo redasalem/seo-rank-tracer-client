@@ -160,7 +160,7 @@
     "searchPlaceholder": "Enter website URL (e.g., example.com)",
     "analyzeBtn": "Analyze",
     "limitReached": "Daily limit reached",
-    "limitWarning": "You have reached your daily limit of 3 free analyses. Please upgrade your plan to unlock unlimited access.",
+    "limitWarning": "You have reached your daily limit of 10 free analyses. Please upgrade your plan to unlock unlimited access.",
     "upgradeBtn": "Upgrade to Pro",
     "examples": "Examples:",
     "analyzingTitle": "Analyzing Your Website",
