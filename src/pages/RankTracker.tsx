@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown } from "lucide-react";
+import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { useApp } from "../context/AppConext";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface KeywordItem {
     _id: string;
@@ -22,6 +23,7 @@ interface KeywordItem {
 }
 
 export default function RankTracker() {
+    const { t, i18n } = useTranslation();
     const [keywords, setKeywords] = useState<KeywordItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -34,17 +36,44 @@ export default function RankTracker() {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+
     const { getKeywords, addKeyword, deleteKeyword, toggleKeyword, refreshKeyword } = useApp();
 
     const fetchKeywords = async () => {
         setLoading(true);
-        const res = await getKeywords();
+        const res = await getKeywords({
+            page,
+            limit: 10,
+            search: searchQuery,
+            status: statusFilter,
+            sortBy
+        });
         if (res.success) {
             setKeywords(res.data || []);
+            setTotalPages(res.totalPages || 1);
+            setTotalCount(res.total || 0);
         } else {
             toast.error("Failed to load keywords");
         }
         setLoading(false);
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+        setPage(1);
+    };
+
+    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setStatusFilter(e.target.value);
+        setPage(1);
+    };
+
+    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortBy(e.target.value);
+        setPage(1);
     };
 
     const handleAdd = async (e: React.FormEvent) => {
@@ -53,13 +82,13 @@ export default function RankTracker() {
         setAddError("");
         const res = await addKeyword({ keyword: newKeyword, url: newUrl, country: "US" });
         if (res.success) {
-            toast.success("Keyword added!");
+            toast.success(t("rankTracker.alerts.added"));
             setShowAddModal(false);
             setNewKeyword("");
             setNewUrl("");
             fetchKeywords();
         } else {
-            setAddError(res.message || "Failed to add keyword");
+            setAddError(res.message || t("rankTracker.alerts.addFailed"));
         }
         setAdding(false);
     };
@@ -68,23 +97,23 @@ export default function RankTracker() {
         setRefreshing(id);
         const res = await refreshKeyword(id);
         if (res.success) {
-            toast.success("Refresh initiated!");
+            toast.success(t("rankTracker.alerts.refreshing"));
             fetchKeywords();
         } else {
-            toast.error(res.message || "Failed to refresh");
+            toast.error(res.message || t("rankTracker.alerts.refreshFailed"));
         }
         setRefreshing(null);
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Delete this keyword tracking?")) return;
+        if (!confirm(t("rankTracker.alerts.deleteConfirm"))) return;
         setDeleting(id);
         const res = await deleteKeyword(id);
         if (res.success) {
-            toast.success("Keyword deleted");
+            toast.success(t("rankTracker.alerts.deleted"));
             fetchKeywords();
         } else {
-            toast.error(res.message || "Failed to delete");
+            toast.error(res.message || t("rankTracker.alerts.deleteFailed"));
         }
         setDeleting(null);
     };
@@ -92,15 +121,51 @@ export default function RankTracker() {
     const handleToggle = async (id: string) => {
         const res = await toggleKeyword(id);
         if (res.success) {
-            toast.success(res.message || "Tracking toggled");
+            toast.success(res.message || t("rankTracker.alerts.toggleSuccess"));
             fetchKeywords();
         } else {
-            toast.error(res.message || "Failed to toggle");
+            toast.error(res.message || t("rankTracker.alerts.toggleFailed"));
         }
     };
 
+    const handleExportCSV = async () => {
+        // Fetch all keywords for export without pagination
+        const toastId = toast.loading(t("rankTracker.alerts.exportPrep"));
+        const res = await getKeywords({ limit: 10000, search: searchQuery, status: statusFilter, sortBy });
+        
+        if (!res.success || !res.data || res.data.length === 0) {
+            toast.error(t("rankTracker.alerts.exportEmpty"), { id: toastId });
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Keyword,Domain,URL,Current Position,Best Position,Change,Last Checked\n";
+
+        res.data.forEach((kw: any) => {
+            const row = [
+                `"${kw.keyword}"`,
+                `"${kw.domain}"`,
+                `"${kw.url}"`,
+                kw.currentPosition || t("rankTracker.item.notRanked"),
+                kw.bestPosition || "-",
+                kw.positionChange,
+                kw.updatedAt ? new Date(kw.updatedAt).toLocaleDateString() : "-"
+            ].join(",");
+            csvContent += row + "\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `rank_tracker_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success(t("rankTracker.alerts.exportSuccess"), { id: toastId });
+    };
+
     const getPositionBadge = (pos: number | null) => {
-        if (pos === null) return { text: "Not Ranked", class: "text-muted-foreground bg-muted/50" };
+        if (pos === null) return { text: t("rankTracker.item.notRanked"), class: "text-muted-foreground bg-muted/50" };
         if (pos <= 3) return { text: `#${pos}`, class: "text-emerald-400 bg-emerald-500/15 border border-emerald-500/30" };
         if (pos <= 10) return { text: `#${pos}`, class: "text-primary bg-primary/15 border border-primary/30" };
         if (pos <= 20) return { text: `#${pos}`, class: "text-accent bg-accent/15 border border-accent/30" };
@@ -113,36 +178,12 @@ export default function RankTracker() {
         return { icon: <Minus size={14} />, text: "0", class: "text-muted-foreground" };
     };
 
-    let processedData = [...keywords];
-
-    if (searchQuery) {
-        processedData = processedData.filter((k) => k.keyword.toLowerCase().includes(searchQuery.toLowerCase()) || k.domain.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-
-    if (statusFilter !== "all") {
-        if (statusFilter === "active") {
-            processedData = processedData.filter((k) => k.active === true);
-        } else if (statusFilter === "paused") {
-            processedData = processedData.filter((k) => k.active === false);
-        }
-    }
-
-    processedData.sort((a: any, b: any) => {
-        if (sortBy === "newest") {
-            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-        } else if (sortBy === "rank_asc") {
-            return (a.currentPosition || 999) - (b.currentPosition || 999);
-        } else if (sortBy === "rank_desc") {
-            return (b.currentPosition || 0) - (a.currentPosition || 0);
-        } else if (sortBy === "change") {
-            return (b.positionChange || 0) - (a.positionChange || 0);
-        }
-        return 0;
-    });
-
     useEffect(() => {
-        (async () => await fetchKeywords())();
-    }, []);
+        const timer = setTimeout(() => {
+            fetchKeywords();
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, statusFilter, sortBy, page]);
 
     return (
         <div className="min-h-scree pt-16 md:pt-24 bg-background">
@@ -151,52 +192,58 @@ export default function RankTracker() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
-                            <span className="gradient-text">Rank Tracker</span>
+                            <span className="gradient-text">{t("rankTracker.title")}</span>
                         </h1>
-                        <p className="text-muted-foreground text-sm mt-1">Track your keyword rankings on Google — updated daily.</p>
+                        <p className="text-muted-foreground text-sm mt-1">{t("rankTracker.subtitle")}</p>
                     </div>
-                    <button onClick={() => setShowAddModal(true)} className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity flex items-center gap-2 self-start" id="add-keyword-btn" style={{ color: "var(--background)" }}>
-                        <Plus size={18} />
-                        Track Keyword
-                    </button>
+                    <div className="flex gap-2 self-start">
+                        <button onClick={handleExportCSV} className="bg-card border border-border px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-colors flex items-center gap-2">
+                            <Download size={18} />
+                            {t("rankTracker.exportBtn")}
+                        </button>
+                        <button onClick={() => setShowAddModal(true)} className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity flex items-center gap-2" id="add-keyword-btn" style={{ color: "var(--background)" }}>
+                            <Plus size={18} />
+                            {t("rankTracker.trackBtn")}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Filters Row */}
                 <div className="mb-6 flex flex-col md:flex-row gap-3" style={{ animationDelay: "100ms" }}>
                     <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
                         <Search size={18} className="text-muted-foreground" />
-                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search keywords or domains..." className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="rank-search-input" />
+                        <input type="text" value={searchQuery} onChange={handleSearchChange} placeholder={t("rankTracker.searchPlaceholder")} className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="rank-search-input" />
                     </div>
 
                     <div className="flex gap-3">
                         <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2">
                             <Filter size={16} className="text-muted-foreground" />
-                            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
+                            <select value={statusFilter} onChange={handleStatusChange} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
                                 <option value="all" className="bg-background">
-                                    All Status
+                                    {t("rankTracker.filters.allStatus")}
                                 </option>
                                 <option value="active" className="bg-background">
-                                    Active
+                                    {t("rankTracker.filters.active")}
                                 </option>
                                 <option value="paused" className="bg-background">
-                                    Paused
+                                    {t("rankTracker.filters.paused")}
                                 </option>
                             </select>
                         </div>
                         <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2">
                             <ArrowUpDown size={16} className="text-muted-foreground" />
-                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
+                            <select value={sortBy} onChange={handleSortChange} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
                                 <option value="newest" className="bg-background">
-                                    Newest First
+                                    {t("rankTracker.filters.newest")}
                                 </option>
                                 <option value="rank_asc" className="bg-background">
-                                    Highest Ranked
+                                    {t("rankTracker.filters.highest")}
                                 </option>
                                 <option value="rank_desc" className="bg-background">
-                                    Lowest Ranked
+                                    {t("rankTracker.filters.lowest")}
                                 </option>
                                 <option value="change" className="bg-background">
-                                    Biggest Gain
+                                    {t("rankTracker.filters.biggestGain")}
                                 </option>
                             </select>
                         </div>
@@ -208,18 +255,18 @@ export default function RankTracker() {
                     <div className="flex items-center justify-center py-30">
                         <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
-                ) : processedData.length === 0 ? (
+                ) : keywords.length === 0 ? (
                     <div className="glass rounded-2xl p-12 text-center">
                         <Target size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-                        <h3 className="text-lg font-semibold text-foreground mb-2">No keywords tracked yet</h3>
-                        <p className="text-sm text-muted-foreground mb-6">Add your first keyword and URL to start tracking your Google rankings.</p>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{t("rankTracker.empty.title")}</h3>
+                        <p className="text-sm text-muted-foreground mb-6">{t("rankTracker.empty.desc")}</p>
                         <button onClick={() => setShowAddModal(true)} className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity" style={{ color: "var(--background)" }}>
-                            Track Your First Keyword
+                            {t("rankTracker.trackBtn")}
                         </button>
                     </div>
                 ) : (
                     <div className="space-y-3" style={{ animationDelay: "200ms" }}>
-                        {processedData.map((kw) => {
+                        {keywords.map((kw) => {
                             const posBadge = getPositionBadge(kw.currentPosition);
                             const change = getChangeIndicator(kw.positionChange);
 
@@ -241,7 +288,7 @@ export default function RankTracker() {
                                                         {change.icon}
                                                         {change.text}
                                                     </div>
-                                                    <p className="text-[10px] text-muted-foreground mt-0.5">change</p>
+                                                    <p className="text-[10px] text-muted-foreground mt-0.5">{t("rankTracker.item.change")}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -253,12 +300,12 @@ export default function RankTracker() {
                                             <div className="flex items-center gap-2 mt-1">
                                                 <Globe size={12} className="text-muted-foreground" />
                                                 <span className="text-sm text-muted-foreground truncate">{kw.domain}</span>
-                                                {kw.currentPage && <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Page {kw.currentPage}</span>}
+                                                {kw.currentPage && <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{t("rankTracker.item.page")} {kw.currentPage}</span>}
                                             </div>
                                             {kw.updatedAt && (
                                                 <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                                                     <Clock size={10} />
-                                                    Last checked: {new Date(kw.updatedAt).toLocaleString()}
+                                                    {t("rankTracker.item.lastChecked")}: {new Date(kw.updatedAt).toLocaleString()}
                                                 </div>
                                             )}
                                         </div>
@@ -268,11 +315,11 @@ export default function RankTracker() {
                                             <div className="hidden md:flex items-center gap-5">
                                                 <div className="text-center">
                                                     <p className="text-sm font-bold text-primary">{kw.bestPosition || "—"}</p>
-                                                    <p className="text-[10px] text-muted-foreground">Best</p>
+                                                    <p className="text-[10px] text-muted-foreground">{t("rankTracker.item.best")}</p>
                                                 </div>
                                                 <div className="text-center">
                                                     <p className="text-sm font-bold text-accent">{kw.competitors?.length || 0}</p>
-                                                    <p className="text-[10px] text-muted-foreground">Competitors</p>
+                                                    <p className="text-[10px] text-muted-foreground">{t("rankTracker.item.competitors")}</p>
                                                 </div>
                                             </div>
                                         )}
@@ -300,6 +347,36 @@ export default function RankTracker() {
                                 </div>
                             );
                         })}
+                        
+                        {/* Pagination UI */}
+                        {totalPages > 1 && (
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 glass p-4 rounded-2xl">
+                                <p className="text-sm text-muted-foreground">
+                                    {t("rankTracker.pagination.showing")} <span className="font-medium text-foreground">{(page - 1) * 10 + 1}</span> {t("rankTracker.pagination.to")} <span className="font-medium text-foreground">{Math.min(page * 10, totalCount)}</span> {t("rankTracker.pagination.of")} <span className="font-medium text-foreground">{totalCount}</span> {t("rankTracker.pagination.keywords")}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        disabled={page === 1} 
+                                        onClick={() => setPage(p => p - 1)} 
+                                        className={`flex items-center gap-1 px-4 py-2 rounded-xl bg-card border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50 ${i18n.language === 'ar' ? 'flex-row-reverse' : ''}`}
+                                    >
+                                        <ChevronLeft size={16} className={i18n.language === 'ar' ? 'rotate-180' : ''} />
+                                        {t("rankTracker.pagination.prev")}
+                                    </button>
+                                    <div className="px-4 py-2 text-sm font-medium text-foreground bg-primary/10 text-primary rounded-xl border border-primary/20">
+                                        {t("rankTracker.pagination.page")} {page} {t("rankTracker.pagination.of")} {totalPages}
+                                    </div>
+                                    <button 
+                                        disabled={page === totalPages} 
+                                        onClick={() => setPage(p => p + 1)} 
+                                        className={`flex items-center gap-1 px-4 py-2 rounded-xl bg-card border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50 ${i18n.language === 'ar' ? 'flex-row-reverse' : ''}`}
+                                    >
+                                        {t("rankTracker.pagination.next")}
+                                        <ChevronRight size={16} className={i18n.language === 'ar' ? 'rotate-180' : ''} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -309,7 +386,7 @@ export default function RankTracker() {
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-background border border-border rounded-2xl p-6 w-full max-w-md">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold text-foreground">Track New Keyword</h2>
+                            <h2 className="text-lg font-bold text-foreground">{t("rankTracker.modal.title")}</h2>
                             <button
                                 onClick={() => {
                                     setShowAddModal(false);
@@ -322,16 +399,27 @@ export default function RankTracker() {
                         </div>
 
                         {addError && (
-                            <div className="mb-4 px-4 py-3 rounded-xl severity-critical text-sm flex items-center gap-2">
-                                <AlertCircle size={16} className="shrink-0" />
-                                {addError}
+                            <div className="mb-4 px-4 py-3 rounded-xl severity-critical text-sm flex flex-col gap-3">
+                                <div className="flex items-center gap-2">
+                                    <AlertCircle size={16} className="shrink-0" />
+                                    <span>{addError}</span>
+                                </div>
+                                {addError.includes("limit") && (
+                                    <Link 
+                                        to="/settings?tab=subscription" 
+                                        className="inline-flex items-center justify-center bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 self-start"
+                                        style={{ color: "var(--background)" }}
+                                    >
+                                        {t("rankTracker.modal.upgradeBtn")}
+                                    </Link>
+                                )}
                             </div>
                         )}
 
                         <form onSubmit={handleAdd} className="space-y-4">
                             <div>
                                 <label htmlFor="modal-keyword" className="block text-sm font-medium text-foreground mb-1.5">
-                                    Keyword
+                                    {t("rankTracker.modal.keywordLabel")}
                                 </label>
                                 <div className="relative">
                                     <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -340,7 +428,7 @@ export default function RankTracker() {
                                         type="text"
                                         value={newKeyword}
                                         onChange={(e) => setNewKeyword(e.target.value)}
-                                        placeholder='e.g., "best seo tools"'
+                                        placeholder={t("rankTracker.modal.keywordPlaceholder")}
                                         required
                                         className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
                                     />
@@ -348,7 +436,7 @@ export default function RankTracker() {
                             </div>
                             <div>
                                 <label htmlFor="modal-url" className="block text-sm font-medium text-foreground mb-1.5">
-                                    Website URL
+                                    {t("rankTracker.modal.urlLabel")}
                                 </label>
                                 <div className="relative">
                                     <Globe size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -357,7 +445,7 @@ export default function RankTracker() {
                                         type="text"
                                         value={newUrl}
                                         onChange={(e) => setNewUrl(e.target.value)}
-                                        placeholder="e.g., example.com"
+                                        placeholder={t("rankTracker.modal.urlPlaceholder")}
                                         required
                                         className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
                                     />
@@ -365,7 +453,7 @@ export default function RankTracker() {
                             </div>
 
                             <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs text-muted-foreground">
-                                <p>💡 We'll search Google for your keyword, find your website's position (up to page 5), and track it daily.</p>
+                                <p>{t("rankTracker.modal.hint")}</p>
                             </div>
 
                             <button type="submit" disabled={adding} className="w-full py-3 rounded-xl bg-primary font-semibold text-sm text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50" style={{ color: "var(--background)" }}>
@@ -374,7 +462,7 @@ export default function RankTracker() {
                                 ) : (
                                     <>
                                         <Target size={18} />
-                                        Start Tracking
+                                        {t("rankTracker.modal.startBtn")}
                                     </>
                                 )}
                             </button>

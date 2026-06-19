@@ -8,6 +8,7 @@ interface User {
     name: string;
     email: string;
     plan: string;
+    role?: string;
     analysisCount?: number;
 }
 
@@ -20,12 +21,20 @@ interface AppContextType {
     register: (name: string, email: string, password: string) => Promise<{ success: boolean, message?: string }>
     logout: () => void;
     addKeyword: (data: any) => Promise<{ success: boolean; message?: string; tracking?: any }>;
-    getKeywords: () => Promise<{ success: boolean; data?: any[] }>;
+    getKeywords: (params?: { page?: number, limit?: number, search?: string, status?: string, sortBy?: string }) => Promise<{ success: boolean; data?: any[]; totalPages?: number; total?: number; page?: number; message?: string }>;
+    getDashboardStats: () => Promise<{ success: boolean; data?: any; message?: string }>;
     deleteKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
     toggleKeyword: (id: string) => Promise<{ success: boolean; message?: string, active?: boolean }>;
     refreshKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
     startAnalysis: (url: string) => Promise<{ success: boolean; message?: string; analysisId?: string }>;
     getAnalysis: (id: string) => Promise<{ success: boolean; data?: any; message?: string }>;
+    updateProfile: (name: string, email: string) => Promise<{ success: boolean; message?: string }>;
+    updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
+    getNotifications: () => Promise<{ success: boolean; data?: any[] }>;
+    markNotificationAsRead: (id: string) => Promise<{ success: boolean }>;
+    markAllNotificationsAsRead: () => Promise<{ success: boolean }>;
+    createCheckoutSession: () => Promise<{ success: boolean; url?: string; message?: string }>;
+    getGlobalCompetitors: () => Promise<{ success: boolean; data?: any; message?: string }>;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -38,9 +47,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const [token, settoken] = useState<string | null>(localStorage.getItem("token"));
     const [loading, setloading] = useState(true);
 
-    //axios instance with auth header
     const api = axios.create({
-        baseURL: BACKEND_URL
+        baseURL: BACKEND_URL,
+        withCredentials: true
     });
 
     //UPDATE axios header when token changes
@@ -53,10 +62,61 @@ export function AddProvider({ children }: { children: ReactNode }) {
         return config;
     });
 
+    api.interceptors.response.use((response) => response, async (error) => {
+        const originalRequest = error.config;
+        // If 401 Unauthorized and we haven't retried yet (and it's not a login attempt)
+        if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/api/auth/login') {
+            originalRequest._retry = true;
+            try {
+                // Try to refresh the token using the HttpOnly cookie
+                const { data } = await axios.get(`${BACKEND_URL}/api/auth/refresh`, { withCredentials: true });
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    settoken(data.token);
+                    // Update header for original request and retry it
+                    originalRequest.headers.Authorization = `Bearer ${data.token}`;
+                    return api(originalRequest);
+                }
+            } catch (refreshError) {
+                // Refresh token expired or missing
+                localStorage.removeItem("token");
+                settoken(null);
+                setUser(null);
+            }
+        }
+        return Promise.reject(error);
+    });
+
     const loadUser = async () => {
-        if (!token) {
-            setloading(false);
-            return;
+        let currentToken = token;
+        
+        // Attempt silent login via refresh token if no access token exists
+        if (!currentToken) {
+            try {
+                const { data } = await axios.get(`${BACKEND_URL}/api/auth/refresh`, { withCredentials: true });
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    settoken(data.token);
+                    currentToken = data.token;
+                    if (data.user) {
+                        setUser({
+                            id: data.user.id || data.user._id,
+                            name: data.user.name,
+                            email: data.user.email,
+                            plan: data.user.plan,
+                            role: data.user.role,
+                            analysisCount: data.user.analysisCount
+                        });
+                    }
+                }
+            } catch (error) {
+                // No valid refresh cookie, user is not logged in
+            }
+            
+            if (!currentToken) {
+                setloading(false);
+                return;
+            }
         }
         try {
             const { data } = await api.get('/api/auth/getCurrentUser');
@@ -66,6 +126,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
                     name: data.user.name,
                     email: data.user.email,
                     plan: data.user.plan,
+                    role: data.user.role,
                     analysisCount: data.user.analysisCount
                 });
             }
@@ -93,6 +154,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
                         name: data.user.name,
                         email: data.user.email,
                         plan: data.user.plan,
+                        role: data.user.role,
                         analysisCount: data.user.analysisCount
                     });
                 }
@@ -108,21 +170,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message?: string }> => {
         try {
             const { data } = await api.post('/api/auth/register', { name, email, password });
-            if (data && data.token) {
-                localStorage.setItem("token", data.token);
-                settoken(data.token);
-                if (data.user) {
-                    setUser({
-                        id: data.user.id || data.user._id,
-                        name: data.user.name,
-                        email: data.user.email,
-                        plan: data.user.plan,
-                        analysisCount: data.user.analysisCount
-                    });
-                }
-                return { success: true, message: data.message };
-            }
-            return { success: false, message: data.message || "Failed to register" };
+            return { success: true, message: data.message };
         } catch (error: any) {
             const msg = error.response?.data?.message || "An error occurred during registration";
             return { success: false, message: msg };
@@ -138,12 +186,31 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const getKeywords = async () => {
+    const getKeywords = async (params?: { page?: number, limit?: number, search?: string, status?: string, sortBy?: string }) => {
         try {
-            const { data } = await api.get('/api/rank');
-            return { success: true, data: data.keywords };
+            const queryParams = new URLSearchParams();
+            if (params) {
+                if (params.page) queryParams.append('page', params.page.toString());
+                if (params.limit) queryParams.append('limit', params.limit.toString());
+                if (params.search) queryParams.append('search', params.search);
+                if (params.status && params.status !== 'all') queryParams.append('status', params.status);
+                if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+            }
+            
+            const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+            const { data } = await api.get(`/api/rank${queryString}`);
+            return { success: true, data: data.keywords, totalPages: data.totalPages, total: data.total, page: data.page };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Failed to fetch keywords" };
+        }
+    };
+
+    const getDashboardStats = async () => {
+        try {
+            const { data } = await api.get('/api/rank/stats');
+            return { success: true, data: data.stats };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to fetch dashboard stats" };
         }
     };
 
@@ -177,6 +244,15 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const startAnalysis = async (url: string) => {
         try {
             const { data } = await api.post("/api/analysis/start", { url });
+            
+            // Increment the user's local analysis count
+            if (user && user.plan === "free") {
+                setUser({
+                    ...user,
+                    analysisCount: (user.analysisCount || 0) + 1
+                });
+            }
+            
             return { success: true, message: data.message, analysisId: data.analysisId };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Failed to start analysis" };
@@ -201,6 +277,79 @@ export function AddProvider({ children }: { children: ReactNode }) {
         });
     };
 
+    const updateProfile = async (name: string, email: string) => {
+        try {
+            const { data } = await api.put('/api/auth/profile', { name, email });
+            if (data.user) {
+                setUser({
+                    id: data.user.id || data.user._id,
+                    name: data.user.name,
+                    email: data.user.email,
+                    plan: data.user.plan,
+                    role: data.user.role,
+                    analysisCount: data.user.analysisCount
+                });
+            }
+            return { success: true, message: data.message };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to update profile" };
+        }
+    };
+
+    const updatePassword = async (currentPassword: string, newPassword: string) => {
+        try {
+            const { data } = await api.put('/api/auth/password', { currentPassword, newPassword });
+            return { success: true, message: data.message };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to update password" };
+        }
+    };
+
+    const getNotifications = async () => {
+        try {
+            const { data } = await api.get('/api/notifications');
+            return { success: true, data: data.data };
+        } catch (error: any) {
+            return { success: false, message: "Failed to fetch notifications" };
+        }
+    };
+
+    const markNotificationAsRead = async (id: string) => {
+        try {
+            await api.put(`/api/notifications/${id}/read`);
+            return { success: true };
+        } catch (error: any) {
+            return { success: false };
+        }
+    };
+
+    const markAllNotificationsAsRead = async () => {
+        try {
+            await api.put('/api/notifications/read-all');
+            return { success: true };
+        } catch (error: any) {
+            return { success: false };
+        }
+    };
+
+    const createCheckoutSession = async () => {
+        try {
+            const { data } = await api.post('/api/subscription/create-checkout-session');
+            return { success: true, url: data.url };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to create checkout session" };
+        }
+    };
+
+    const getGlobalCompetitors = async () => {
+        try {
+            const { data } = await api.get('/api/rank/competitors');
+            return { success: true, data: data.competitors };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to fetch global competitors" };
+        }
+    };
+
     const value = { 
         user, 
         token, 
@@ -211,11 +360,19 @@ export function AddProvider({ children }: { children: ReactNode }) {
         logout, 
         addKeyword, 
         getKeywords, 
+        getDashboardStats,
         deleteKeyword, 
         toggleKeyword, 
         refreshKeyword,
         startAnalysis,
-        getAnalysis 
+        getAnalysis,
+        updateProfile,
+        updatePassword,
+        getNotifications,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        createCheckoutSession,
+        getGlobalCompetitors
     };
 
     return <AppContext.Provider value={value}>

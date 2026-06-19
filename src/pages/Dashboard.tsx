@@ -1,30 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy } from "lucide-react";
+import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy, Activity, ArrowUpCircle, Loader2 } from "lucide-react";
 import { useApp } from "../context/AppConext";
-
-interface KeywordSummary {
-    _id: string;
-    keyword: string;
-    domain: string;
-    currentPosition: number | null;
-    positionChange: number;
-    status: string;
-    active: boolean;
-    updatedAt: string;
-}
+import { useTranslation } from "react-i18next";
+import {
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    PieChart, Pie, Cell
+} from "recharts";
 
 export default function Dashboard() {
-    const { user, getKeywords } = useApp();
+    const { t, i18n } = useTranslation();
+    const { user, getDashboardStats } = useApp();
     const navigate = useNavigate();
     const [url, setUrl] = useState("");
-    const [keywords, setKeywords] = useState<KeywordSummary[]>([]);
+    const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
-        const res = await getKeywords();
+        const res = await getDashboardStats();
         if (res.success) {
-            setKeywords(res.data || []);
+            setStats(res.data);
         }
         setLoading(false);
     };
@@ -36,14 +31,7 @@ export default function Dashboard() {
         }
     };
 
-    // إحصائيات مبنية على بيانات حقيقية
-    const totalKeywords = keywords.length;
-    const inTop10 = keywords.filter((k) => k.currentPosition !== null && k.currentPosition <= 10).length;
-    const bestPos = keywords.reduce((best, k) => {
-        if (k.currentPosition !== null && (best === null || k.currentPosition < best)) return k.currentPosition;
-        return best;
-    }, null as number | null);
-
+    // ─── Helpers ─────────────────────────────────────────────────────────────────
     const getPositionColor = (pos: number | null) => {
         if (pos === null) return "text-muted-foreground";
         if (pos <= 3) return "text-emerald-500";
@@ -61,15 +49,28 @@ export default function Dashboard() {
         (async () => await fetchData())();
     }, []);
 
+    // Custom Tooltip for Recharts
+    const CustomTooltip = ({ active, payload, label }: any) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
+                    <p className="text-sm font-semibold text-foreground mb-1">{label}</p>
+                    <p className="text-sm text-primary">{t("dashboard.charts.avgRank")}: #{payload[0].value}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
         <div className="min-h-screen pt-16 md:pt-24 bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-2xl sm:text-3xl font-medium text-foreground mb-1">
-                        Welcome back, <span className="gradient-text">{user?.name || "User"}</span>
+                        {t("dashboard.welcome")} <span className="gradient-text">{user?.name || "User"}</span>
                     </h1>
-                    <p className="text-muted-foreground text-sm">Analyze websites and boost your SEO performance.</p>
+                    <p className="text-muted-foreground text-sm">{t("dashboard.subtitle")}</p>
                 </div>
 
                 {/* Quick Analyze */}
@@ -77,53 +78,134 @@ export default function Dashboard() {
                     <div className="border border-primary/20 rounded-full p-2 flex items-center gap-2 max-w-2xl">
                         <div className="flex items-center gap-3 flex-1 px-3">
                             <SearchIcon size={20} className="text-muted-foreground shrink-0" />
-                            <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Enter a URL to analyze..." className="w-full bg-transparent text-foreground placeholder-muted-foreground outline-none text-sm py-3" id="dashboard-url-input" />
+                            <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder={t("dashboard.searchPlaceholder")} className="w-full bg-transparent text-foreground placeholder-muted-foreground outline-none text-sm py-3" id="dashboard-url-input" />
                         </div>
                         <button type="submit" className="bg-primary px-5 py-3 rounded-full text-primary-foreground text-sm hover:opacity-90 transition-opacity shrink-0 flex items-center gap-2" style={{ color: "var(--background)" }} id="dashboard-analyze-btn">
-                            Analyze
-                            <ArrowRightIcon size={16} />
+                            {t("dashboard.analyzeBtn")}
+                            <ArrowRightIcon size={16} className={i18n.language === 'ar' ? 'rotate-180' : ''} />
                         </button>
                     </div>
                 </form>
 
-                {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                {/* KPIs / Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                     <div className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                             <Target size={22} />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-foreground">{totalKeywords}</p>
-                            <p className="text-xs text-muted-foreground">Keywords Tracked</p>
+                            <p className="text-2xl font-bold text-foreground">{stats?.totalKeywords || 0}</p>
+                            <p className="text-xs text-muted-foreground">{t("dashboard.stats.keywordsTracked")}</p>
                         </div>
                     </div>
                     <div className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                             <TrendingUpIcon size={22} />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-emerald-500">{inTop10}</p>
-                            <p className="text-xs text-muted-foreground">In Top 10</p>
+                            <p className="text-2xl font-bold text-emerald-500">{stats?.inTop10 || 0}</p>
+                            <p className="text-xs text-muted-foreground">{t("dashboard.stats.inTop10")}</p>
                         </div>
                     </div>
                     <div className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
                             <Trophy size={22} />
                         </div>
                         <div>
-                            <p className={`text-2xl font-bold ${getPositionColor(bestPos)}`}>{bestPos ? `#${bestPos}` : "—"}</p>
-                            <p className="text-xs text-muted-foreground">Best Ranking</p>
+                            <p className={`text-2xl font-bold ${getPositionColor(stats?.bestPosition)}`}>{stats?.bestPosition ? `#${stats.bestPosition}` : "—"}</p>
+                            <p className="text-xs text-muted-foreground">{t("dashboard.stats.bestRanking")}</p>
                         </div>
+                    </div>
+                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                            <Activity size={22} />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-foreground">{stats?.averageRank ? `#${stats.averageRank}` : "—"}</p>
+                            <p className="text-xs text-muted-foreground">{t("dashboard.stats.averageRank")}</p>
+                        </div>
+                    </div>
+                    <div className="glass rounded-2xl p-5 flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                            <ArrowUpCircle size={22} />
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-lg font-bold text-emerald-500 truncate">{stats?.biggestImprover && stats.biggestImprover.positionChange > 0 ? `+${stats.biggestImprover.positionChange}` : "—"}</p>
+                            <p className="text-xs text-muted-foreground truncate" title={stats?.biggestImprover ? stats.biggestImprover.keyword : ""}>{stats?.biggestImprover && stats.biggestImprover.positionChange > 0 ? stats.biggestImprover.keyword : t("dashboard.stats.biggestImprover")}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                    {/* Line Chart */}
+                    <div className="glass rounded-2xl p-6 lg:col-span-2">
+                        <h2 className="text-lg font-semibold text-foreground mb-6">{t("dashboard.charts.trendTitle")}</h2>
+                        {loading ? (
+                            <div className="h-[250px] flex items-center justify-center">
+                                <Loader2 className="animate-spin text-primary size-8" />
+                            </div>
+                        ) : !stats?.historyData || stats.historyData.length < 2 ? (
+                            <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                                {t("dashboard.charts.noTrendData")}
+                            </div>
+                        ) : (
+                            <div className="h-[250px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={stats.historyData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                                        <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} reversed={true} domain={['dataMin', 'dataMax + 10']} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Line type="monotone" dataKey="averageRank" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, fill: "hsl(var(--background))", strokeWidth: 2 }} activeDot={{ r: 6 }} animationDuration={1500} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Pie Chart */}
+                    <div className="glass rounded-2xl p-6">
+                        <h2 className="text-lg font-semibold text-foreground mb-6">{t("dashboard.charts.distTitle")}</h2>
+                        {loading ? (
+                            <div className="h-[250px] flex items-center justify-center">
+                                <Loader2 className="animate-spin text-primary size-8" />
+                            </div>
+                        ) : !stats?.rankDistribution || stats.rankDistribution.length === 0 ? (
+                            <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                                {t("dashboard.charts.noDistData")}
+                            </div>
+                        ) : (
+                            <div className="h-[250px] w-full relative flex items-center justify-center">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie data={stats.rankDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={5} dataKey="value" animationDuration={1000}>
+                                            {stats.rankDistribution.map((entry: any, index: number) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px' }}
+                                            itemStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span className="text-3xl font-bold text-foreground">{stats?.totalKeywords}</span>
+                                    <span className="text-xs text-muted-foreground">{t("dashboard.charts.total")}</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Recent Keywords */}
                 <div style={{ animationDelay: "300ms" }}>
                     <div className="flex items-center justify-between mb-5">
-                        <h2 className="text-lg font-semibold text-foreground">Tracked Keywords</h2>
-                        {keywords.length > 0 && (
+                        <h2 className="text-lg font-semibold text-foreground">{t("dashboard.keywords.title")}</h2>
+                        {stats?.recentKeywords && stats.recentKeywords.length > 0 && (
                             <Link to="/rank-tracker" className="text-sm text-primary hover:underline flex items-center gap-1">
-                                View All <ArrowRightIcon size={14} />
+                                {t("dashboard.keywords.viewAll")} <ArrowRightIcon size={14} className={i18n.language === 'ar' ? 'rotate-180' : ''} />
                             </Link>
                         )}
                     </div>
@@ -132,18 +214,18 @@ export default function Dashboard() {
                         <div className="flex items-center justify-center py-30">
                             <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         </div>
-                    ) : keywords.length === 0 ? (
+                    ) : !stats?.recentKeywords || stats.recentKeywords.length === 0 ? (
                         <div className="glass rounded-2xl p-12 text-center">
                             <Target size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-                            <h3 className="text-lg font-semibold text-foreground mb-2">No keywords tracked yet</h3>
-                            <p className="text-sm text-muted-foreground mb-6">Start tracking your keywords to see your rankings here.</p>
+                            <h3 className="text-lg font-semibold text-foreground mb-2">{t("dashboard.keywords.noKeywordsTitle")}</h3>
+                            <p className="text-sm text-muted-foreground mb-6">{t("dashboard.keywords.noKeywordsDesc")}</p>
                             <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity inline-block" style={{ color: "var(--background)" }}>
-                                Go to Rank Tracker
+                                {t("dashboard.keywords.goToTracker")}
                             </Link>
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {keywords.slice(0, 5).map((kw) => {
+                            {stats.recentKeywords.map((kw: any) => {
                                 const change = getChangeText(kw.positionChange);
                                 return (
                                     <Link key={kw._id} to={`/rank/${kw._id}`} className="glass rounded-xl p-4 flex items-center gap-4 hover:bg-muted/50 transition-all block">

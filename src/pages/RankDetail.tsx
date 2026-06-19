@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Target, Globe, Clock, TrendingUp, TrendingDown, Minus, RefreshCw, AlertCircle, ExternalLink, Trophy, Users, Calendar, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Target, Globe, Clock, TrendingUp, TrendingDown, Minus, RefreshCw, AlertCircle, ExternalLink, Trophy, Users, Calendar, Loader2 } from "lucide-react";
 import { useApp } from "../context/AppConext";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface RankHistoryEntry {
     date: string;
@@ -46,13 +47,14 @@ export default function RankDetail() {
     const [activeTab, setActiveTab] = useState("overview");
     const chartRef = useRef<HTMLCanvasElement>(null);
     const { api, refreshKeyword } = useApp();
+    const { t, i18n } = useTranslation();
 
     const fetchTracking = async () => {
         try {
             const { data } = await api.get(`/api/rank/${id}`);
             setTracking(data.keyword);
         } catch (error) {
-            toast.error("Failed to load keyword details");
+            toast.error(t("rankDetail.alerts.loadFailed"));
         }
         setLoading(false);
     };
@@ -62,11 +64,11 @@ export default function RankDetail() {
         setRefreshing(true);
         const res = await refreshKeyword(tracking._id);
         if (res.success) {
-            toast.success("Refresh started!");
+            toast.success(t("rankDetail.alerts.refreshStarted"));
             // إعادة جلب البيانات بعد ثوانٍ ليتاح للـ Scraper وقت للعمل
             setTimeout(() => fetchTracking(), 3000);
         } else {
-            toast.error(res.message || "Failed to refresh");
+            toast.error(res.message || t("rankDetail.alerts.refreshFailed"));
         }
         setRefreshing(false);
     };
@@ -201,7 +203,7 @@ export default function RankDetail() {
         ctx.fillStyle = textColor;
         ctx.font = "11px Outfit";
         ctx.textAlign = "center";
-        ctx.fillText("Position", 0, 0);
+        ctx.fillText(t("rankDetail.chart.position"), 0, 0);
         ctx.restore();
     };
 
@@ -242,9 +244,9 @@ export default function RankDetail() {
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center glass-strong rounded-2xl p-10">
                     <AlertCircle size={48} className="mx-auto text-danger mb-4" />
-                    <h2 className="text-xl font-bold text-foreground mb-2">Tracking Not Found</h2>
+                    <h2 className="text-xl font-bold text-foreground mb-2">{t("rankDetail.notFound.title")}</h2>
                     <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground mt-4 inline-block" style={{ color: "var(--background)" }}>
-                        Back to Rank Tracker
+                        {t("rankDetail.notFound.backBtn")}
                     </Link>
                 </div>
             </div>
@@ -253,9 +255,9 @@ export default function RankDetail() {
 
     const change = getChangeIndicator(tracking.positionChange);
     const tabs = [
-        { id: "overview", label: "Overview" },
-        { id: "competitors", label: `Competitors (${tracking.competitors.length})` },
-        { id: "history", label: "History" },
+        { id: "overview", label: t("rankDetail.tabs.overview") },
+        { id: "competitors", label: t("rankDetail.tabs.competitors", { count: tracking.competitors.length }) },
+        { id: "history", label: t("rankDetail.tabs.history") },
     ];
 
     return (
@@ -264,8 +266,8 @@ export default function RankDetail() {
                 {/* Back + Header */}
                 <div className="mb-8">
                     <Link to="/rank-tracker" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors">
-                        <ArrowLeft size={16} />
-                        Back to Rank Tracker
+                        {i18n.language === 'ar' ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
+                        {t("rankDetail.header.backBtn")}
                     </Link>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
@@ -276,13 +278,13 @@ export default function RankDetail() {
                                 <Globe size={14} />
                                 <span>{tracking.domain}</span>
                                 <a href={tracking.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                                    Visit <ExternalLink size={12} />
+                                    {t("rankDetail.header.visit")} <ExternalLink size={12} />
                                 </a>
                             </div>
                         </div>
                         <button onClick={handleRefresh} disabled={refreshing || tracking.status === "checking"} className="glass px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-muted/50 transition-all disabled:opacity-50 self-start text-foreground">
                             <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
-                            Refresh Now
+                            {t("rankDetail.header.refreshNow")}
                         </button>
                     </div>
                 </div>
@@ -292,40 +294,40 @@ export default function RankDetail() {
                     <div className="glass-strong rounded-2xl p-6 text-center">
                         <p className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-1">
                             <Target size={14} />
-                            Current Position
+                            {t("rankDetail.stats.currentPos")}
                         </p>
-                        {tracking.status === "checking" ? <Loader2 size={32} className="animate-spin mx-auto text-primary" /> : <p className={`text-4xl font-bold ${getPositionColor(tracking.currentPosition)}`}>{tracking.currentPosition ? `#${tracking.currentPosition}` : "Not Ranked"}</p>}
-                        {tracking.currentPage && <p className="text-xs text-muted-foreground mt-1">Page {tracking.currentPage}</p>}
+                        {tracking.status === "checking" ? <Loader2 size={32} className="animate-spin mx-auto text-primary" /> : <p className={`text-4xl font-bold ${getPositionColor(tracking.currentPosition)}`}>{tracking.currentPosition ? `#${tracking.currentPosition}` : t("rankDetail.stats.notRanked")}</p>}
+                        {tracking.currentPage && <p className="text-xs text-muted-foreground mt-1">{t("rankDetail.stats.page")} {tracking.currentPage}</p>}
                     </div>
 
                     <div className="glass rounded-2xl p-6 text-center">
                         <p className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-1">
                             <TrendingUp size={14} />
-                            Position Change
+                            {t("rankDetail.stats.posChange")}
                         </p>
                         <div className={`text-3xl font-bold flex items-center justify-center gap-2 ${change.class}`}>
                             {change.icon}
                             {change.text}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">since last check</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t("rankDetail.stats.sinceLastCheck")}</p>
                     </div>
 
                     <div className="glass rounded-2xl p-6 text-center">
                         <p className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-1">
                             <Trophy size={14} />
-                            Best Position
+                            {t("rankDetail.stats.bestPos")}
                         </p>
                         <p className={`text-3xl font-bold ${getPositionColor(tracking.bestPosition)}`}>{tracking.bestPosition ? `#${tracking.bestPosition}` : "—"}</p>
-                        <p className="text-xs text-muted-foreground mt-1">all time</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t("rankDetail.stats.allTime")}</p>
                     </div>
 
                     <div className="glass rounded-2xl p-6 text-center">
                         <p className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-1">
                             <Calendar size={14} />
-                            Data Points
+                            {t("rankDetail.stats.dataPoints")}
                         </p>
                         <p className="text-3xl font-bold text-accent">{tracking.rankHistory.length}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{tracking.updatedAt ? `Last: ${new Date(tracking.updatedAt).toLocaleDateString()}` : "Never checked"}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{tracking.updatedAt ? `${t("rankDetail.stats.lastChecked")} ${new Date(tracking.updatedAt).toLocaleDateString()}` : t("rankDetail.stats.neverChecked")}</p>
                     </div>
                 </div>
 
@@ -351,7 +353,7 @@ export default function RankDetail() {
                             <div className="glass rounded-2xl p-6">
                                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                     <TrendingUp size={20} className="text-primary" />
-                                    Ranking History
+                                    {t("rankDetail.overview.rankingHistory")}
                                 </h3>
                                 {tracking.rankHistory.filter((h) => h.position !== null).length > 0 ? (
                                     <div className="relative" style={{ height: "300px" }}>
@@ -360,10 +362,10 @@ export default function RankDetail() {
                                 ) : (
                                     <div className="text-center py-12 text-muted-foreground">
                                         <Calendar size={32} className="mx-auto mb-2 opacity-50" />
-                                        <p className="text-sm">No ranking data yet. Check back after the daily tracking runs.</p>
+                                        <p className="text-sm">{t("rankDetail.overview.noRankingData")}</p>
                                     </div>
                                 )}
-                                <p className="text-xs text-muted-foreground mt-3 text-center">↑ Lower position number = higher rank. Updated daily at 6:00 AM UTC.</p>
+                                <p className="text-xs text-muted-foreground mt-3 text-center">{t("rankDetail.overview.chartHint")}</p>
                             </div>
 
                             {/* Top 3 Competitors Preview */}
@@ -372,10 +374,10 @@ export default function RankDetail() {
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                                             <Users size={20} className="text-accent" />
-                                            Top Competitors
+                                            {t("rankDetail.overview.topCompetitors")}
                                         </h3>
                                         <button onClick={() => setActiveTab("competitors")} className="text-sm text-primary hover:underline">
-                                            View All →
+                                            {t("rankDetail.overview.viewAll")}
                                         </button>
                                     </div>
                                     <div className="space-y-2">
@@ -407,7 +409,7 @@ export default function RankDetail() {
                         <div className="glass rounded-2xl p-6">
                             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                 <Users size={20} className="text-accent" />
-                                Competitors for "{tracking.keyword}"
+                                {t("rankDetail.competitorsTab.title", { keyword: tracking.keyword })}
                             </h3>
                             {tracking.competitors.length > 0 ? (
                                 <div className="space-y-3">
@@ -422,7 +424,7 @@ export default function RankDetail() {
                                                     #{comp.position}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-foreground">{comp.title || "Untitled"}</p>
+                                                    <p className="text-sm font-medium text-foreground">{comp.title || t("rankDetail.competitorsTab.untitled")}</p>
                                                     <p className="text-xs text-primary mt-0.5">{comp.domain}</p>
                                                     {comp.snippet && <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{comp.snippet}</p>}
                                                 </div>
@@ -436,7 +438,7 @@ export default function RankDetail() {
                             ) : (
                                 <div className="text-center py-12 text-muted-foreground">
                                     <Users size={32} className="mx-auto mb-2 opacity-50" />
-                                    <p className="text-sm">No competitor data available yet.</p>
+                                    <p className="text-sm">{t("rankDetail.competitorsTab.noData")}</p>
                                 </div>
                             )}
                         </div>
@@ -446,7 +448,7 @@ export default function RankDetail() {
                         <div className="glass rounded-2xl p-6">
                             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                 <Clock size={20} className="text-accent" />
-                                Ranking History
+                                {t("rankDetail.historyTab.title")}
                             </h3>
                             {tracking.rankHistory.length > 0 ? (
                                 <div className="space-y-2">
@@ -479,11 +481,11 @@ export default function RankDetail() {
                                                         })}
                                                     </p>
                                                     <div className="flex items-center gap-3 mt-0.5">
-                                                        {entry.page && <span className="text-xs text-muted-foreground">Page {entry.page}</span>}
+                                                        {entry.page && <span className="text-xs text-muted-foreground">{t("rankDetail.stats.page")} {entry.page}</span>}
                                                         {entry.title && <span className="text-xs text-muted-foreground truncate">{entry.title}</span>}
                                                     </div>
                                                 </div>
-                                                <div className="text-right shrink-0">
+                                                <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'} shrink-0`}>
                                                     <p className={`text-lg font-bold ${getPositionColor(entry.position)}`}>{entry.position || "N/R"}</p>
                                                 </div>
                                             </div>
@@ -492,7 +494,7 @@ export default function RankDetail() {
                             ) : (
                                 <div className="text-center py-12 text-muted-foreground">
                                     <Calendar size={32} className="mx-auto mb-2 opacity-50" />
-                                    <p className="text-sm">No history data yet. Data will appear after the first rank check.</p>
+                                    <p className="text-sm">{t("rankDetail.historyTab.noData")}</p>
                                 </div>
                             )}
                         </div>

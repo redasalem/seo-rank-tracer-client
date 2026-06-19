@@ -1,0 +1,634 @@
+{
+  "navbar": {
+    "login": "Log In",
+    "getStarted": "Get Started",
+    "dashboard": "Dashboard",
+    "analyze": "Analyze",
+    "rankTracker": "Rank Tracker",
+    "competitors": "Competitors",
+    "settings": "Settings",
+    "history": "History",
+    "logout": "Logout"
+  },
+  "hero": {
+    "badge": "Powered by BrowserBase & Gemini AI",
+    "title1": "Analyze & Boost Your",
+    "title2": "SEO Rankings",
+    "subtitle": "Get instant AI-powered SEO audits for any website. Uncover hidden issues, optimize performance, and outrank your competition.",
+    "placeholder": "Enter website URL (e.g., example.com)",
+    "analyzeBtn": "Analyze",
+    "disclaimer": "Free — No credit card required • 5 analyses per day"
+  },
+  "features": {
+    "title1": "Everything You Need to",
+    "title2": "Rank Higher",
+    "subtitle": "Comprehensive SEO analysis powered by real browser rendering and artificial intelligence.",
+    "items": [
+      {
+        "title": "SEO Score",
+        "desc": "Get a comprehensive SEO score analyzing 50+ ranking factors with AI-powered insights."
+      },
+      {
+        "title": "Performance",
+        "desc": "Analyze load times, page size, and Core Web Vitals to maximize your site speed."
+      },
+      {
+        "title": "Best Practices",
+        "desc": "Check meta tags, heading structure, image optimization, and technical SEO health."
+      },
+      {
+        "title": "Accessibility",
+        "desc": "Ensure your site is accessible to all users with alt text, ARIA, and contrast checks."
+      },
+      {
+        "title": "Keyword Analysis",
+        "desc": "Discover top keywords, density analysis, and content optimization opportunities."
+      },
+      {
+        "title": "Actionable Fixes",
+        "desc": "Get prioritized, actionable recommendations to boost your search rankings."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title1": "How It",
+    "title2": "Works",
+    "subtitle": "Rank Pilot uses advanced browser automation and AI to simulate a real user experience and provide deep SEO insights.",
+    "items": [
+      {
+        "title": "Enter Your URL",
+        "desc": "Paste any website URL into the analyzer bar."
+      },
+      {
+        "title": "AI Scans Your Site",
+        "desc": "BrowserBase visits your site and Gemini AI analyzes every SEO factor."
+      },
+      {
+        "title": "Get Your Report",
+        "desc": "Receive a detailed report with scores, issues, and recommendations."
+      }
+    ]
+  },
+  "pricing": {
+    "title1": "Simple",
+    "title2": "Pricing",
+    "subtitle": "Start free. Upgrade when you need more.",
+    "freePlan": {
+      "title": "Free",
+      "price": "$0",
+      "period": "/month",
+      "features": [
+        "5 analyses per day",
+        "Full SEO report",
+        "Keyword analysis",
+        "Issue detection",
+        "Export results"
+      ],
+      "btn": "Get Started Free"
+    },
+    "proPlan": {
+      "badge": "Popular",
+      "title": "Pro",
+      "price": "$19",
+      "period": "/month",
+      "features": [
+        "Unlimited analyses",
+        "Priority processing",
+        "Competitor analysis",
+        "Historical tracking",
+        "API access",
+        "Email reports"
+      ],
+      "btn": "Upgrade to Pro"
+    }
+  },
+  "footer": {
+    "desc": "Optimize your website for search engines with AI-powered insights and real-time tracking.",
+    "copyright": "© {{year}} RankPilot. All rights reserved.",
+    "status": "Status: All Systems Operational",
+    "sections": [
+      {
+        "title": "Product",
+        "links": ["Features", "Pricing", "API", "Browser Extension"]
+      },
+      {
+        "title": "Resources",
+        "links": ["Documentation", "Blog", "SEO Guide", "Support"]
+      },
+      {
+        "title": "Company",
+        "links": ["About Us", "Careers", "Contact", "Press"]
+      },
+      {
+        "title": "Legal",
+        "links": ["Privacy Policy", "Terms of Service", "Cookie Policy"]
+      }
+    ]
+  },
+  "dashboard": {
+    "welcome": "Welcome back,",
+    "subtitle": "Monitor your keyword rankings and overall SEO performance.",
+    "searchPlaceholder": "Enter a URL to analyze...",
+    "analyzeBtn": "Analyze",
+    "stats": {
+      "keywordsTracked": "Keywords Tracked",
+      "inTop10": "In Top 10",
+      "bestRanking": "Best Ranking",
+      "averageRank": "Average Rank",
+      "biggestImprover": "Biggest Improver"
+    },
+    "charts": {
+      "trendTitle": "Average Rank Trend",
+      "noTrendData": "Not enough historical data to show trend.",
+      "avgRank": "Avg Rank",
+      "distTitle": "Rank Distribution",
+      "noDistData": "No keywords to distribute.",
+      "total": "Total"
+    },
+    "keywords": {
+      "title": "Tracked Keywords",
+      "viewAll": "View All",
+      "noKeywordsTitle": "No keywords tracked yet",
+      "noKeywordsDesc": "Start tracking your keywords to see your rankings here.",
+      "goToTracker": "Go to Rank Tracker"
+    }
+  },
+  "analyze": {
+    "title1": "Analyze",
+    "title2": "Any Website",
+    "subtitle": "Enter a URL to get a comprehensive AI-powered SEO audit report.",
+    "searchPlaceholder": "Enter website URL (e.g., example.com)",
+    "analyzeBtn": "Analyze",
+    "limitReached": "Daily limit reached",
+    "limitWarning": "You have reached your daily limit of 3 free analyses. Please upgrade your plan to unlock unlimited access.",
+    "upgradeBtn": "Upgrade to Pro",
+    "examples": "Examples:",
+    "analyzingTitle": "Analyzing Your Website",
+    "disclaimer": "This may take 15-30 seconds depending on the website.",
+    "steps": [
+      {
+        "label": "Connecting to browser",
+        "desc": "Creating cloud browser session..."
+      },
+      {
+        "label": "Scanning website",
+        "desc": "Extracting meta tags, links, images..."
+      },
+      {
+        "label": "AI Analysis",
+        "desc": "Gemini is analyzing your SEO data..."
+      },
+      {
+        "label": "Report Ready",
+        "desc": "Your SEO report is complete!"
+      }
+    ]
+  },
+  "history": {
+    "title1": "Keywords",
+    "title2": "History",
+    "subtitle": "Manage all your tracked keywords and view their current rankings.",
+    "trackNewBtn": "Track New Keyword",
+    "searchPlaceholder": "Search by keyword or domain...",
+    "sort": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "highest": "Highest Rank (#1)",
+      "lowest": "Lowest Rank"
+    },
+    "empty": {
+      "noMatchTitle": "No matching keywords",
+      "noMatchDesc": "Try a different search term.",
+      "noKeywordsTitle": "No keywords yet",
+      "noKeywordsDesc": "Start tracking your first keyword to see it here.",
+      "goToTrackerBtn": "Go to Rank Tracker"
+    },
+    "item": {
+      "rank": "Rank",
+      "viewDetails": "View Details",
+      "deleteTracking": "Delete Tracking"
+    },
+    "alerts": {
+      "deleteConfirm": "Are you sure you want to delete tracking for \"{{keyword}}\"?",
+      "deleteSuccess": "Keyword removed",
+      "deleteFailed": "Failed to delete"
+    }
+  },
+  "rankTracker": {
+    "title": "Rank Tracker",
+    "subtitle": "Track your keyword rankings on Google — updated daily.",
+    "exportBtn": "Export CSV",
+    "trackBtn": "Track Keyword",
+    "searchPlaceholder": "Search keywords or domains...",
+    "filters": {
+      "allStatus": "All Status",
+      "active": "Active",
+      "paused": "Paused",
+      "newest": "Newest First",
+      "highest": "Highest Ranked",
+      "lowest": "Lowest Ranked",
+      "biggestGain": "Biggest Gain"
+    },
+    "empty": {
+      "title": "No keywords found",
+      "desc": "Try adjusting your search filters or track a new keyword."
+    },
+    "item": {
+      "change": "change",
+      "lastChecked": "Last checked",
+      "best": "Best",
+      "competitors": "Competitors",
+      "notRanked": "Not Ranked",
+      "page": "Page"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "keywords": "keywords",
+      "prev": "Prev",
+      "page": "Page",
+      "next": "Next"
+    },
+    "modal": {
+      "title": "Track New Keyword",
+      "keywordLabel": "Keyword",
+      "keywordPlaceholder": "e.g., \"best seo tools\"",
+      "urlLabel": "Website URL",
+      "urlPlaceholder": "e.g., example.com",
+      "hint": "💡 We'll search Google for your keyword, find your website's position (up to page 5), and track it daily.",
+      "startBtn": "Start Tracking",
+      "upgradeBtn": "Upgrade to Pro"
+    },
+    "alerts": {
+      "deleteConfirm": "Delete this keyword tracking?",
+      "added": "Keyword added!",
+      "addFailed": "Failed to add keyword",
+      "refreshing": "Refresh initiated!",
+      "refreshFailed": "Failed to refresh",
+      "deleted": "Keyword deleted",
+      "deleteFailed": "Failed to delete",
+      "exportPrep": "Preparing CSV export...",
+      "exportEmpty": "No keywords to export",
+      "exportSuccess": "CSV Exported successfully!",
+      "toggleSuccess": "Tracking toggled",
+      "toggleFailed": "Failed to toggle"
+    }
+  },
+  "rankDetail": {
+    "alerts": {
+      "loadFailed": "Failed to load keyword details",
+      "refreshStarted": "Refresh started!",
+      "refreshFailed": "Failed to refresh"
+    },
+    "chart": {
+      "position": "Position"
+    },
+    "notFound": {
+      "title": "Tracking Not Found",
+      "backBtn": "Back to Rank Tracker"
+    },
+    "header": {
+      "backBtn": "Back to Rank Tracker",
+      "visit": "Visit",
+      "refreshNow": "Refresh Now"
+    },
+    "stats": {
+      "currentPos": "Current Position",
+      "notRanked": "Not Ranked",
+      "page": "Page",
+      "posChange": "Position Change",
+      "sinceLastCheck": "since last check",
+      "bestPos": "Best Position",
+      "allTime": "all time",
+      "dataPoints": "Data Points",
+      "lastChecked": "Last:",
+      "neverChecked": "Never checked"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "competitors": "Competitors ({{count}})",
+      "history": "History"
+    },
+    "overview": {
+      "rankingHistory": "Ranking History",
+      "noRankingData": "No ranking data yet. Check back after the daily tracking runs.",
+      "chartHint": "↑ Lower position number = higher rank. Updated daily at 6:00 AM UTC.",
+      "topCompetitors": "Top Competitors",
+      "viewAll": "View All →"
+    },
+    "competitorsTab": {
+      "title": "Competitors for \"{{keyword}}\"",
+      "untitled": "Untitled",
+      "noData": "No competitor data available yet."
+    },
+    "historyTab": {
+      "title": "Ranking History",
+      "noData": "No history data yet. Data will appear after the first rank check."
+    }
+  },
+  "competitors": {
+    "alerts": {
+      "loadFailed": "Failed to load competitors"
+    },
+    "errorTitle": "Error Loading Data",
+    "header": {
+      "title1": "Competitor",
+      "title2": "Intelligence",
+      "subtitle": "Discover which domains are competing with you across all your tracked keywords."
+    },
+    "kpi": {
+      "total": "Total Competitors",
+      "uniqueDomains": "Unique domains identified",
+      "biggestThreat": "Biggest Threat",
+      "ranksFor": "Ranks for",
+      "ofYourKeywords": "of your keywords",
+      "avgPosition": "Avg Competitor Position",
+      "acrossShared": "Across all shared keywords"
+    },
+    "empty": {
+      "title": "No Competitors Found Yet",
+      "desc": "We haven't gathered enough data yet. Make sure you have active keywords and wait for the first scan to complete.",
+      "goToTrackerBtn": "Go to Rank Tracker"
+    },
+    "list": {
+      "title": "Top Shared Competitors",
+      "sharedKeywords": "shared keywords",
+      "avgRank": "Avg Rank",
+      "bestRank": "Best Rank",
+      "topKeywordsTitle": "Top Keywords They Rank For"
+    }
+  },
+  "settings": {
+    "alerts": {
+      "subSuccess": "Subscription successful! Welcome to Pro.",
+      "subCanceled": "Subscription checkout was canceled.",
+      "profileSuccess": "Profile updated successfully",
+      "profileFailed": "Failed to update profile",
+      "passwordSuccess": "Password updated successfully",
+      "passwordFailed": "Failed to update password",
+      "paymentFailed": "Failed to initialize payment"
+    },
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "nameMax": "Name is too long",
+      "emailInvalid": "Please enter a valid email address",
+      "currentReq": "Current password is required",
+      "newMin": "New password must be at least 6 characters",
+      "confirmReq": "Please confirm your new password",
+      "passMismatch": "Passwords do not match"
+    },
+    "tabs": {
+      "profile": "Profile Settings",
+      "security": "Security",
+      "subscription": "Subscription"
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "desc": "Update your personal information and email address.",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "John Doe",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "john@example.com",
+      "saveBtn": "Save Changes"
+    },
+    "security": {
+      "title": "Security",
+      "desc": "Ensure your account is using a long, random password to stay secure.",
+      "currentLabel": "Current Password",
+      "newLabel": "New Password",
+      "confirmLabel": "Confirm New Password",
+      "updateBtn": "Update Password"
+    },
+    "subscription": {
+      "title": "Subscription Plan",
+      "desc": "Manage your billing and subscription details.",
+      "planName": "{{plan}} Plan",
+      "active": "Active",
+      "currentPlanDesc": "You are currently on the {{plan}} plan.",
+      "upgradeBtn": "Upgrade to Pro",
+      "planLimits": "Plan Limits",
+      "dailyUsed": "Daily SEO Analyses Used",
+      "unlimited": "Unlimited",
+      "trackingLimit": "Keyword Tracking Limit",
+      "max10": "10 Max"
+    }
+  },
+  "auth": {
+    "login": {
+      "success": "Welcome back!",
+      "failed": "Failed to login",
+      "regSuccess": "Account created! Please check your email to verify.",
+      "regFailed": "Failed to register",
+      "error": "An unexpected error occurred",
+      "title": "Welcome back",
+      "subtitleSignIn": "Sign in to your Rank Pilot account",
+      "subtitleCreate": "Create a Rank Pilot account",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "forgotBtn": "Forgot Password?",
+      "passwordPlaceholder": "Enter your password",
+      "signInBtn": "Sign In",
+      "createBtn": "Create Account",
+      "noAccount": "Don't have an account?",
+      "hasAccount": "Already have an account?",
+      "signUp": "Sign up",
+      "signIn": "Sign in"
+    },
+    "forgot": {
+      "success": "Reset link sent successfully!",
+      "checkEmailTitle": "Check your email",
+      "checkEmailDesc": "We have sent a password reset link to",
+      "spamHint": "If you don't receive the email within a few minutes, please check your spam folder.",
+      "backToSignIn": "Back to Sign In",
+      "title": "Reset Password",
+      "desc": "Enter your email and we'll send you a link to reset your password.",
+      "emailLabel": "Email Address",
+      "sendBtn": "Send Reset Link"
+    },
+    "reset": {
+      "passMin": "Password must be at least 6 characters long",
+      "passMismatch": "Passwords do not match",
+      "successAlert": "Password reset successfully!",
+      "invalidToken": "Invalid or expired token",
+      "title": "Password Reset",
+      "successDesc": "Your password has been successfully reset.",
+      "redirecting": "Redirecting you to login page...",
+      "newTitle": "New Password",
+      "newDesc": "Please enter and confirm your new password below.",
+      "newLabel": "New Password",
+      "newPlaceholder": "Min 6 characters",
+      "confirmLabel": "Confirm Password",
+      "confirmPlaceholder": "Confirm new password",
+      "resetBtn": "Reset Password"
+    },
+    "verify": {
+      "noToken": "No verification token provided.",
+      "failedAlert": "Failed to verify email. The token may be invalid or expired.",
+      "loadingTitle": "Verifying Email...",
+      "loadingDesc": "Please wait while we verify your email address.",
+      "successTitle": "Email Verified!",
+      "continueBtn": "Continue to Login",
+      "failTitle": "Verification Failed",
+      "backBtn": "Back to Login"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "desc": "Oops! The page you are looking for seems to have vanished into the digital void.",
+    "goBack": "Go Back",
+    "home": "Return Home"
+  },
+  "report": {
+    "loading": "Loading report...",
+    "notFound": "Report Not Found",
+    "notFoundDesc": "This analysis doesn't exist.",
+    "backToDash": "Back to Dashboard",
+    "analysisFailed": "Analysis Failed",
+    "failedDesc": "The AI model might be down. Please try again later.",
+    "tryAgain": "Try Again",
+    "exportPdf": "Export PDF",
+    "tabs": {
+      "overview": "Overview",
+      "meta": "Meta Tags",
+      "content": "Content",
+      "advanced": "Advanced SEO",
+      "issues": "Issues"
+    },
+    "score": {
+      "overall": "Overall Score",
+      "seo": "SEO",
+      "performance": "Performance",
+      "accessibility": "Accessibility",
+      "bestPractices": "Best Practices",
+      "loadTime": "Load Time",
+      "pageSize": "Page Size",
+      "words": "Words"
+    },
+    "overview": {
+      "issuesSummary": "Issues Summary",
+      "critical": "Critical",
+      "warnings": "Warnings",
+      "info": "Info",
+      "viewAll": "View all {{count}} issues →",
+      "linksAnalysis": "Links Analysis",
+      "internal": "Internal",
+      "external": "External",
+      "total": "Total",
+      "imagesAudit": "Images Audit",
+      "withAlt": "With Alt",
+      "missingAlt": "Missing Alt",
+      "headingStructure": "Heading Structure",
+      "h1Text": "H1 Text:",
+      "topKeywords": "Top Keywords",
+      "noKeywords": "No keyword data available."
+    },
+    "meta": {
+      "title": "Meta Tags Analysis",
+      "chars": "chars",
+      "missing": "Missing",
+      "ideal": "Ideal: ",
+      "tags": {
+        "title": "Title",
+        "description": "Description",
+        "canonical": "Canonical URL",
+        "robots": "Robots",
+        "viewport": "Viewport",
+        "charset": "Charset",
+        "ogTitle": "OG Title",
+        "ogDescription": "OG Description",
+        "ogImage": "OG Image",
+        "twitterCard": "Twitter Card"
+      },
+      "ideals": {
+        "title": "50-60 characters",
+        "description": "150-160 characters"
+      }
+    },
+    "content": {
+      "statsTitle": "Content Stats",
+      "wordCount": "Word Count",
+      "pageSize": "Page Size",
+      "loadTime": "Load Time",
+      "totalLinks": "Total Links",
+      "totalImages": "Total Images",
+      "totalHeadings": "Total Headings",
+      "hierarchyTitle": "Heading Hierarchy",
+      "tag": "tag",
+      "tags": "tags",
+      "good": "✓ Good",
+      "missing": "✗ Missing",
+      "multiple": "✗ Multiple"
+    },
+    "advanced": {
+      "security": "Security & SSL",
+      "sslCert": "SSL Certificate",
+      "unknownIssuer": "Unknown Issuer",
+      "secure": "Secure (HTTPS)",
+      "insecure": "Insecure",
+      "validUntil": "Valid until:",
+      "crawling": "Crawling & Indexing",
+      "robots": "robots.txt",
+      "sitemap": "sitemap.xml",
+      "found": "Found",
+      "missing": "Missing",
+      "notDetected": "Not Detected",
+      "sitemapNote": "* Note: Sitemaps can be located at custom paths. This checks the default /sitemap.xml",
+      "schema": "Schema Markup (Rich Results)",
+      "schemaDesc": "Structured data helps search engines understand your content and display rich snippets.",
+      "noSchema": "No Schema Markup Detected",
+      "noSchemaDesc": "Consider adding JSON-LD structured data to improve search appearance."
+    },
+    "issues": {
+      "filter": "Filter:",
+      "criticalCount": "{{count}} Critical",
+      "warningsCount": "{{count}} Warnings",
+      "infoCount": "{{count}} Info",
+      "noIssues": "No Issues Found!",
+      "noIssuesDesc": "Your website is following SEO best practices."
+    }
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "backToApp": "Back to App"
+    },
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "subtitle": "Overview of your platform's performance and growth.",
+      "totalUsers": "Total Users",
+      "proUsers": "Pro Users",
+      "freeUsers": "Free Users",
+      "totalKeywords": "Total Keywords",
+      "newUsers30d": "New Users (30 Days)",
+      "growthChart": "User Growth (Last 6 Months)",
+      "noGrowthData": "Not enough data to display growth chart."
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "View and manage all registered users.",
+      "searchPlaceholder": "Search by name or email...",
+      "filterAll": "All Plans",
+      "filterFree": "Free",
+      "filterPro": "Pro",
+      "name": "Name",
+      "email": "Email",
+      "plan": "Plan",
+      "role": "Role",
+      "joined": "Joined",
+      "actions": "Actions",
+      "changePlan": "Change Plan",
+      "makeAdmin": "Make Admin",
+      "removeAdmin": "Remove Admin",
+      "noUsers": "No users found.",
+      "updateSuccess": "User updated successfully!",
+      "updateFailed": "Failed to update user.",
+      "page": "Page",
+      "of": "of"
+    }
+  }
+}

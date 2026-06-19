@@ -222,3 +222,32 @@ button {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--scroll-thumb-hover);
 }
+
+/* Print Styles for PDF Export */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    .glass, .bg-card, .glass-strong, .gradient-bg {
+        border: 1px solid #ccc !important;
+        background: white !important;
+        box-shadow: none !important;
+        color: black !important;
+    }
+    .text-muted-foreground, .text-gray-500, .text-gray-400 {
+        color: #666 !important;
+    }
+    /* Expand all tabs for printing Report.tsx */
+    .print-show-all > div {
+        display: block !important;
+        margin-bottom: 2rem !important;
+        page-break-inside: avoid;
+    }
+    .print-tabs-nav {
+        display: none !important;
+    }
+}

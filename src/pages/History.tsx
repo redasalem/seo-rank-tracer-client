@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Clock, Trash2, ExternalLink, Search, Target, Loader2, ArrowUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useApp } from "../context/AppConext";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface KeywordSummary {
     _id: string;
@@ -19,6 +20,7 @@ interface KeywordSummary {
 }
 
 export default function History() {
+    const { t } = useTranslation();
     const { getKeywords, deleteKeyword } = useApp();
     const [keywords, setKeywords] = useState<KeywordSummary[]>([]);
     const [loading, setLoading] = useState(true);
@@ -36,15 +38,15 @@ export default function History() {
     };
 
     const handleDelete = async (id: string, keywordText: string) => {
-        if (!confirm(`Are you sure you want to delete tracking for "${keywordText}"?`)) return;
+        if (!confirm(t("history.alerts.deleteConfirm", { keyword: keywordText }))) return;
         
         setDeleting(id);
         const res = await deleteKeyword(id);
         if (res.success) {
             setKeywords((prev) => prev.filter((k) => k._id !== id));
-            toast.success("Keyword removed");
+            toast.success(t("history.alerts.deleteSuccess"));
         } else {
-            toast.error(res.message || "Failed to delete");
+            toast.error(res.message || t("history.alerts.deleteFailed"));
         }
         setDeleting(null);
     };
@@ -100,12 +102,12 @@ export default function History() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
-                            Keywords <span className="gradient-text">History</span>
+                            {t("history.title1")} <span className="gradient-text">{t("history.title2")}</span>
                         </h1>
-                        <p className="text-muted-foreground text-sm mt-1">Manage all your tracked keywords and view their current rankings.</p>
+                        <p className="text-muted-foreground text-sm mt-1">{t("history.subtitle")}</p>
                     </div>
                     <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity self-start" style={{ color: "var(--background)" }}>
-                        Track New Keyword
+                        {t("history.trackNewBtn")}
                     </Link>
                 </div>
 
@@ -113,16 +115,16 @@ export default function History() {
                 <div className="mb-6 flex flex-col md:flex-row gap-3" style={{ animationDelay: "100ms" }}>
                     <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
                         <Search size={18} className="text-muted-foreground" />
-                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by keyword or domain..." className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="history-search-input" />
+                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("history.searchPlaceholder")} className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="history-search-input" />
                     </div>
 
                     <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2">
                         <ArrowUpDown size={16} className="text-muted-foreground" />
                         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
-                            <option value="newest" className="bg-background">Newest First</option>
-                            <option value="oldest" className="bg-background">Oldest First</option>
-                            <option value="highest_rank" className="bg-background">Highest Rank (#1)</option>
-                            <option value="lowest_rank" className="bg-background">Lowest Rank</option>
+                            <option value="newest" className="bg-background">{t("history.sort.newest")}</option>
+                            <option value="oldest" className="bg-background">{t("history.sort.oldest")}</option>
+                            <option value="highest_rank" className="bg-background">{t("history.sort.highest")}</option>
+                            <option value="lowest_rank" className="bg-background">{t("history.sort.lowest")}</option>
                         </select>
                     </div>
                 </div>
@@ -135,11 +137,11 @@ export default function History() {
                 ) : processedData.length === 0 ? (
                     <div className="glass rounded-2xl p-12 text-center">
                         <Target size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{searchQuery ? "No matching keywords" : "No keywords yet"}</h3>
-                        <p className="text-sm text-muted-foreground mb-6">{searchQuery ? "Try a different search term." : "Start tracking your first keyword to see it here."}</p>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{searchQuery ? t("history.empty.noMatchTitle") : t("history.empty.noKeywordsTitle")}</h3>
+                        <p className="text-sm text-muted-foreground mb-6">{searchQuery ? t("history.empty.noMatchDesc") : t("history.empty.noKeywordsDesc")}</p>
                         {!searchQuery && (
                             <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity inline-block" style={{ color: "var(--background)" }}>
-                                Go to Rank Tracker
+                                {t("history.empty.goToTrackerBtn")}
                             </Link>
                         )}
                     </div>
@@ -153,7 +155,7 @@ export default function History() {
                                 {/* Rank Badge */}
                                 <div className="shrink-0">
                                     <div className={`w-14 h-14 rounded-2xl border flex flex-col items-center justify-center ${getPositionColor(k.currentPosition)}`}>
-                                        <span className="text-[10px] uppercase font-bold opacity-70">Rank</span>
+                                        <span className="text-[10px] uppercase font-bold opacity-70">{t("history.item.rank")}</span>
                                         <span className="text-xl font-bold leading-tight">{k.currentPosition ? `#${k.currentPosition}` : "-"}</span>
                                     </div>
                                 </div>
@@ -183,10 +185,10 @@ export default function History() {
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-2 shrink-0">
-                                    <Link to={`/rank/${k._id}`} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all" title="View Details">
+                                    <Link to={`/rank/${k._id}`} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all" title={t("history.item.viewDetails")}>
                                         <ExternalLink size={16} />
                                     </Link>
-                                    <button onClick={() => handleDelete(k._id, k.keyword)} disabled={deleting === k._id} className="p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all disabled:opacity-50" title="Delete Tracking">
+                                    <button onClick={() => handleDelete(k._id, k.keyword)} disabled={deleting === k._id} className="p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all disabled:opacity-50" title={t("history.item.deleteTracking")}>
                                         {deleting === k._id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                                     </button>
                                 </div>

@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { SearchIcon, GlobeIcon, FileSearchIcon, BrainIcon, CheckCircleIcon, AlertCircle, Loader2, ArrowRightIcon } from "lucide-react";
 import { useApp } from "../context/AppConext";
+import { useTranslation } from "react-i18next";
 
 const STEPS = [
     { icon: <GlobeIcon size={22} />, label: "Connecting to browser", desc: "Creating cloud browser session..." },
@@ -13,7 +14,8 @@ const STEPS = [
 ];
 
 export default function Analyze() {
-    const { startAnalysis } = useApp();
+    const { t, i18n } = useTranslation();
+    const { startAnalysis, user } = useApp();
     const [url, setUrl] = useState("");
     const [analyzing, setAnalyzing] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
@@ -22,6 +24,8 @@ export default function Analyze() {
     const pollRef = useRef<any>(null);
 
     const navigate = useNavigate();
+
+    const isLimitReached = user?.plan === "free" && (user?.analysisCount || 0) >= 3;
 
     const handleAnalyze = async (submitUrl?: string) => {
         const targetUrl = submitUrl || url;
@@ -81,9 +85,9 @@ export default function Analyze() {
                     <div>
                         <div className="text-center mb-10 mt-24">
                             <h1 className="text-3xl sm:text-4xl font-medium text-foreground mb-3">
-                                Analyze <span className="gradient-text">Any Website</span>
+                                {t("analyze.title1")} <span className="gradient-text">{t("analyze.title2")}</span>
                             </h1>
-                            <p className="text-muted-foreground">Enter a URL to get a comprehensive AI-powered SEO audit report.</p>
+                            <p className="text-muted-foreground">{t("analyze.subtitle")}</p>
                         </div>
 
                         {error && (
@@ -101,40 +105,55 @@ export default function Analyze() {
                                         type="text"
                                         value={url}
                                         onChange={(e) => setUrl(e.target.value)}
-                                        placeholder="Enter website URL (e.g., example.com)"
-                                        className="w-full bg-transparent text-foreground placeholder-muted-foreground outline-none text-base py-3"
+                                        placeholder={isLimitReached ? t("analyze.limitReached") : t("analyze.searchPlaceholder")}
+                                        className="w-full bg-transparent text-foreground placeholder-muted-foreground outline-none text-base py-3 disabled:opacity-50"
                                         id="analyze-url-input"
                                         autoFocus
+                                        disabled={isLimitReached}
                                     />
                                 </div>
-                                <button type="submit" className="bg-primary px-6 py-3 rounded-full flex items-center gap-2 text-primary-foreground text-sm hover:opacity-90 transition-opacity shrink-0" id="analyze-submit-btn" style={{ color: "var(--background)" }}>
-                                    Analyze <ArrowRightIcon className="text-background size-4 shrink-0" />
+                                <button type="submit" disabled={isLimitReached} className="bg-primary px-6 py-3 rounded-full flex items-center gap-2 text-primary-foreground text-sm hover:opacity-90 transition-opacity shrink-0 disabled:opacity-50 disabled:cursor-not-allowed" id="analyze-submit-btn" style={{ color: "var(--background)" }}>
+                                    {t("analyze.analyzeBtn")} <ArrowRightIcon className={`text-background size-4 shrink-0 ${i18n.language === 'ar' ? 'rotate-180' : ''}`} />
                                 </button>
                             </div>
                         </form>
 
-                        <div className="mt-6 text-center text-sm text-muted-foreground">
-                            Examples:{" "}
-                            {["github.com", "stripe.com", "vercel.com"].map((ex, i) => (
-                                <span key={ex}>
-                                    <button
-                                        onClick={() => {
-                                            setUrl(ex);
-                                        }}
-                                        className="text-primary hover:underline"
-                                    >
-                                        {ex}
-                                    </button>
-                                    {i < 2 ? ", " : ""}
-                                </span>
-                            ))}
-                        </div>
+                        {isLimitReached && (
+                            <div className="mt-6 flex flex-col items-center gap-3">
+                                <div className="px-4 py-3 rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm max-w-lg mx-auto text-center font-medium flex items-start gap-2">
+                                    <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                                    <p>{t("analyze.limitWarning")}</p>
+                                </div>
+                                <Link to="/settings?tab=subscription" className="px-6 py-2.5 bg-gradient-to-r from-accent to-purple-600 text-white rounded-full font-medium shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all hover:-translate-y-0.5 text-sm">
+                                    {t("analyze.upgradeBtn")}
+                                </Link>
+                            </div>
+                        )}
+
+                        {!isLimitReached && (
+                            <div className="mt-6 text-center text-sm text-muted-foreground">
+                                {t("analyze.examples")}{" "}
+                                {["github.com", "stripe.com", "vercel.com"].map((ex, i) => (
+                                    <span key={ex}>
+                                        <button
+                                            onClick={() => {
+                                                setUrl(ex);
+                                            }}
+                                            className="text-primary hover:underline"
+                                        >
+                                            {ex}
+                                        </button>
+                                        {i < 2 ? ", " : ""}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div>
                         {/* Analyzing State */}
                         <div className="text-center mb-12">
-                            <h2 className="text-2xl font-medium text-foreground">Analyzing Your Website</h2>
+                            <h2 className="text-2xl font-medium text-foreground">{t("analyze.analyzingTitle")}</h2>
                             <div className="flex justify-center items-center gap-2 mt-2">
                                 <Loader2 size={16} className="text-primary/60 mt-0.5 animate-spin" />
                                 <p className="text-muted-foreground sm:text-lg">{url}</p>
@@ -157,8 +176,8 @@ export default function Analyze() {
                                             {isComplete ? <CheckCircleIcon size={20} /> : step.icon}
                                         </div>
                                         <div className="flex-1">
-                                            <p className={`text-sm font-medium ${isPending ? "text-muted-foreground" : "text-foreground"}`}>{step.label}</p>
-                                            <p className="text-xs text-muted-foreground">{step.desc}</p>
+                                            <p className={`text-sm font-medium ${isPending ? "text-muted-foreground" : "text-foreground"}`}>{t(`analyze.steps.${i}.label`)}</p>
+                                            <p className="text-xs text-muted-foreground">{t(`analyze.steps.${i}.desc`)}</p>
                                         </div>
                                         {isCurrent && <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin shrink-0" />}
                                     </div>
@@ -166,7 +185,7 @@ export default function Analyze() {
                             })}
                         </div>
 
-                        <p className="text-center text-xs text-muted-foreground mt-8">This may take 15-30 seconds depending on the website.</p>
+                        <p className="text-center text-xs text-muted-foreground mt-8">{t("analyze.disclaimer")}</p>
                     </div>
                 )}
             </div>
