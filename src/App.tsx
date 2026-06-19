@@ -6,7 +6,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import VerifyEmail from "./pages/VerifyEmail";
 import Dashboard from "./pages/Dashboard";
 import Analyze from "./pages/Analyze";
 import Report from "./pages/Report";
@@ -35,7 +34,7 @@ export default function App() {
         document.documentElement.lang = i18n.language;
     }, [i18n.language]);
 
-    const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/verify-email") || location.pathname.startsWith("/admin");
+    const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/admin");
 
     return (
         <ErrorBoundary>
@@ -48,7 +47,6 @@ export default function App() {
                 <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <Login state="register" />} />
                 <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
                 <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
-                <Route path="/verify-email/:token" element={<VerifyEmail />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route element={<ProtectedRoute />}>
