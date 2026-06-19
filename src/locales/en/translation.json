@@ -630,5 +630,41 @@
       "page": "Page",
       "of": "of"
     }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated:",
+      "section1": {
+        "title": "1. Information We Collect",
+        "desc": "We collect information you provide directly to us when you create an account, subscribe to our newsletter, or use our services. This may include your name, email address, and billing information."
+      },
+      "section2": {
+        "title": "2. How We Use Your Information",
+        "desc": "We use the information we collect to operate, maintain, and provide the features and functionality of the Service, as well as to communicate directly with you, such as to send you email messages regarding your account or updates to our services."
+      },
+      "section3": {
+        "title": "3. Data Security",
+        "desc": "We care about the security of your information and use commercially reasonable safeguards to preserve the integrity and security of all information we collect and that we share with our service providers."
+      },
+      "note": "This is a template privacy policy. Please update it with your actual legal privacy policy."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated:",
+      "section1": {
+        "title": "1. Acceptance of Terms",
+        "desc": "By accessing and using this service, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services."
+      },
+      "section2": {
+        "title": "2. Service Provision",
+        "desc": "We reserve the right to modify or discontinue, temporarily or permanently, the Service (or any part thereof) with or without notice. You agree that we shall not be liable to you or to any third party for any modification, suspension or discontinuance of the Service."
+      },
+      "section3": {
+        "title": "3. User Accounts",
+        "desc": "To use certain features of the Service, you must register for an account. You are responsible for maintaining the confidentiality of your account and password and for restricting access to your computer or device."
+      },
+      "note": "This is a template terms of service. Please update it with your actual legal terms."
+    }
   }
 }

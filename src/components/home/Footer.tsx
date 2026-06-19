@@ -3,6 +3,7 @@ import { ChartNoAxesColumnIcon } from "lucide-react";
 import { homefooterLinks } from "../../assets/assets";
 import { SiX, SiInstagram, SiFacebook, SiTwitch } from "@icons-pack/react-simple-icons";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
     const { t } = useTranslation();
@@ -37,10 +38,10 @@ export default function Footer() {
                             <h3 className="mb-4">{t(`footer.sections.${i}.title`)}</h3>
                             <ul className="space-y-1">
                                 {section.links.map((link: any, j: number) => (
-                                    <li key={link}>
-                                        <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                                    <li key={link.name}>
+                                        <Link to={link.path} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                                             {t(`footer.sections.${i}.links.${j}`)}
-                                        </a>
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>

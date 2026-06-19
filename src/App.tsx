@@ -18,6 +18,8 @@ import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import { Toaster } from "react-hot-toast";
 import { useApp } from "./context/AppContext";
 import { useTranslation } from "react-i18next";
@@ -47,6 +49,8 @@ export default function App() {
                 <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
                 <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
                 <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route element={<ProtectedRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/analyze" element={<Analyze />} />

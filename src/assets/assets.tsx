@@ -58,19 +58,38 @@ export const homeHowItWorksData = [
 export const homefooterLinks = [
     {
         title: "Product",
-        links: ["Features", "Pricing", "API", "Browser Extension"],
+        links: [
+            { name: "Features", path: "/#features" },
+            { name: "Pricing", path: "/#pricing" },
+            { name: "API", path: "/api-docs" },
+            { name: "Browser Extension", path: "/extension" }
+        ],
     },
     {
         title: "Resources",
-        links: ["Documentation", "Blog", "SEO Guide", "Support"],
+        links: [
+            { name: "Documentation", path: "/docs" },
+            { name: "Blog", path: "/blog" },
+            { name: "SEO Guide", path: "/guide" },
+            { name: "Support", path: "/support" }
+        ],
     },
     {
         title: "Company",
-        links: ["About Us", "Careers", "Contact", "Press"],
+        links: [
+            { name: "About Us", path: "/about" },
+            { name: "Careers", path: "/careers" },
+            { name: "Contact", path: "/contact" },
+            { name: "Press", path: "/press" }
+        ],
     },
     {
         title: "Legal",
-        links: ["Privacy Policy", "Terms of Service", "Cookie Policy"],
+        links: [
+            { name: "Privacy Policy", path: "/privacy-policy" },
+            { name: "Terms of Service", path: "/terms-of-service" },
+            { name: "Cookie Policy", path: "/cookie-policy" }
+        ],
     },
 ];
 
