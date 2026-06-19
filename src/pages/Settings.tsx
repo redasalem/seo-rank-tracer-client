@@ -289,12 +289,12 @@ export default function Settings() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1.5">
                                         <span className="text-muted-foreground">{t("settings.subscription.dailyUsed")}</span>
-                                        <span className="font-medium text-foreground">{user?.analysisCount || 0} / {user?.plan === "pro" ? t("settings.subscription.unlimited") : "3"}</span>
+                                        <span className="font-medium text-foreground">{user?.analysisCount || 0} / {user?.plan === "pro" ? t("settings.subscription.unlimited") : "10"}</span>
                                     </div>
                                     <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                                         <div 
                                             className="bg-primary h-2 rounded-full transition-all duration-500" 
-                                            style={{ width: `${user?.plan === "pro" ? 100 : Math.min(((user?.analysisCount || 0) / 3) * 100, 100)}%` }}
+                                            style={{ width: `${user?.plan === "pro" ? 100 : Math.min(((user?.analysisCount || 0) / 10) * 100, 100)}%` }}
                                         ></div>
                                     </div>
                                 </div>

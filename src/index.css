@@ -11,6 +11,7 @@
     --color-muted-foreground: var(--muted-foreground);
 
     --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
     --color-primary-dark: var(--primary-dark);
     --color-accent: var(--accent);
 
@@ -37,6 +38,7 @@
     --muted-foreground: #64748b;
 
     --primary: #0f172a;
+    --primary-foreground: #ffffff;
     --primary-dark: #020617;
     --accent: #3b82f6;
 
@@ -68,6 +70,7 @@
     --muted-foreground: #94a3b8;
 
     --primary: #ffffff;
+    --primary-foreground: #0f172a;
     --primary-dark: #f1f5f9;
     --accent: #3b82f6;
 
