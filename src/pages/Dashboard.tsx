@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy, Activity, ArrowUpCircle, Loader2 } from "lucide-react";
+import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy, Activity, ArrowUpCircle } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
