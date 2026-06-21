@@ -8,7 +8,8 @@
     "competitors": "Competitors",
     "settings": "Settings",
     "history": "History",
-    "logout": "Logout"
+    "logout": "Logout",
+    "upgrade": "Upgrade"
   },
   "hero": {
     "badge": "Powered by BrowserBase & Gemini AI",
@@ -185,33 +186,32 @@
     ]
   },
   "history": {
-    "title1": "Keywords",
+    "title1": "Analysis",
     "title2": "History",
-    "subtitle": "Manage all your tracked keywords and view their current rankings.",
-    "trackNewBtn": "Track New Keyword",
-    "searchPlaceholder": "Search by keyword or domain...",
+    "subtitle": "Review your past SEO analysis reports and track improvements.",
+    "analyzeNewBtn": "Analyze New Website",
+    "searchPlaceholder": "Search by URL or domain...",
     "sort": {
       "newest": "Newest First",
       "oldest": "Oldest First",
-      "highest": "Highest Rank (#1)",
-      "lowest": "Lowest Rank"
+      "highestScore": "Highest Score",
+      "lowestScore": "Lowest Score"
     },
     "empty": {
-      "noMatchTitle": "No matching keywords",
-      "noMatchDesc": "Try a different search term.",
-      "noKeywordsTitle": "No keywords yet",
-      "noKeywordsDesc": "Start tracking your first keyword to see it here.",
-      "goToTrackerBtn": "Go to Rank Tracker"
+      "noReportsTitle": "No analysis reports found",
+      "noReportsDesc": "You haven't run any SEO analyses yet. Start analyzing websites to build your history.",
+      "noMatchTitle": "No matching reports",
+      "noMatchDesc": "No analysis reports matched your search criteria. Try a different URL.",
+      "goToAnalyzeBtn": "Run SEO Analysis"
     },
-    "item": {
-      "rank": "Rank",
-      "viewDetails": "View Details",
-      "deleteTracking": "Delete Tracking"
+    "card": {
+      "seo": "SEO Score",
+      "speed": "Load Speed",
+      "viewReport": "View Report"
     },
-    "alerts": {
-      "deleteConfirm": "Are you sure you want to delete tracking for \"{{keyword}}\"?",
-      "deleteSuccess": "Keyword removed",
-      "deleteFailed": "Failed to delete"
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next"
     }
   },
   "rankTracker": {
@@ -418,7 +418,7 @@
     "login": {
       "success": "Welcome back!",
       "failed": "Failed to login",
-      "regSuccess": "Account created! Please check your email to verify.",
+      "regSuccess": "Account created successfully! You can now login.",
       "regFailed": "Failed to register",
       "error": "An unexpected error occurred",
       "title": "Welcome back",

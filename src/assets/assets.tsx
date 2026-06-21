@@ -60,35 +60,14 @@ export const homefooterLinks = [
         title: "Product",
         links: [
             { name: "Features", path: "/#features" },
-            { name: "Pricing", path: "/#pricing" },
-            { name: "API", path: "/api-docs" },
-            { name: "Browser Extension", path: "/extension" }
-        ],
-    },
-    {
-        title: "Resources",
-        links: [
-            { name: "Documentation", path: "/docs" },
-            { name: "Blog", path: "/blog" },
-            { name: "SEO Guide", path: "/guide" },
-            { name: "Support", path: "/support" }
-        ],
-    },
-    {
-        title: "Company",
-        links: [
-            { name: "About Us", path: "/about" },
-            { name: "Careers", path: "/careers" },
-            { name: "Contact", path: "/contact" },
-            { name: "Press", path: "/press" }
+            { name: "Pricing", path: "/#pricing" }
         ],
     },
     {
         title: "Legal",
         links: [
             { name: "Privacy Policy", path: "/privacy-policy" },
-            { name: "Terms of Service", path: "/terms-of-service" },
-            { name: "Cookie Policy", path: "/cookie-policy" }
+            { name: "Terms of Service", path: "/terms-of-service" }
         ],
     },
 ];

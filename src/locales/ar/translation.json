@@ -8,7 +8,8 @@
     "competitors": "المنافسين",
     "settings": "الإعدادات",
     "history": "السجل",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "upgrade": "ترقية"
   },
   "hero": {
     "badge": "مدعوم بتقنية BrowserBase و Gemini AI",
@@ -186,32 +187,31 @@
   },
   "history": {
     "title1": "سجل",
-    "title2": "الكلمات",
-    "subtitle": "أدر جميع كلماتك المتتبعة واعرض ترتيبها الحالي.",
-    "trackNewBtn": "تتبع كلمة جديدة",
-    "searchPlaceholder": "ابحث بالكلمة أو النطاق...",
+    "title2": "التحليلات",
+    "subtitle": "راجع تقارير تحليلات الـ SEO السابقة وتتبع التحسينات.",
+    "analyzeNewBtn": "تحليل موقع جديد",
+    "searchPlaceholder": "ابحث بالرابط أو النطاق...",
     "sort": {
       "newest": "الأحدث أولاً",
       "oldest": "الأقدم أولاً",
-      "highest": "الأعلى ترتيباً (#1)",
-      "lowest": "الأقل ترتيباً"
+      "highestScore": "الأعلى تقييماً",
+      "lowestScore": "الأقل تقييماً"
     },
     "empty": {
-      "noMatchTitle": "لا يوجد نتائج مطابقة",
-      "noMatchDesc": "جرب كلمة بحث أخرى.",
-      "noKeywordsTitle": "لا توجد كلمات بعد",
-      "noKeywordsDesc": "ابدأ بتتبع أول كلمة مفتاحية لك لرؤيتها هنا.",
-      "goToTrackerBtn": "الذهاب لتتبع الترتيب"
+      "noReportsTitle": "لا توجد تقارير سابقة",
+      "noReportsDesc": "لم تقم بأي تحليلات للـ SEO بعد. ابدأ بتحليل المواقع لبناء سجلك.",
+      "noMatchTitle": "لا توجد نتائج مطابقة",
+      "noMatchDesc": "لا توجد تقارير مطابقة لبحثك. جرب رابطاً آخر.",
+      "goToAnalyzeBtn": "إجراء تحليل SEO"
     },
-    "item": {
-      "rank": "الترتيب",
-      "viewDetails": "عرض التفاصيل",
-      "deleteTracking": "حذف التتبع"
+    "card": {
+      "seo": "تقييم الـ SEO",
+      "speed": "سرعة التحميل",
+      "viewReport": "عرض التقرير"
     },
-    "alerts": {
-      "deleteConfirm": "هل أنت متأكد من حذف تتبع الكلمة \"{{keyword}}\"؟",
-      "deleteSuccess": "تم حذف الكلمة",
-      "deleteFailed": "فشل الحذف"
+    "pagination": {
+      "prev": "السابق",
+      "next": "التالي"
     }
   },
   "rankTracker": {
@@ -418,7 +418,7 @@
     "login": {
       "success": "مرحباً بعودتك!",
       "failed": "فشل تسجيل الدخول",
-      "regSuccess": "تم إنشاء الحساب! يرجى التحقق من بريدك الإلكتروني للتفعيل.",
+      "regSuccess": "تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.",
       "regFailed": "فشل إنشاء الحساب",
       "error": "حدث خطأ غير متوقع",
       "title": "مرحباً بعودتك",

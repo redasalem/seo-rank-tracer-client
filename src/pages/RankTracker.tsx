@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown, Download, ChevronLeft, ChevronRight } from "lucide-react";
@@ -141,7 +141,7 @@ export default function RankTracker() {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Keyword,Domain,URL,Current Position,Best Position,Change,Last Checked\n";
 
-        res.data.forEach((kw: any) => {
+        res.data.forEach((kw: KeywordItem) => {
             const row = [
                 `"${kw.keyword}"`,
                 `"${kw.domain}"`,

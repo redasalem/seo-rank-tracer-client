@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode, useMemo } from 'react';
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 
@@ -28,6 +28,7 @@ interface AppContextType {
     refreshKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
     startAnalysis: (url: string) => Promise<{ success: boolean; message?: string; analysisId?: string }>;
     getAnalysis: (id: string) => Promise<{ success: boolean; data?: any; message?: string }>;
+    getAnalysisHistory: (params?: { page?: number, limit?: number }) => Promise<{ success: boolean; data?: any[]; totalPages?: number; total?: number; page?: number; message?: string }>;
     updateProfile: (name: string, email: string) => Promise<{ success: boolean; message?: string }>;
     updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
     getNotifications: () => Promise<{ success: boolean; data?: any[] }>;
@@ -47,45 +48,49 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const [token, settoken] = useState<string | null>(localStorage.getItem("token"));
     const [loading, setloading] = useState(true);
 
-    const api = axios.create({
-        baseURL: BACKEND_URL,
-        withCredentials: true
-    });
+    const api = useMemo(() => {
+        const instance = axios.create({
+            baseURL: BACKEND_URL,
+            withCredentials: true
+        });
 
-    //UPDATE axios header when token changes
-    api.interceptors.request.use((config) => {
-        const token = localStorage.getItem("token");
+        //UPDATE axios header when token changes
+        instance.interceptors.request.use((config) => {
+            const token = localStorage.getItem("token");
 
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-        return config;
-    });
-
-    api.interceptors.response.use((response) => response, async (error) => {
-        const originalRequest = error.config;
-        // If 401 Unauthorized and we haven't retried yet (and it's not a login attempt)
-        if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/api/auth/login') {
-            originalRequest._retry = true;
-            try {
-                // Try to refresh the token using the HttpOnly cookie
-                const { data } = await axios.get(`${BACKEND_URL}/api/auth/refresh`, { withCredentials: true });
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
-                    settoken(data.token);
-                    // Update header for original request and retry it
-                    originalRequest.headers.Authorization = `Bearer ${data.token}`;
-                    return api(originalRequest);
-                }
-            } catch (refreshError) {
-                // Refresh token expired or missing
-                localStorage.removeItem("token");
-                settoken(null);
-                setUser(null);
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`
             }
-        }
-        return Promise.reject(error);
-    });
+            return config;
+        });
+
+        instance.interceptors.response.use((response) => response, async (error) => {
+            const originalRequest = error.config;
+            // If 401 Unauthorized and we haven't retried yet (and it's not a login attempt)
+            if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/api/auth/login') {
+                originalRequest._retry = true;
+                try {
+                    // Try to refresh the token using the HttpOnly cookie
+                    const { data } = await axios.get(`${BACKEND_URL}/api/auth/refresh`, { withCredentials: true });
+                    if (data.token) {
+                        localStorage.setItem("token", data.token);
+                        settoken(data.token);
+                        // Update header for original request and retry it
+                        originalRequest.headers.Authorization = `Bearer ${data.token}`;
+                        return instance(originalRequest);
+                    }
+                } catch (refreshError) {
+                    // Refresh token expired or missing
+                    localStorage.removeItem("token");
+                    settoken(null);
+                    setUser(null);
+                }
+            }
+            return Promise.reject(error);
+        });
+
+        return instance;
+    }, []); // Empty dependency array as settoken and setUser are stable functions
 
     const loadUser = async () => {
         let currentToken = token;
@@ -268,6 +273,22 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const getAnalysisHistory = async (params?: { page?: number, limit?: number }) => {
+        try {
+            const queryParams = new URLSearchParams();
+            if (params) {
+                if (params.page) queryParams.append('page', params.page.toString());
+                if (params.limit) queryParams.append('limit', params.limit.toString());
+            }
+            
+            const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+            const { data } = await api.get(`/api/analysis${queryString}`);
+            return { success: true, data: data.analyses, totalPages: data.totalPages, total: data.total, page: data.page };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to fetch analysis history" };
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         settoken(null);
@@ -366,6 +387,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
         refreshKeyword,
         startAnalysis,
         getAnalysis,
+        getAnalysisHistory,
         updateProfile,
         updatePassword,
         getNotifications,

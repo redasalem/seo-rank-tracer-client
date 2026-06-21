@@ -57,9 +57,9 @@ export default function Pricing() {
                                 </li>
                             ))}
                         </ul>
-                        <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-center text-sm hover:opacity-90 transition-opacity" style={{ color: "var(--background)" }}>
+                        <Link to="/register" className="block w-full py-3 rounded-xl bg-primary text-primary-foreground text-center text-sm hover:opacity-90 transition-opacity" style={{ color: "var(--background)" }}>
                             {t("pricing.proPlan.btn")}
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

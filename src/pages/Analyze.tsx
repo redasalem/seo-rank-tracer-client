@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { SearchIcon, GlobeIcon, FileSearchIcon, BrainIcon, CheckCircleIcon, AlertCircle, Loader2, ArrowRightIcon } from "lucide-react";
 import { useApp } from "../context/AppContext";
@@ -21,7 +20,7 @@ export default function Analyze() {
     const [currentStep, setCurrentStep] = useState(0);
     const [error, setError] = useState("");
     const [searchParams] = useSearchParams();
-    const pollRef = useRef<any>(null);
+
 
     const navigate = useNavigate();
 
@@ -73,9 +72,6 @@ export default function Analyze() {
             setTimeout(() => handleAnalyze(prefillUrl), 500);
         }
 
-        return () => {
-            if (pollRef.current) clearInterval(pollRef.current);
-        };
     }, []);
 
     return (

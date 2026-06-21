@@ -1,75 +1,58 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Clock, Trash2, ExternalLink, Search, Target, Loader2, ArrowUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Search, Loader2, ArrowUpDown, FileSearchIcon, GlobeIcon, Gauge, CheckCircle2, AlertCircle } from "lucide-react";
 import { useApp } from "../context/AppContext";
-import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
-interface KeywordSummary {
+interface AnalysisSummary {
     _id: string;
-    keyword: string;
-    domain: string;
     url: string;
-    currentPosition: number | null;
-    bestPosition: number | null;
-    positionChange: number;
+    domain: string;
     status: string;
-    active: boolean;
-    updatedAt: string;
+    overallScore: number;
+    categories: {
+        seo: number;
+        performance: number;
+        accessibility: number;
+        bestPractices: number;
+    };
+    loadTime: number;
+    pageSize: number;
     createdAt: string;
 }
 
 export default function History() {
-    const { t } = useTranslation();
-    const { getKeywords, deleteKeyword } = useApp();
-    const [keywords, setKeywords] = useState<KeywordSummary[]>([]);
+    const { t, i18n } = useTranslation();
+    const { getAnalysisHistory } = useApp();
+    const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
     const [loading, setLoading] = useState(true);
-    const [deleting, setDeleting] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("newest");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const fetchKeywords = async () => {
+    const fetchHistory = async (pageNumber = 1) => {
         setLoading(true);
-        const res = await getKeywords();
-        if (res.success) {
-            setKeywords(res.data || []);
+        const res = await getAnalysisHistory({ page: pageNumber, limit: 12 });
+        if (res.success && res.data) {
+            setAnalyses(res.data);
+            setTotalPages(res.totalPages || 1);
+            setPage(res.page || 1);
         }
         setLoading(false);
     };
 
-    const handleDelete = async (id: string, keywordText: string) => {
-        if (!confirm(t("history.alerts.deleteConfirm", { keyword: keywordText }))) return;
-        
-        setDeleting(id);
-        const res = await deleteKeyword(id);
-        if (res.success) {
-            setKeywords((prev) => prev.filter((k) => k._id !== id));
-            toast.success(t("history.alerts.deleteSuccess"));
-        } else {
-            toast.error(res.message || t("history.alerts.deleteFailed"));
-        }
-        setDeleting(null);
-    };
+    useEffect(() => {
+        fetchHistory(page);
+    }, [page]);
 
-    const getPositionColor = (pos: number | null) => {
-        if (pos === null) return "text-muted-foreground bg-muted";
-        if (pos <= 3) return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
-        if (pos <= 10) return "text-primary bg-primary/10 border-primary/20";
-        return "text-accent bg-accent/10 border-accent/20";
-    };
-
-    const getChangeIndicator = (change: number) => {
-        if (change > 0) return { icon: <TrendingUp size={14} />, text: `+${change}`, class: "text-emerald-500" };
-        if (change < 0) return { icon: <TrendingDown size={14} />, text: `${Math.abs(change)}`, class: "text-danger" };
-        return { icon: <Minus size={14} />, text: "—", class: "text-muted-foreground" };
-    };
-
-    let processedData = [...keywords];
+    let processedData = [...analyses];
 
     if (searchQuery) {
-        processedData = processedData.filter((k) => 
-            k.keyword.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            k.domain.toLowerCase().includes(searchQuery.toLowerCase())
+        processedData = processedData.filter((a) => 
+            a.url.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            a.domain.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }
 
@@ -78,22 +61,40 @@ export default function History() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         } else if (sortBy === "oldest") {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        } else if (sortBy === "highest_rank") {
-            // Nulls at the bottom
-            if (a.currentPosition === null) return 1;
-            if (b.currentPosition === null) return -1;
-            return a.currentPosition - b.currentPosition;
-        } else if (sortBy === "lowest_rank") {
-            if (a.currentPosition === null) return 1;
-            if (b.currentPosition === null) return -1;
-            return b.currentPosition - a.currentPosition;
+        } else if (sortBy === "highest_score") {
+            return b.overallScore - a.overallScore;
+        } else if (sortBy === "lowest_score") {
+            return a.overallScore - b.overallScore;
         }
         return 0;
     });
 
-    useEffect(() => {
-        fetchKeywords();
-    }, []);
+    const getScoreColor = (score: number) => {
+        if (score >= 90) return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
+        if (score >= 50) return "text-primary bg-primary/10 border-primary/20";
+        return "text-danger bg-danger/10 border-danger/20";
+    };
+
+    const formatBytes = (bytes: number) => {
+        if (!bytes) return "0 B";
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.05 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0 }
+    };
 
     return (
         <div className="min-h-screen pt-16 md:pt-24 bg-background">
@@ -106,13 +107,13 @@ export default function History() {
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">{t("history.subtitle")}</p>
                     </div>
-                    <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity self-start" style={{ color: "var(--background)" }}>
-                        {t("history.trackNewBtn")}
+                    <Link to="/analyze" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity self-start" style={{ color: "var(--background)" }}>
+                        {t("history.analyzeNewBtn")}
                     </Link>
                 </div>
 
                 {/* Filters Row */}
-                <div className="mb-6 flex flex-col md:flex-row gap-3" style={{ animationDelay: "100ms" }}>
+                <div className="mb-6 flex flex-col md:flex-row gap-3">
                     <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
                         <Search size={18} className="text-muted-foreground" />
                         <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("history.searchPlaceholder")} className="bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none flex-1" id="history-search-input" />
@@ -123,77 +124,111 @@ export default function History() {
                         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent text-sm text-foreground outline-none appearance-none pr-4 cursor-pointer">
                             <option value="newest" className="bg-background">{t("history.sort.newest")}</option>
                             <option value="oldest" className="bg-background">{t("history.sort.oldest")}</option>
-                            <option value="highest_rank" className="bg-background">{t("history.sort.highest")}</option>
-                            <option value="lowest_rank" className="bg-background">{t("history.sort.lowest")}</option>
+                            <option value="highest_score" className="bg-background">{t("history.sort.highestScore")}</option>
+                            <option value="lowest_score" className="bg-background">{t("history.sort.lowestScore")}</option>
                         </select>
                     </div>
                 </div>
 
-                {/* List */}
-                {loading ? (
+                {/* List / Grid */}
+                {loading && analyses.length === 0 ? (
                     <div className="flex items-center justify-center py-30">
                         <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : processedData.length === 0 ? (
                     <div className="glass rounded-2xl p-12 text-center">
-                        <Target size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{searchQuery ? t("history.empty.noMatchTitle") : t("history.empty.noKeywordsTitle")}</h3>
-                        <p className="text-sm text-muted-foreground mb-6">{searchQuery ? t("history.empty.noMatchDesc") : t("history.empty.noKeywordsDesc")}</p>
+                        <FileSearchIcon size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{searchQuery ? t("history.empty.noMatchTitle") : t("history.empty.noReportsTitle")}</h3>
+                        <p className="text-sm text-muted-foreground mb-6">{searchQuery ? t("history.empty.noMatchDesc") : t("history.empty.noReportsDesc")}</p>
                         {!searchQuery && (
-                            <Link to="/rank-tracker" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity inline-block" style={{ color: "var(--background)" }}>
-                                {t("history.empty.goToTrackerBtn")}
+                            <Link to="/analyze" className="bg-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity inline-block" style={{ color: "var(--background)" }}>
+                                {t("history.empty.goToAnalyzeBtn")}
                             </Link>
                         )}
                     </div>
                 ) : (
-                    <div className="space-y-3" style={{ animationDelay: "200ms" }}>
-                        {processedData.map((k) => {
-                            const change = getChangeIndicator(k.positionChange);
-                            
-                            return (
-                            <div key={k._id} className="glass rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-muted/50 transition-all group">
-                                {/* Rank Badge */}
-                                <div className="shrink-0">
-                                    <div className={`w-14 h-14 rounded-2xl border flex flex-col items-center justify-center ${getPositionColor(k.currentPosition)}`}>
-                                        <span className="text-[10px] uppercase font-bold opacity-70">{t("history.item.rank")}</span>
-                                        <span className="text-xl font-bold leading-tight">{k.currentPosition ? `#${k.currentPosition}` : "-"}</span>
+                    <motion.div 
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    >
+                        {processedData.map((report) => (
+                            <motion.div key={report._id} variants={itemVariants}>
+                                <Link to={`/report/${report._id}`} className="block glass rounded-2xl p-5 hover:bg-muted/30 transition-all group h-full flex flex-col">
+                                    <div className="flex items-start justify-between gap-4 mb-4">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-1 truncate">
+                                                <GlobeIcon size={12} /> {report.domain}
+                                            </p>
+                                            <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors" title={report.url}>
+                                                {report.url.replace(/^https?:\/\//, '')}
+                                            </h3>
+                                        </div>
+                                        {report.status === 'completed' ? (
+                                            <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg border ${getScoreColor(report.overallScore)}`}>
+                                                {report.overallScore}
+                                            </div>
+                                        ) : report.status === 'failed' ? (
+                                            <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-danger bg-danger/10 border border-danger/20">
+                                                <AlertCircle size={20} />
+                                            </div>
+                                        ) : (
+                                            <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-primary bg-primary/10 border border-primary/20">
+                                                <Loader2 size={20} className="animate-spin" />
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
 
-                                {/* Keyword Info */}
-                                <div className="flex-1 min-w-0">
-                                    <Link to={`/rank/${k._id}`} className="text-base font-semibold text-foreground hover:text-primary transition-colors truncate block">
-                                        "{k.keyword}"
-                                    </Link>
-                                    <p className="text-xs text-muted-foreground truncate mt-0.5">{k.domain}</p>
+                                    {report.status === 'completed' && (
+                                        <div className="grid grid-cols-2 gap-2 mt-auto">
+                                            <div className="bg-background/50 rounded-lg p-2 flex items-center gap-2">
+                                                <CheckCircle2 size={14} className="text-emerald-500" />
+                                                <div className="min-w-0">
+                                                    <p className="text-[10px] text-muted-foreground uppercase">{t("history.card.seo")}</p>
+                                                    <p className="text-sm font-bold text-foreground truncate">{report.categories?.seo || 0}/100</p>
+                                                </div>
+                                            </div>
+                                            <div className="bg-background/50 rounded-lg p-2 flex items-center gap-2">
+                                                <Gauge size={14} className="text-primary" />
+                                                <div className="min-w-0">
+                                                    <p className="text-[10px] text-muted-foreground uppercase">{t("history.card.speed")}</p>
+                                                    <p className="text-sm font-bold text-foreground truncate">{report.loadTime ? (report.loadTime / 1000).toFixed(1) + 's' : 'N/A'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                     
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                            <Clock size={12} />
-                                            {new Date(k.updatedAt).toLocaleDateString()}
-                                        </span>
-                                        
-                                        <span className={`text-xs flex items-center gap-1 font-medium ${change.class}`}>
-                                            {change.icon} {change.text}
-                                        </span>
-
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${k.status === "success" ? "bg-emerald-500/10 text-emerald-500" : k.status === "pending" ? "bg-primary/10 text-primary" : "bg-danger/10 text-danger"}`}>
-                                            {k.status}
-                                        </span>
+                                    <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                                        <span>{new Date(report.createdAt).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                                        {report.pageSize > 0 && <span>{formatBytes(report.pageSize)}</span>}
                                     </div>
-                                </div>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
 
-                                {/* Actions */}
-                                <div className="flex items-center gap-2 shrink-0">
-                                    <Link to={`/rank/${k._id}`} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-all" title={t("history.item.viewDetails")}>
-                                        <ExternalLink size={16} />
-                                    </Link>
-                                    <button onClick={() => handleDelete(k._id, k.keyword)} disabled={deleting === k._id} className="p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all disabled:opacity-50" title={t("history.item.deleteTracking")}>
-                                        {deleting === k._id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                                    </button>
-                                </div>
-                            </div>
-                        )})}
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                        <button 
+                            disabled={page === 1 || loading}
+                            onClick={() => setPage(p => p - 1)}
+                            className="px-4 py-2 rounded-xl glass text-sm font-medium disabled:opacity-50 hover:bg-muted transition-colors"
+                        >
+                            {t("history.pagination.prev")}
+                        </button>
+                        <span className="text-sm text-muted-foreground">
+                            {page} / {totalPages}
+                        </span>
+                        <button 
+                            disabled={page === totalPages || loading}
+                            onClick={() => setPage(p => p + 1)}
+                            className="px-4 py-2 rounded-xl glass text-sm font-medium disabled:opacity-50 hover:bg-muted transition-colors"
+                        >
+                            {t("history.pagination.next")}
+                        </button>
                     </div>
                 )}
             </div>
