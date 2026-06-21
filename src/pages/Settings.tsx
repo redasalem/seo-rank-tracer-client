@@ -13,7 +13,7 @@ type PasswordFormValues = { currentPassword: string; newPassword: string; confir
 
 export default function Settings() {
     const { t } = useTranslation();
-    const { user, updateProfile, updatePassword, createCheckoutSession } = useApp();
+    const { user, updateProfile, updatePassword, createCheckoutSession, api, loadUser } = useApp();
     const [activeTab, setActiveTab] = useState("profile");
     const location = useLocation();
 
@@ -73,6 +73,7 @@ export default function Settings() {
             toast.success(t("settings.alerts.subSuccess"));
             window.history.replaceState({}, document.title, window.location.pathname);
             setActiveTab("subscription");
+            loadUser(); // Re-fetch user data to reflect new plan
         }
         if (query.get("canceled")) {
             toast.error(t("settings.alerts.subCanceled"));
@@ -107,6 +108,22 @@ export default function Settings() {
             window.location.href = res.url;
         } else {
             toast.error(res.message || t("settings.alerts.paymentFailed"));
+            setIsRedirecting(false);
+        }
+    };
+
+    const handleManageSubscription = async () => {
+        setIsRedirecting(true);
+        try {
+            const { data } = await api.post('/api/subscription/create-portal-session');
+            if (data.success && data.url) {
+                window.location.href = data.url;
+            } else {
+                toast.error(data.message || t("settings.alerts.paymentFailed"));
+                setIsRedirecting(false);
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t("settings.alerts.paymentFailed"));
             setIsRedirecting(false);
         }
     };
@@ -278,6 +295,16 @@ export default function Settings() {
                                     >
                                         {isRedirecting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
                                         {t("settings.subscription.upgradeBtn")}
+                                    </button>
+                                )}
+                                {user?.plan === "pro" && (
+                                    <button 
+                                        onClick={handleManageSubscription}
+                                        disabled={isRedirecting}
+                                        className="px-5 py-2.5 bg-card border border-border text-foreground rounded-xl font-medium hover:bg-muted transition-all flex items-center gap-2 disabled:opacity-70"
+                                    >
+                                        {isRedirecting && <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>}
+                                        {t("settings.subscription.manageBtn", { defaultValue: "Manage Subscription" })}
                                     </button>
                                 )}
                             </div>

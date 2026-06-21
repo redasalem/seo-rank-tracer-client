@@ -36,6 +36,7 @@ interface AppContextType {
     markAllNotificationsAsRead: () => Promise<{ success: boolean }>;
     createCheckoutSession: () => Promise<{ success: boolean; url?: string; message?: string }>;
     getGlobalCompetitors: () => Promise<{ success: boolean; data?: any; message?: string }>;
+    loadUser: () => Promise<void>;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -394,7 +395,8 @@ export function AddProvider({ children }: { children: ReactNode }) {
         markNotificationAsRead,
         markAllNotificationsAsRead,
         createCheckoutSession,
-        getGlobalCompetitors
+        getGlobalCompetitors,
+        loadUser
     };
 
     return <AppContext.Provider value={value}>
