@@ -20,7 +20,7 @@ interface Pagination {
 }
 
 const AdminUsers = () => {
-    const { token } = useApp();
+    const { api } = useApp();
     const { t } = useTranslation();
     const [users, setUsers] = useState<UserData[]>([]);
     const [pagination, setPagination] = useState<Pagination>({ total: 0, page: 1, pages: 1 });
@@ -36,10 +36,7 @@ const AdminUsers = () => {
             if (search) params.append("search", search);
             if (planFilter !== "all") params.append("plan", planFilter);
 
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/users?${params}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
+            const { data } = await api.get(`/api/admin/users?${params}`);
             if (data.success) {
                 setUsers(data.users);
                 setPagination(data.pagination);
@@ -62,15 +59,7 @@ const AdminUsers = () => {
 
     const handleUpdateUser = async (userId: string, updates: { plan?: string; role?: string }) => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/users/${userId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(updates)
-            });
-            const data = await res.json();
+            const { data } = await api.put(`/api/admin/users/${userId}`, updates);
             if (data.success) {
                 setUsers(prev => prev.map(u => u._id === userId ? { ...u, ...updates } : u));
                 setToastMsg(t("admin.users.updateSuccess"));

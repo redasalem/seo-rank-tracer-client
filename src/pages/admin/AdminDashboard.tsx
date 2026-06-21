@@ -15,7 +15,7 @@ interface Stats {
 }
 
 const AdminDashboard = () => {
-    const { token } = useApp();
+    const { api } = useApp();
     const { t } = useTranslation();
     const [stats, setStats] = useState<Stats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -23,10 +23,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/stats`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const data = await res.json();
+                const { data } = await api.get("/api/admin/stats");
                 if (data.success) setStats(data.stats);
             } catch (err) {
                 console.error("Failed to fetch admin stats", err);
@@ -35,7 +32,7 @@ const AdminDashboard = () => {
             }
         };
         fetchStats();
-    }, [token]);
+    }, [api]);
 
     if (loading) {
         return (
