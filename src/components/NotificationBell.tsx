@@ -171,7 +171,7 @@ export default function NotificationBell() {
                                                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                                                     {typeof notification.message === 'string' 
                                                         ? notification.message 
-                                                        : t(notification.message.key, notification.message.data)}
+                                                        : t(notification.message.key, notification.message.data) as string}
                                                 </p>
                                                 <p className="text-[10px] text-muted-foreground mt-2 opacity-70">
                                                     {new Date(notification.createdAt).toLocaleString()}
