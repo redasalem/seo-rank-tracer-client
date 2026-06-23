@@ -9,6 +9,11 @@ The sleek, modern user interface for the SEO Rank Tracer application. Built with
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
 </div>
 
+<div align="center">
+  <br/>
+  <a href="https://seo-rank-tracer-client.vercel.app" target="_blank"><strong>🌐 Live Frontend Demo</strong></a>
+</div>
+
 ## 🚀 Features
 
 - **📊 Dashboard:** Comprehensive overview of your tracked keywords and their current search engine rankings.
@@ -50,7 +55,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 3. Configure Environment Variables:
    Create a `.env` file in the root directory and add the backend API URL:
    ```env
-   VITE_API_URL=http://localhost:5000/api
+   VITE_BACKEND_URL=http://localhost:5000
    ```
 
 4. Start the development server:
@@ -71,5 +76,5 @@ npm run build
 This project is optimized for deployment on Vercel:
 1. Connect your GitHub repository to Vercel.
 2. Select the framework preset as **Vite**.
-3. Add the `VITE_API_URL` environment variable pointing to your deployed backend.
+3. Add the `VITE_BACKEND_URL` environment variable pointing to your deployed backend.
 4. Click **Deploy**.
