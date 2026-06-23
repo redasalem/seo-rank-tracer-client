@@ -31,7 +31,7 @@ describe('Navbar Component', () => {
                 <Navbar />
             </MemoryRouter>
         );
-        expect(screen.getByText('Rank Pilot')).toBeInTheDocument();
+        expect(screen.getByText('RankBoost')).toBeInTheDocument();
     });
 
     it('toggles language when the language button is clicked', () => {

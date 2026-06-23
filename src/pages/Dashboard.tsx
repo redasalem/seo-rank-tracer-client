@@ -147,7 +147,7 @@ export default function Dashboard() {
                                 ></div>
                             </div>
                             <span className="text-xs font-medium text-muted-foreground shrink-0">
-                                {stats!.analysisLimit!.used} / 10 Free Analyses Used
+                                {stats!.analysisLimit!.used} / 10 Daily Free Analyses Used
                             </span>
                             {stats!.analysisLimit!.used >= 10 && (
                                 <Link to="/settings?tab=subscription" className="text-xs font-bold text-primary hover:underline">

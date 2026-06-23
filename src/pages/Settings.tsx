@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useApp } from "../context/AppContext";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { User, Lock, CreditCard, Save } from "lucide-react";
+import { User, Lock, CreditCard, Save, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -55,6 +55,11 @@ export default function Settings() {
     
     // Checkout State
     const [isRedirecting, setIsRedirecting] = useState(false);
+    
+    // Password Visibility State
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -219,34 +224,61 @@ export default function Settings() {
                         <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-5 max-w-xl">
                             <div>
                                 <label className="block text-sm font-medium text-foreground mb-1.5">{t("settings.security.currentLabel")}</label>
-                                <input 
-                                    type="password" 
-                                    className={`w-full px-4 py-2.5 rounded-xl border ${passwordErrors.currentPassword ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
-                                    placeholder="••••••••"
-                                    {...registerPassword("currentPassword")}
-                                />
+                                <div className="relative">
+                                    <input 
+                                        type={showCurrentPassword ? "text" : "password"} 
+                                        className={`w-full pl-4 pr-11 py-2.5 rounded-xl border ${passwordErrors.currentPassword ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
+                                        placeholder="••••••••"
+                                        {...registerPassword("currentPassword")}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                    >
+                                        {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                                 {passwordErrors.currentPassword && <p className="text-danger text-xs mt-1.5 font-medium">{passwordErrors.currentPassword.message}</p>}
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-medium text-foreground mb-1.5">{t("settings.security.newLabel")}</label>
-                                <input 
-                                    type="password" 
-                                    className={`w-full px-4 py-2.5 rounded-xl border ${passwordErrors.newPassword ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
-                                    placeholder="••••••••"
-                                    {...registerPassword("newPassword")}
-                                />
+                                <div className="relative">
+                                    <input 
+                                        type={showNewPassword ? "text" : "password"} 
+                                        className={`w-full pl-4 pr-11 py-2.5 rounded-xl border ${passwordErrors.newPassword ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
+                                        placeholder="••••••••"
+                                        {...registerPassword("newPassword")}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                    >
+                                        {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                                 {passwordErrors.newPassword && <p className="text-danger text-xs mt-1.5 font-medium">{passwordErrors.newPassword.message}</p>}
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-foreground mb-1.5">{t("settings.security.confirmLabel")}</label>
-                                <input 
-                                    type="password" 
-                                    className={`w-full px-4 py-2.5 rounded-xl border ${passwordErrors.confirmPassword ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
-                                    placeholder="••••••••"
-                                    {...registerPassword("confirmPassword")}
-                                />
+                                <div className="relative">
+                                    <input 
+                                        type={showConfirmPassword ? "text" : "password"} 
+                                        className={`w-full pl-4 pr-11 py-2.5 rounded-xl border ${passwordErrors.confirmPassword ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
+                                        placeholder="••••••••"
+                                        {...registerPassword("confirmPassword")}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                                 {passwordErrors.confirmPassword && <p className="text-danger text-xs mt-1.5 font-medium">{passwordErrors.confirmPassword.message}</p>}
                             </div>
 

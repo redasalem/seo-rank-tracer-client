@@ -54,7 +54,7 @@
   "howItWorks": {
     "title1": "How It",
     "title2": "Works",
-    "subtitle": "Rank Pilot uses advanced browser automation and AI to simulate a real user experience and provide deep SEO insights.",
+    "subtitle": "RankBoost uses advanced browser automation and AI to simulate a real user experience and provide deep SEO insights.",
     "items": [
       {
         "title": "Enter Your URL",
@@ -422,8 +422,8 @@
       "regFailed": "Failed to register",
       "error": "An unexpected error occurred",
       "title": "Welcome back",
-      "subtitleSignIn": "Sign in to your Rank Pilot account",
-      "subtitleCreate": "Create a Rank Pilot account",
+      "subtitleSignIn": "Sign in to your RankBoost account",
+      "subtitleCreate": "Create a RankBoost account",
       "nameLabel": "Name",
       "namePlaceholder": "Enter your name",
       "emailLabel": "Email",

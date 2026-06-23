@@ -13,8 +13,8 @@ export default defineConfig({
             registerType: "autoUpdate",
             includeAssets: ["favicon.svg", "icons/icon-192x192.png", "icons/icon-512x512.png"],
             manifest: {
-                name: "Rank Pilot",
-                short_name: "Rank Pilot",
+                name: "RankBoost",
+                short_name: "RankBoost",
                 description: "Monitor your keyword rankings and SEO performance.",
                 theme_color: "#09090b", // Background color of dark theme
                 background_color: "#09090b",

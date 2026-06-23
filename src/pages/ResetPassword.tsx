@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { Lock, Loader2, ChartNoAxesColumnIcon, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Lock, Loader2, ChartNoAxesColumnIcon, ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -15,6 +15,8 @@ export default function ResetPassword() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,7 +56,7 @@ export default function ResetPassword() {
                 <div className="text-center mb-8">
                     <Link to="/" className="flex items-center justify-center gap-2 group mb-10">
                         <ChartNoAxesColumnIcon />
-                        <span className="text-xl tracking-tight text-foreground">Rank Pilot</span>
+                        <span className="text-xl tracking-tight text-foreground">RankBoost</span>
                     </Link>
                 </div>
 
@@ -87,13 +89,20 @@ export default function ResetPassword() {
                                 <div className="relative">
                                     <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                     <input
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder={t("auth.reset.newPlaceholder")}
-                                        className="w-full pl-11 pr-4 py-3 rounded-lg bg-muted/60 border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
+                                        className="w-full pl-11 pr-11 py-3 rounded-lg bg-muted/60 border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
                             </label>
 
@@ -102,13 +111,20 @@ export default function ResetPassword() {
                                 <div className="relative">
                                     <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                     <input
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         required
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         placeholder={t("auth.reset.confirmPlaceholder")}
-                                        className="w-full pl-11 pr-4 py-3 rounded-lg bg-muted/60 border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
+                                        className="w-full pl-11 pr-11 py-3 rounded-lg bg-muted/60 border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
                             </label>
 

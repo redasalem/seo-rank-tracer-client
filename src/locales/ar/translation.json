@@ -54,7 +54,7 @@
   "howItWorks": {
     "title1": "كيف",
     "title2": "يعمل؟",
-    "subtitle": "يستخدم Rank Pilot الذكاء الاصطناعي وتقنيات محاكاة المتصفح ليعيش تجربة المستخدم الحقيقية ويقدم لك أدق التحليلات.",
+    "subtitle": "يستخدم RankBoost الذكاء الاصطناعي وتقنيات محاكاة المتصفح ليعيش تجربة المستخدم الحقيقية ويقدم لك أدق التحليلات.",
     "items": [
       {
         "title": "أدخل رابط موقعك",
@@ -422,8 +422,8 @@
       "regFailed": "فشل إنشاء الحساب",
       "error": "حدث خطأ غير متوقع",
       "title": "مرحباً بعودتك",
-      "subtitleSignIn": "سجل الدخول لحسابك في Rank Pilot",
-      "subtitleCreate": "إنشاء حساب جديد في Rank Pilot",
+      "subtitleSignIn": "سجل الدخول لحسابك في RankBoost",
+      "subtitleCreate": "إنشاء حساب جديد في RankBoost",
       "nameLabel": "الاسم",
       "namePlaceholder": "أدخل اسمك",
       "emailLabel": "البريد الإلكتروني",

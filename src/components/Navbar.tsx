@@ -42,21 +42,22 @@ export default function Navbar() {
     ];
 
     return (
-        <div className="fixed top-0 left-0 w-full z-50 flex justify-center pointer-events-none no-print">
+        <div className="fixed top-0 left-0 w-full z-[999] flex justify-center pointer-events-none no-print">
         <motion.nav 
             style={{ 
                 width: navWidth, 
                 y: navY, 
                 borderRadius: navBorderRadius,
             }}
-            className="pointer-events-auto bg-background/60 backdrop-blur-xl border border-border shadow-sm transition-colors duration-300 overflow-hidden"
+            className="pointer-events-auto border border-border shadow-sm transition-colors duration-300 relative"
         >
-            <motion.div style={{ padding: navPadding }} className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-xl rounded-[inherit] -z-10 pointer-events-none"></div>
+            <motion.div style={{ padding: navPadding }} className="max-w-7xl mx-auto px-4 sm:px-6 relative">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group">
                         <ChartNoAxesColumnIcon />
-                        <span className="text-xl tracking-tight text-foreground">Rank Pilot</span>
+                        <span className="text-xl tracking-tight text-foreground">RankBoost</span>
                     </Link>
 
                     {/* Desktop nav */}
@@ -94,8 +95,8 @@ export default function Navbar() {
                                     <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-xs font-bold" style={{ color: "var(--background)" }}>
                                         {user.name.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="text-foreground font-medium">{user.name}</span>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase bg-accent/10 border border-accent/15 text-accent">{user.plan}</span>
+                                    <span className="text-foreground font-medium max-w-[80px] sm:max-w-[120px] truncate" title={user.name}>{user.name}</span>
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase bg-accent/10 border border-accent/15 text-accent shrink-0">{user.plan}</span>
                                 </div>
                                 {user.role === 'admin' && (
                                     <Link to="/admin" className="p-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-full transition-colors flex items-center justify-center" aria-label="Admin Panel" title="Admin Panel">

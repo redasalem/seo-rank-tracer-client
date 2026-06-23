@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Bell, Check, TrendingUp, TrendingDown, Info, AlertTriangle } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
@@ -16,8 +17,10 @@ interface Notification {
 export default function NotificationBell() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [dropdownCoords, setDropdownCoords] = useState<{ top: number; right: number } | null>(null);
     const { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } = useApp();
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const portalRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
     const fetchNotifications = async () => {
@@ -41,12 +44,22 @@ export default function NotificationBell() {
     // Close dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            if (
+                dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+                (!portalRef.current || !portalRef.current.contains(event.target as Node))
+            ) {
                 setIsOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Close on resize to prevent floating portal misalignment
+    useEffect(() => {
+        const handleResize = () => setIsOpen(false);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -76,10 +89,25 @@ export default function NotificationBell() {
         }
     };
 
+    const toggleDropdown = () => {
+        if (!isOpen) {
+            const rect = dropdownRef.current?.getBoundingClientRect();
+            if (rect) {
+                setDropdownCoords({
+                    top: rect.bottom + 16,
+                    right: window.innerWidth - rect.right
+                });
+            }
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    };
+
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative pointer-events-auto" ref={dropdownRef}>
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleDropdown}
                 className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors relative flex items-center justify-center"
                 aria-label="Notifications"
             >
@@ -89,8 +117,12 @@ export default function NotificationBell() {
                 )}
             </button>
 
-            {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 glass-strong rounded-2xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+            {isOpen && dropdownCoords && createPortal(
+                <div 
+                    ref={portalRef}
+                    style={{ top: dropdownCoords.top, right: dropdownCoords.right }}
+                    className="fixed mt-2 w-80 sm:w-96 glass rounded-2xl shadow-xl overflow-hidden z-[99999] animate-in fade-in slide-in-from-top-2"
+                >
                     <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
                         <h3 className="font-semibold text-foreground flex items-center gap-2">
                             Notifications
@@ -151,7 +183,8 @@ export default function NotificationBell() {
                             </div>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
