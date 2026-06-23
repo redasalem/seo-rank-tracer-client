@@ -10,6 +10,7 @@ interface Stats {
     proUsers: number;
     freeUsers: number;
     totalKeywords: number;
+    totalAnalyses: number;
     newUsersLast30Days: number;
     monthlyGrowth: { month: string; users: number }[];
 }
@@ -47,6 +48,7 @@ const AdminDashboard = () => {
         { label: t("admin.dashboard.proUsers"), value: stats.proUsers, icon: <Crown size={22} />, color: "text-amber-500", bg: "bg-amber-500/10" },
         { label: t("admin.dashboard.freeUsers"), value: stats.freeUsers, icon: <Users size={22} />, color: "text-emerald-500", bg: "bg-emerald-500/10" },
         { label: t("admin.dashboard.totalKeywords"), value: stats.totalKeywords, icon: <KeyRound size={22} />, color: "text-purple-500", bg: "bg-purple-500/10" },
+        { label: t("admin.dashboard.totalAnalyses"), value: stats.totalAnalyses, icon: <TrendingUp size={22} />, color: "text-teal-500", bg: "bg-teal-500/10" },
         { label: t("admin.dashboard.newUsers30d"), value: stats.newUsersLast30Days, icon: <UserPlus size={22} />, color: "text-pink-500", bg: "bg-pink-500/10" },
     ] : [];
 

@@ -604,6 +604,7 @@
       "proUsers": "Pro Users",
       "freeUsers": "Free Users",
       "totalKeywords": "Total Keywords",
+      "totalAnalyses": "Total Analyses",
       "newUsers30d": "New Users (30 Days)",
       "growthChart": "User Growth (Last 6 Months)",
       "noGrowthData": "Not enough data to display growth chart."
