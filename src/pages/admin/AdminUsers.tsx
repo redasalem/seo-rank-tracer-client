@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Search, ChevronLeft, ChevronRight, Crown, Shield, ShieldOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface UserData {
     _id: string;
@@ -27,7 +28,6 @@ const AdminUsers = () => {
     const [search, setSearch] = useState("");
     const [planFilter, setPlanFilter] = useState("all");
     const [loading, setLoading] = useState(true);
-    const [toastMsg, setToastMsg] = useState("");
 
     const fetchUsers = async (page = 1) => {
         setLoading(true);
@@ -62,12 +62,10 @@ const AdminUsers = () => {
             const { data } = await api.put(`/api/admin/users/${userId}`, updates);
             if (data.success) {
                 setUsers(prev => prev.map(u => u._id === userId ? { ...u, ...updates } : u));
-                setToastMsg(t("admin.users.updateSuccess"));
-                setTimeout(() => setToastMsg(""), 3000);
+                toast.success(t("admin.users.updateSuccess"));
             }
         } catch {
-            setToastMsg(t("admin.users.updateFailed"));
-            setTimeout(() => setToastMsg(""), 3000);
+            toast.error(t("admin.users.updateFailed"));
         }
     };
 
@@ -210,12 +208,6 @@ const AdminUsers = () => {
                 </div>
             </div>
 
-            {/* Toast */}
-            {toastMsg && (
-                <div className="fixed bottom-6 start-1/2 -translate-x-1/2 bg-card border border-border px-6 py-3 rounded-2xl shadow-lg text-sm text-foreground font-medium z-50 animate-in fade-in slide-in-from-bottom-4">
-                    {toastMsg}
-                </div>
-            )}
         </div>
     );
 };

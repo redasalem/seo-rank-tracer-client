@@ -667,5 +667,14 @@
       },
       "note": "This is a template terms of service. Please update it with your actual legal terms."
     }
+  },
+  "notifications": {
+    "rank_improved": "Your keyword \"{{keyword}}\" moved up by {{change}} positions (now #{{newPos}})",
+    "rank_dropped": "Your keyword \"{{keyword}}\" dropped by {{change}} positions (now #{{newPos}})",
+    "keyword_added": "Keyword \"{{keyword}}\" has been added to tracking",
+    "analysis_done": "SEO analysis for {{url}} is complete. Score: {{score}}",
+    "payment_success": "Your account has been upgraded to Pro successfully",
+    "password_changed": "Your password has been changed successfully",
+    "account_created": "Welcome to SEO Rank Tracer! Your account is ready"
   }
 }

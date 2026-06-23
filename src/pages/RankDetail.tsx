@@ -62,13 +62,14 @@ export default function RankDetail() {
     const handleRefresh = async () => {
         if (!tracking) return;
         setRefreshing(true);
+        const toastId = toast.loading(t("rankDetail.alerts.refreshStarted"));
         const res = await refreshKeyword(tracking._id);
         if (res.success) {
-            toast.success(t("rankDetail.alerts.refreshStarted"));
+            toast.success(res.message || t("rankDetail.alerts.refreshStarted"), { id: toastId });
             // إعادة جلب البيانات بعد ثوانٍ ليتاح للـ Scraper وقت للعمل
             setTimeout(() => fetchTracking(), 3000);
         } else {
-            toast.error(res.message || t("rankDetail.alerts.refreshFailed"));
+            toast.error(res.message || t("rankDetail.alerts.refreshFailed"), { id: toastId });
         }
         setRefreshing(false);
     };

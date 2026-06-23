@@ -95,12 +95,13 @@ export default function RankTracker() {
 
     const handleRefresh = async (id: string) => {
         setRefreshing(id);
+        const toastId = toast.loading(t("rankTracker.alerts.refreshing"));
         const res = await refreshKeyword(id);
         if (res.success) {
-            toast.success(t("rankTracker.alerts.refreshing"));
+            toast.success(t("rankTracker.alerts.refreshing"), { id: toastId });
             fetchKeywords();
         } else {
-            toast.error(res.message || t("rankTracker.alerts.refreshFailed"));
+            toast.error(res.message || t("rankTracker.alerts.refreshFailed"), { id: toastId });
         }
         setRefreshing(null);
     };

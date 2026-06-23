@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Bell, Check, TrendingUp, TrendingDown, Info, AlertTriangle } from "lucide-react";
 import { useApp } from "../context/AppContext";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-
 interface Notification {
     _id: string;
     title: string;
-    message: string;
+    message: { key: string; data?: any } | string;
     type: "info" | "success" | "warning" | "error";
     isRead: boolean;
     link?: string;
@@ -22,6 +22,7 @@ export default function NotificationBell() {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const portalRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const fetchNotifications = async () => {
         const res = await getNotifications();
@@ -168,7 +169,9 @@ export default function NotificationBell() {
                                                     {notification.title}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                                                    {notification.message}
+                                                    {typeof notification.message === 'string' 
+                                                        ? notification.message 
+                                                        : t(notification.message.key, notification.message.data)}
                                                 </p>
                                                 <p className="text-[10px] text-muted-foreground mt-2 opacity-70">
                                                     {new Date(notification.createdAt).toLocaleString()}

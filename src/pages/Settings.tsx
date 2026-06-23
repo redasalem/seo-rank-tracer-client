@@ -108,27 +108,31 @@ export default function Settings() {
 
     const handleUpgrade = async () => {
         setIsRedirecting(true);
+        const toastId = toast.loading("Redirecting to checkout...");
         const res = await createCheckoutSession();
         if (res.success && res.url) {
+            toast.success("Redirecting...", { id: toastId });
             window.location.href = res.url;
         } else {
-            toast.error(res.message || t("settings.alerts.paymentFailed"));
+            toast.error(res.message || t("settings.alerts.paymentFailed"), { id: toastId });
             setIsRedirecting(false);
         }
     };
 
     const handleManageSubscription = async () => {
         setIsRedirecting(true);
+        const toastId = toast.loading("Redirecting...");
         try {
             const { data } = await api.post('/api/subscription/create-portal-session');
             if (data.success && data.url) {
+                toast.success("Redirecting...", { id: toastId });
                 window.location.href = data.url;
             } else {
-                toast.error(data.message || t("settings.alerts.paymentFailed"));
+                toast.error(data.message || t("settings.alerts.paymentFailed"), { id: toastId });
                 setIsRedirecting(false);
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.message || t("settings.alerts.paymentFailed"));
+            toast.error(error.response?.data?.message || t("settings.alerts.paymentFailed"), { id: toastId });
             setIsRedirecting(false);
         }
     };

@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { SearchIcon, GlobeIcon, FileSearchIcon, BrainIcon, CheckCircleIcon, AlertCircle, Loader2, ArrowRightIcon } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 const STEPS = [
     { icon: <GlobeIcon size={22} />, label: "Connecting to browser", desc: "Creating cloud browser session..." },
@@ -40,16 +41,20 @@ export default function Analyze() {
         }, 3000);
 
         // 1. Start Analysis (This will block until finished because of Vercel changes)
+        const toastId = toast.loading(t("analyze.analyzingTitle") || "Analysis started...");
         const startRes = await startAnalysis(targetUrl);
         clearInterval(stepInterval);
         
         if (!startRes.success || !startRes.analysisId) {
-            setError(startRes.message || "Failed to complete analysis");
+            const errorMsg = startRes.message || "Failed to complete analysis";
+            setError(errorMsg);
+            toast.error(errorMsg, { id: toastId });
             setAnalyzing(false);
             return;
         }
 
         // 2. Success, move to final step and redirect
+        toast.success("Analysis complete", { id: toastId });
         setCurrentStep(3); // Report Ready
         
         // Small delay before redirecting
@@ -61,6 +66,10 @@ export default function Analyze() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (isLimitReached) {
+            toast.error(t("analyze.limitWarning") || "Daily limit reached");
+            return;
+        }
         handleAnalyze();
     };
 

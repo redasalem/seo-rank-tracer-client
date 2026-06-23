@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode, useMemo } from 'react';
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 
 interface User {
@@ -297,6 +298,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
         api.post('/api/auth/logout').catch(err => {
             console.error("Logout backend request failed:", err);
         });
+        toast.success("Logged out successfully");
     };
 
     const updateProfile = async (name: string, email: string) => {

@@ -667,5 +667,14 @@
       },
       "note": "هذا نموذج لشروط الخدمة. يرجى تحديثه بالشروط القانونية الفعلية الخاصة بك."
     }
+  },
+  "notifications": {
+    "rank_improved": "كلمتك المفتاحية \"{{keyword}}\" ارتفعت {{change}} مراكز (الآن #{{newPos}})",
+    "rank_dropped": "كلمتك المفتاحية \"{{keyword}}\" انخفضت {{change}} مراكز (الآن #{{newPos}})",
+    "keyword_added": "تمت إضافة الكلمة المفتاحية \"{{keyword}}\" للتتبع",
+    "analysis_done": "اكتمل تحليل SEO لـ {{url}}. النتيجة: {{score}}",
+    "payment_success": "تم ترقية حسابك إلى Pro بنجاح",
+    "password_changed": "تم تغيير كلمة المرور بنجاح",
+    "account_created": "مرحباً بك في SEO Rank Tracer! حسابك جاهز"
   }
 }
