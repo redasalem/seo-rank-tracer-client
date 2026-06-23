@@ -16,6 +16,7 @@ import Competitors from "./pages/Competitors";
 import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
+import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -34,7 +35,7 @@ export default function App() {
         document.documentElement.lang = i18n.language;
     }, [i18n.language]);
 
-    const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/admin");
+    const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/verify-email") || location.pathname.startsWith("/admin");
 
     return (
         <ErrorBoundary>
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <Login state="register" />} />
                 <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
                 <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
+                <Route path="/verify-email/:token" element={user ? <Navigate to='/dashboard' /> : <VerifyEmail />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route element={<ProtectedRoute />}>
