@@ -66,8 +66,8 @@ export default function RankDetail() {
         const res = await refreshKeyword(tracking._id);
         if (res.success) {
             toast.success(res.message || t("rankDetail.alerts.refreshStarted"), { id: toastId });
-            // إعادة جلب البيانات بعد ثوانٍ ليتاح للـ Scraper وقت للعمل
-            setTimeout(() => fetchTracking(), 3000);
+            // Server now completes processing before responding, fetch immediately
+            await fetchTracking();
         } else {
             toast.error(res.message || t("rankDetail.alerts.refreshFailed"), { id: toastId });
         }
