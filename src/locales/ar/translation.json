@@ -303,7 +303,9 @@
       "allTime": "طوال الوقت",
       "dataPoints": "نقاط البيانات",
       "lastChecked": "آخر فحص:",
-      "neverChecked": "لم يفحص بعد"
+      "neverChecked": "لم يفحص بعد",
+      "checking": "جارِ الفحص...",
+      "scanFailed": "فشل الفحص"
     },
     "tabs": {
       "overview": "نظرة عامة",

@@ -303,7 +303,9 @@
       "allTime": "all time",
       "dataPoints": "Data Points",
       "lastChecked": "Last:",
-      "neverChecked": "Never checked"
+      "neverChecked": "Never checked",
+      "checking": "Checking...",
+      "scanFailed": "Scan Failed"
     },
     "tabs": {
       "overview": "Overview",
