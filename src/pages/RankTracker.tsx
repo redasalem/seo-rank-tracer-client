@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown, Download, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -29,6 +29,7 @@ export default function RankTracker() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [newKeyword, setNewKeyword] = useState("");
     const [newUrl, setNewUrl] = useState("");
+    const [country, setCountry] = useState("US");
     const [adding, setAdding] = useState(false);
     const [addError, setAddError] = useState("");
     const [refreshing, setRefreshing] = useState<string | null>(null);
@@ -80,12 +81,13 @@ export default function RankTracker() {
         e.preventDefault();
         setAdding(true);
         setAddError("");
-        const res = await addKeyword({ keyword: newKeyword, url: newUrl, country: "US" });
+        const res = await addKeyword({ keyword: newKeyword, url: newUrl, country });
         if (res.success) {
             toast.success(t("rankTracker.alerts.added"));
             setShowAddModal(false);
             setNewKeyword("");
             setNewUrl("");
+            setCountry("US");
             fetchKeywords();
         } else {
             setAddError(res.message || t("rankTracker.alerts.addFailed"));
@@ -450,6 +452,30 @@ export default function RankTracker() {
                                         required
                                         className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted border border-border text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors text-sm"
                                     />
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="modal-country" className="block text-sm font-medium text-foreground mb-1.5">
+                                    Country
+                                </label>
+                                <div className="relative">
+                                    <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                    <select
+                                        id="modal-country"
+                                        value={country}
+                                        onChange={(e) => setCountry(e.target.value)}
+                                        className="w-full pl-11 pr-8 py-3 rounded-xl bg-muted border border-border text-foreground outline-none focus:border-primary/50 transition-colors text-sm appearance-none"
+                                    >
+                                        <option value="US">United States (US)</option>
+                                        <option value="GB">United Kingdom (GB)</option>
+                                        <option value="EG">Egypt (EG)</option>
+                                        <option value="SA">Saudi Arabia (SA)</option>
+                                        <option value="AE">United Arab Emirates (AE)</option>
+                                        <option value="FR">France (FR)</option>
+                                        <option value="DE">Germany (DE)</option>
+                                        <option value="CA">Canada (CA)</option>
+                                        <option value="AU">Australia (AU)</option>
+                                    </select>
                                 </div>
                             </div>
 
