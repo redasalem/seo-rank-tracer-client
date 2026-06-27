@@ -105,7 +105,7 @@
   },
   "footer": {
     "desc": "Optimize your website for search engines with AI-powered insights and real-time tracking.",
-    "copyright": "© {{year}} RankPilot. All rights reserved.",
+    "copyright": "© {{year}} RankBoost. All rights reserved.",
     "status": "Status: All Systems Operational",
     "sections": [
       {
@@ -675,6 +675,6 @@
     "analysis_done": "SEO analysis for {{url}} is complete. Score: {{score}}",
     "payment_success": "Your account has been upgraded to Pro successfully",
     "password_changed": "Your password has been changed successfully",
-    "account_created": "Welcome to SEO Rank Tracer! Your account is ready"
+    "account_created": "Welcome to RankBoost! Your account is ready"
   }
 }

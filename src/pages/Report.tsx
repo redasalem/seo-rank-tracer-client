@@ -169,7 +169,7 @@ export default function Report() {
 
         const opt = {
             margin: [10, 10, 10, 10] as [number, number, number, number],
-            filename: `RankPilot_Report_${hostname}_${date}.pdf`,
+            filename: `RankBoost_Report_${hostname}_${date}.pdf`,
             image: { type: "jpeg" as const, quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
             jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const },

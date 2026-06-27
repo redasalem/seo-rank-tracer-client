@@ -1,6 +1,6 @@
-# Contributing to SEO Rank Tracker
+# Contributing to RankBoost
 
-First off, thank you for considering contributing to SEO Rank Tracker! It's people like you that make SEO Rank Tracker such a great tool.
+First off, thank you for considering contributing to RankBoost! It's people like you that make RankBoost such a great tool.
 
 ## Where do I go from here?
 
@@ -8,7 +8,7 @@ If you've noticed a bug or have a feature request, make sure to check our [Issue
 
 ## Fork & create a branch
 
-If this is something you think you can fix, then fork SEO Rank Tracker and create a branch with a descriptive name.
+If this is something you think you can fix, then fork RankBoost and create a branch with a descriptive name.
 
 A good branch name would be (where issue #325 is the ticket you're working on):
 

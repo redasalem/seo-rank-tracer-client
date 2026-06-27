@@ -1,6 +1,6 @@
-# ✨ SEO Rank Tracer - Frontend
+# ✨ RankBoost - Frontend
 
-The sleek, modern user interface for the SEO Rank Tracer application. Built with React, Vite, and Tailwind CSS to provide a fast and responsive user experience for tracking search engine rankings and analyzing SEO metrics.
+The sleek, modern user interface for the RankBoost application. Built with React, Vite, and Tailwind CSS to provide a fast and responsive user experience for tracking search engine rankings and analyzing SEO metrics.
 
 <div align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />

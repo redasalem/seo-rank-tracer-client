@@ -105,7 +105,7 @@
   },
   "footer": {
     "desc": "قم بتحسين موقعك لمحركات البحث باستخدام تحليلات الذكاء الاصطناعي والتتبع اللحظي.",
-    "copyright": "© {{year}} RankPilot. جميع الحقوق محفوظة.",
+    "copyright": "© {{year}} RankBoost. جميع الحقوق محفوظة.",
     "status": "الحالة: جميع الأنظمة تعمل بكفاءة",
     "sections": [
       {
@@ -675,6 +675,6 @@
     "analysis_done": "اكتمل تحليل SEO لـ {{url}}. النتيجة: {{score}}",
     "payment_success": "تم ترقية حسابك إلى Pro بنجاح",
     "password_changed": "تم تغيير كلمة المرور بنجاح",
-    "account_created": "مرحباً بك في SEO Rank Tracer! حسابك جاهز"
+    "account_created": "مرحباً بك في RankBoost! حسابك جاهز"
   }
 }
