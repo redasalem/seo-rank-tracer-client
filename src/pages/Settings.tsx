@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useApp } from "../context/AppContext";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { User, Lock, CreditCard, Save, Eye, EyeOff } from "lucide-react";
+import { User, Lock, CreditCard, Save, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -60,6 +60,11 @@ export default function Settings() {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // Delete Account State
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletePassword, setDeletePassword] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -134,6 +139,22 @@ export default function Settings() {
         } catch (error: any) {
             toast.error(error.response?.data?.message || t("settings.alerts.paymentFailed"), { id: toastId });
             setIsRedirecting(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!deletePassword) return toast.error("Password is required");
+        setIsDeleting(true);
+        const toastId = toast.loading("Deleting account...");
+        try {
+            const { data } = await api.delete('/api/auth/account', { data: { password: deletePassword } });
+            toast.success(data.message || "Account deleted successfully", { id: toastId });
+            await api.post("/api/auth/logout");
+            window.location.href = "/";
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to delete account", { id: toastId });
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -214,6 +235,17 @@ export default function Settings() {
                                 {t("settings.profile.saveBtn")}
                             </button>
                         </form>
+
+                        <div className="mt-12 pt-6 border-t border-border">
+                            <h3 className="text-xl font-bold text-danger mb-2">Danger Zone</h3>
+                            <p className="text-muted-foreground text-sm mb-4">Permanently delete your account and all of your data. This action cannot be undone.</p>
+                            <button 
+                                onClick={() => setShowDeleteModal(true)}
+                                className="px-6 py-2.5 bg-danger/10 text-danger border border-danger/20 rounded-xl font-medium hover:bg-danger hover:text-white transition-colors"
+                            >
+                                Delete Account
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -373,6 +405,49 @@ export default function Settings() {
                     </div>
                 )}
             </div>
+
+            {/* Delete Account Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+                    <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-xl animate-scale-in">
+                        <div className="flex items-center gap-3 text-danger mb-4">
+                            <AlertTriangle size={24} />
+                            <h3 className="text-xl font-bold">Delete Account</h3>
+                        </div>
+                        <p className="text-muted-foreground text-sm mb-6">
+                            This action is permanent and cannot be undone. All your keywords, tracking history, and SEO reports will be permanently deleted.
+                        </p>
+                        
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-foreground mb-1.5">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                value={deletePassword}
+                                onChange={(e) => setDeletePassword(e.target.value)}
+                                className="w-full px-4 py-2.5 rounded-xl border border-border focus:border-danger bg-background/50 text-foreground focus:outline-none transition-all"
+                                placeholder="Enter your password"
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3">
+                            <button 
+                                onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }}
+                                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleDeleteAccount}
+                                disabled={isDeleting || !deletePassword}
+                                className="flex items-center gap-2 px-4 py-2 bg-danger text-white rounded-xl text-sm font-medium hover:bg-danger/90 transition-colors disabled:opacity-70"
+                            >
+                                {isDeleting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                                Delete My Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
