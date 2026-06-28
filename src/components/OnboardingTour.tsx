@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import Joyride, { CallBackProps, STATUS, Step } from "react-joyride";
+import { Joyride, STATUS, type Step, type EventData } from "react-joyride";
 
 const TOUR_KEY = "rankboost_tour_completed";
 
@@ -9,36 +9,36 @@ const steps: Step[] = [
         placement: "center",
         title: "Welcome to RankBoost! 🚀",
         content: "Let's take a quick tour to help you get started. This will only take a minute.",
-        disableBeacon: true,
+        skipBeacon: true,
     },
     {
         target: '[data-tour="rank-tracker"]',
         title: "Track Your Keywords",
         content: "Add your website's keywords here and we'll track their Google rankings daily.",
-        disableBeacon: true,
+        skipBeacon: true,
     },
     {
         target: '[data-tour="analyze"]',
         title: "Analyze Your Website",
         content: "Run a full SEO audit on any URL to discover issues and opportunities.",
-        disableBeacon: true,
+        skipBeacon: true,
     },
     {
         target: '[data-tour="dashboard"]',
         title: "Your Dashboard",
         content: "Monitor all your SEO metrics, ranking changes, and competitor insights in one place.",
-        disableBeacon: true,
+        skipBeacon: true,
     },
     {
         target: '[data-tour="upgrade"]',
         title: "Go Pro for More Power 💪",
         content: "Unlock unlimited keywords, daily tracking, and advanced reports with Pro.",
-        disableBeacon: true,
+        skipBeacon: true,
     },
 ];
 
 function TourComponent({ run, onFinish }: { run: boolean; onFinish: () => void }) {
-    const handleCallback = (data: CallBackProps) => {
+    const handleCallback = (data: EventData) => {
         const { status } = data;
         const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
         if (finishedStatuses.includes(status)) {
@@ -52,18 +52,18 @@ function TourComponent({ run, onFinish }: { run: boolean; onFinish: () => void }
             steps={steps}
             run={run}
             continuous
-            showSkipButton
-            showProgress
-            callback={handleCallback}
+            onEvent={handleCallback}
+            options={{
+                showProgress: true,
+                buttons: ['back', 'close', 'primary', 'skip'],
+                zIndex: 10000,
+                arrowColor: "var(--card)",
+                backgroundColor: "var(--card)",
+                textColor: "var(--foreground)",
+                primaryColor: "hsl(var(--primary))",
+                overlayColor: "rgba(0, 0, 0, 0.6)",
+            }}
             styles={{
-                options: {
-                    zIndex: 10000,
-                    arrowColor: "var(--card)",
-                    backgroundColor: "var(--card)",
-                    textColor: "var(--foreground)",
-                    primaryColor: "hsl(var(--primary))",
-                    overlayColor: "rgba(0, 0, 0, 0.6)",
-                },
                 tooltip: {
                     borderRadius: "16px",
                     padding: "20px",
@@ -78,7 +78,7 @@ function TourComponent({ run, onFinish }: { run: boolean; onFinish: () => void }
                     fontSize: "14px",
                     lineHeight: "1.6",
                 },
-                buttonNext: {
+                buttonPrimary: {
                     backgroundColor: "hsl(var(--primary))",
                     borderRadius: "10px",
                     padding: "8px 18px",
@@ -93,9 +93,6 @@ function TourComponent({ run, onFinish }: { run: boolean; onFinish: () => void }
                 buttonSkip: {
                     color: "var(--muted-foreground)",
                     fontSize: "13px",
-                },
-                spotlight: {
-                    borderRadius: "12px",
                 },
             }}
             locale={{
