@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /rank
+Disallow: /analyze
+Disallow: /report
+Disallow: /settings
+Disallow: /admin
+Disallow: /history
+Disallow: /competitors
+
+Sitemap: https://seo-rank-tracer-client.vercel.app/sitemap.xml
