@@ -4,6 +4,7 @@ import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy, Activity, A
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { useOnboardingTour } from "../components/OnboardingTour";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
@@ -49,6 +50,8 @@ export default function Dashboard() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const { startTour, TourComponent } = useOnboardingTour();
+
     const fetchData = async () => {
         const res = await getDashboardStats();
         if (res.success) {
@@ -88,6 +91,12 @@ export default function Dashboard() {
         (async () => await fetchData())();
     }, []);
 
+    useEffect(() => {
+        if (user && !loading) {
+            startTour();
+        }
+    }, [user, loading]);
+
     // Custom Tooltip for Recharts
     const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: { value: number }[], label?: string }) => {
         if (active && payload && payload.length) {
@@ -116,6 +125,7 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen pt-16 md:pt-24 bg-transparent">
+            <TourComponent />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 {/* Header */}
                 <div className="mb-8">

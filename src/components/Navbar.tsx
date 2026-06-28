@@ -34,9 +34,9 @@ export default function Navbar() {
     };
 
     const navLinks = [
-        { path: "/dashboard", label: t("navbar.dashboard"), icon: <BarChart3 size={18} /> },
-        { path: "/analyze", label: t("navbar.analyze"), icon: <Search size={18} /> },
-        { path: "/rank-tracker", label: t("navbar.rankTracker"), icon: <Target size={18} /> },
+        { path: "/dashboard", label: t("navbar.dashboard"), icon: <BarChart3 size={18} />, tour: "dashboard" },
+        { path: "/analyze", label: t("navbar.analyze"), icon: <Search size={18} />, tour: "analyze" },
+        { path: "/rank-tracker", label: t("navbar.rankTracker"), icon: <Target size={18} />, tour: "rank-tracker" },
         { path: "/competitors", label: t("navbar.competitors"), icon: <Users size={18} /> },
         { path: "/history", label: t("navbar.history"), icon: <History size={18} /> },
     ];
@@ -64,7 +64,7 @@ export default function Navbar() {
                     {user && (
                         <div className="hidden md:flex items-center gap-1">
                             {navLinks.map((link) => (
-                                <Link key={link.path} to={link.path} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${isActive(link.path) ? "bg-accent/5 text-accent font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/80"}`}>
+                                <Link key={link.path} to={link.path} data-tour={link.tour} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${isActive(link.path) ? "bg-accent/5 text-accent font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/80"}`}>
                                     {link.icon}
                                     {link.label}
                                 </Link>
@@ -87,7 +87,7 @@ export default function Navbar() {
                             <>
                                 <NotificationBell />
                                 {user.plan === 'free' && (
-                                    <Link to="/settings?tab=subscription" className="px-3 py-1.5 text-xs font-bold rounded-full bg-accent/10 text-accent border border-accent/20 hover:bg-accent hover:text-white transition-colors">
+                                    <Link to="/settings?tab=subscription" data-tour="upgrade" className="px-3 py-1.5 text-xs font-bold rounded-full bg-accent/10 text-accent border border-accent/20 hover:bg-accent hover:text-white transition-colors">
                                         {t("navbar.upgrade")}
                                     </Link>
                                 )}
