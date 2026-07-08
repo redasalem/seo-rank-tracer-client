@@ -4,6 +4,8 @@ import { CheckCircle2, XCircle, Loader2, ArrowRight, ArrowLeft } from "lucide-re
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 
+// INTENTIONALLY UNUSED: This page is dead code. The verify-email endpoint 
+// does not exist in the backend and email verification is intentionally skipped.
 export default function VerifyEmail() {
     const { t, i18n } = useTranslation();
     const { token } = useParams<{ token: string }>();

@@ -19,7 +19,7 @@ interface KeywordItem {
     updatedAt: string;
     createdAt: string;
     status: string;
-    competitors: { position: number; url: string; domain: string; title: string; snippet: string }[];
+    competitors: { position: number; url: string; domain: string; snippet: string }[];
 }
 
 export default function RankTracker() {
