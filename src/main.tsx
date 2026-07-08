@@ -7,8 +7,8 @@ import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { AddProvider } from "./context/AppContext.tsx";
 import ReactGA from "react-ga4";
 
-if (import.meta.env.PROD) {
-    ReactGA.initialize("G-XXXXXXXXXX"); // Measurement ID
+if (import.meta.env.PROD && import.meta.env.VITE_GA_MEASUREMENT_ID) {
+    ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
 }
 
 createRoot(document.getElementById("root")!).render(
