@@ -23,6 +23,7 @@ import { Toaster } from "react-hot-toast";
 import { useApp } from "./context/AppContext";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import ReactGA from "react-ga4";
 
 export default function App() {
     const { user } = useApp();
@@ -33,6 +34,15 @@ export default function App() {
         document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
         document.documentElement.lang = i18n.language;
     }, [i18n.language]);
+
+    useEffect(() => {
+        if (import.meta.env.PROD) {
+            ReactGA.send({ 
+                hitType: "pageview", 
+                page: location.pathname 
+            });
+        }
+    }, [location]);
 
     const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/admin");
 

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode, useMemo
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import ReactGA from "react-ga4";
 
 
 interface User {
@@ -165,6 +166,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
                         analysisCount: data.user.analysisCount
                     });
                 }
+                if (import.meta.env.PROD) {
+                    ReactGA.event({ category: "Auth", action: "Login" });
+                }
                 return { success: true, message: data.message };
             }
             return { success: false, message: data.message || "Failed to login" };
@@ -177,6 +181,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message?: string }> => {
         try {
             const { data } = await api.post('/api/auth/register', { name, email, password });
+            if (import.meta.env.PROD) {
+                ReactGA.event({ category: "Auth", action: "Register" });
+            }
             return { success: true, message: data.message };
         } catch (error: any) {
             const msg = error.response?.data?.message || "An error occurred during registration";
@@ -187,6 +194,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const addKeyword = async (keywordData: any) => {
         try {
             const { data } = await api.post('/api/rank/add', keywordData);
+            if (import.meta.env.PROD) {
+                ReactGA.event({ category: "RankTracker", action: "Keyword Added" });
+            }
             return { success: true, message: data.message, tracking: data.tracking };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Failed to add keyword" };
@@ -260,6 +270,10 @@ export function AddProvider({ children }: { children: ReactNode }) {
                 });
             }
             
+            if (import.meta.env.PROD) {
+                ReactGA.event({ category: "Analysis", action: "Analysis Started" });
+            }
+
             return { success: true, message: data.message, analysisId: data.analysisId };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Failed to start analysis" };
@@ -359,6 +373,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
     const createCheckoutSession = async () => {
         try {
             const { data } = await api.post('/api/subscription/create-checkout-session');
+            if (import.meta.env.PROD) {
+                ReactGA.event({ category: "Subscription", action: "Upgraded to Pro" });
+            }
             return { success: true, url: data.url };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Failed to create checkout session" };
