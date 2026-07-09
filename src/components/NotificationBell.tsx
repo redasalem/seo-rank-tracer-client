@@ -27,7 +27,7 @@ export default function NotificationBell() {
     const fetchNotifications = useCallback(async () => {
         const res = await getNotifications();
         if (res.success && res.data) {
-            setNotifications(res.data);
+            setNotifications(res.data as unknown as Notification[]);
         }
     }, [getNotifications]);
 

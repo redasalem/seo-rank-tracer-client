@@ -68,8 +68,8 @@ export default function Dashboard() {
 
     const fetchData = async () => {
         const res = await getDashboardStats();
-        if (res.success) {
-            setStats(res.data);
+        if (res.success && res.data) {
+            setStats(res.data as DashboardStats);
         }
         setLoading(false);
     };
