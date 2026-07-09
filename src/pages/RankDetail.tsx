@@ -341,7 +341,15 @@ export default function RankDetail() {
                             {t("rankDetail.stats.dataPoints")}
                         </p>
                         <p className="text-3xl font-bold text-accent">{tracking.rankHistory.length}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{tracking.updatedAt ? `${t("rankDetail.stats.lastChecked")} ${new Date(tracking.updatedAt).toLocaleDateString()}` : t("rankDetail.stats.neverChecked")}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {tracking.updatedAt ? (
+                                <>
+                                    {t("rankDetail.stats.lastChecked")} <span dir="ltr">{new Date(tracking.updatedAt).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                                </>
+                            ) : (
+                                t("rankDetail.stats.neverChecked")
+                            )}
+                        </p>
                     </div>
                 </div>
 
