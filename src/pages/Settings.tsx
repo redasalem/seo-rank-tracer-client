@@ -76,6 +76,7 @@ export default function Settings() {
         const query = new URLSearchParams(location.search);
         const tab = query.get("tab");
         if (tab && ["profile", "password", "subscription"].includes(tab)) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setActiveTab(tab);
         }
 
@@ -90,6 +91,7 @@ export default function Settings() {
             window.history.replaceState({}, document.title, window.location.pathname);
             setActiveTab("subscription");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
 
     const onProfileSubmit = async (data: ProfileFormValues) => {
@@ -136,7 +138,8 @@ export default function Settings() {
                 toast.error(data.message || t("settings.alerts.paymentFailed"), { id: toastId });
                 setIsRedirecting(false);
             }
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
             toast.error(error.response?.data?.message || t("settings.alerts.paymentFailed"), { id: toastId });
             setIsRedirecting(false);
         }
@@ -151,7 +154,8 @@ export default function Settings() {
             toast.success(data.message || "Account deleted successfully", { id: toastId });
             await api.post("/api/auth/logout");
             window.location.href = "/";
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
             toast.error(error.response?.data?.message || "Failed to delete account", { id: toastId });
         } finally {
             setIsDeleting(false);

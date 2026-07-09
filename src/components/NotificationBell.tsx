@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Bell, Check, TrendingUp, TrendingDown, Info, AlertTriangle } from "lucide-react";
 import { useApp } from "../context/AppContext";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 interface Notification {
     _id: string;
     title: string;
-    message: { key: string; data?: any } | string;
+    message: { key: string; data?: Record<string, string | number> } | string;
     type: "info" | "success" | "warning" | "error";
     isRead: boolean;
     link?: string;
@@ -24,14 +24,15 @@ export default function NotificationBell() {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = useCallback(async () => {
         const res = await getNotifications();
         if (res.success && res.data) {
             setNotifications(res.data);
         }
-    };
+    }, [getNotifications]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetching on mount
         fetchNotifications();
         
         // Polling every 5 minutes (optional, could be removed if real-time isn't strictly needed)
@@ -40,7 +41,7 @@ export default function NotificationBell() {
         }, 5 * 60 * 1000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchNotifications]);
 
     // Close dropdown when clicking outside
     useEffect(() => {

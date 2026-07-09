@@ -42,8 +42,9 @@ export default function ResetPassword() {
             setTimeout(() => {
                 navigate("/login");
             }, 2000);
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || t("auth.reset.invalidToken"));
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            toast.error(error.response?.data?.message || t("auth.reset.invalidToken"));
         } finally {
             setLoading(false);
         }

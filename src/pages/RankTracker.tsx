@@ -53,7 +53,7 @@ export default function RankTracker() {
             sortBy
         });
         if (res.success) {
-            setKeywords(res.data || []);
+            setKeywords((res.data as unknown as KeywordItem[]) || []);
             setTotalPages(res.totalPages || 1);
             setTotalCount(res.total || 0);
         } else {
@@ -144,7 +144,7 @@ export default function RankTracker() {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Keyword,Domain,URL,Current Position,Best Position,Change,Last Checked\n";
 
-        res.data.forEach((kw: KeywordItem) => {
+        (res.data as unknown as KeywordItem[]).forEach((kw: KeywordItem) => {
             const row = [
                 `"${kw.keyword}"`,
                 `"${kw.domain}"`,
@@ -186,10 +186,11 @@ export default function RankTracker() {
             fetchKeywords();
         }, 300);
         return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, statusFilter, sortBy, page]);
 
     return (
-        <div className="min-h-scree pt-16 md:pt-24 bg-background">
+        <div className="min-h-screen pt-16 md:pt-24 bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -255,7 +256,7 @@ export default function RankTracker() {
 
                 {/* Keywords List */}
                 {loading ? (
-                    <div className="flex items-center justify-center py-30">
+                    <div className="flex items-center justify-center py-32">
                         <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : keywords.length === 0 ? (

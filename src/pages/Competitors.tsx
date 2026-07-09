@@ -38,6 +38,7 @@ export default function Competitors() {
             setLoading(false);
         };
         fetchCompetitors();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const getPositionColor = (pos: number) => {

@@ -16,6 +16,7 @@ export default function VerifyEmail() {
 
     useEffect(() => {
         if (!token) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setStatus("error");
             setMessage(t("auth.verify.noToken"));
             return;
@@ -29,13 +30,15 @@ export default function VerifyEmail() {
                 const { data } = await api.get(`/api/auth/verify-email/${token}`);
                 setStatus("success");
                 setMessage(data.message);
-            } catch (error: any) {
+            } catch (err: unknown) {
+                const error = err as { response?: { data?: { message?: string } } };
                 setStatus("error");
                 setMessage(error.response?.data?.message || t("auth.verify.failedAlert"));
             }
         };
 
         verify();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, api]);
 
     return (

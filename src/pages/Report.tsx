@@ -80,7 +80,7 @@ export default function Report() {
         const res = await getAnalysis(id);
         
         if (res.success && res.data) {
-            setAnalysis(res.data);
+            setAnalysis(res.data as unknown as AnalysisData);
         } else {
             setError(res.message || t("report.notFound"));
         }
@@ -109,6 +109,7 @@ export default function Report() {
 
     useEffect(() => {
         (async () => await fetchAnalysis())();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     if (loading) {

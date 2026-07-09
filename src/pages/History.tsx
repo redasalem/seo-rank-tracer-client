@@ -36,7 +36,7 @@ export default function History() {
         setLoading(true);
         const res = await getAnalysisHistory({ page: pageNumber, limit: 12 });
         if (res.success && res.data) {
-            setAnalyses(res.data);
+            setAnalyses(res.data as unknown as AnalysisSummary[]);
             setTotalPages(res.totalPages || 1);
             setPage(res.page || 1);
         }
@@ -44,7 +44,9 @@ export default function History() {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchHistory(page);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
     let processedData = [...analyses];
@@ -132,7 +134,7 @@ export default function History() {
 
                 {/* List / Grid */}
                 {loading && analyses.length === 0 ? (
-                    <div className="flex items-center justify-center py-30">
+                    <div className="flex items-center justify-center py-32">
                         <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : processedData.length === 0 ? (

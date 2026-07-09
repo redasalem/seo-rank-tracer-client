@@ -57,8 +57,49 @@ export const seoAnalysisSchema = {
 };
 
 
+// Shape of data scraped from a website for SEO analysis
+interface ScrapedData {
+    url: string;
+    loadTime: number;
+    statusCode: number;
+    pageSize: number;
+    wordCount: number;
+    metaData: {
+        title: string;
+        description: string;
+        canonical: string;
+        robots: string;
+        ogTitle: string;
+        ogDescription: string;
+        ogImage: string;
+        twitterCard: string;
+        viewport: string;
+        charset: string;
+    };
+    headings: {
+        h1: number;
+        h1Texts: string[];
+        h2: number;
+        h3: number;
+        h4: number;
+        h5: number;
+        h6: number;
+    };
+    links: {
+        internal: number;
+        external: number;
+        total: number;
+    };
+    images: {
+        total: number;
+        missingAlt: number;
+        withAlt: number;
+    };
+    bodyText: string;
+}
+
 // Prompt for getting SEO Analysis structured data from AI
-export const getSeoPrompt = (scrapedData: any) => `You are an expert SEO analyst. Analyze the following website data and provide a comprehensive SEO audit.
+export const getSeoPrompt = (scrapedData: ScrapedData) => `You are an expert SEO analyst. Analyze the following website data and provide a comprehensive SEO audit.
 
 Website URL: ${scrapedData.url}
 Load Time: ${scrapedData.loadTime}ms

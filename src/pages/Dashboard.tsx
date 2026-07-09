@@ -42,6 +42,20 @@ interface DashboardStats {
     analysisLimit: { plan: string; used: number; max: number | 'unlimited' } | null;
 }
 
+// Custom Tooltip for Recharts
+const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: { value: number }[], label?: string }) => {
+    const { t } = useTranslation();
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
+                <p className="text-sm font-semibold text-foreground mb-1">{label}</p>
+                <p className="text-sm text-primary">{t("dashboard.charts.avgRank")}: #{payload[0].value}</p>
+            </div>
+        );
+    }
+    return null;
+};
+
 export default function Dashboard() {
     const { t, i18n } = useTranslation();
     const { user, getDashboardStats } = useApp();
@@ -89,26 +103,17 @@ export default function Dashboard() {
 
     useEffect(() => {
         (async () => await fetchData())();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         if (user && !loading) {
             startTour();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, loading]);
 
-    // Custom Tooltip for Recharts
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: { value: number }[], label?: string }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
-                    <p className="text-sm font-semibold text-foreground mb-1">{label}</p>
-                    <p className="text-sm text-primary">{t("dashboard.charts.avgRank")}: #{payload[0].value}</p>
-                </div>
-            );
-        }
-        return null;
-    };
+
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -235,7 +240,7 @@ export default function Dashboard() {
                         {loading ? (
                             <div className="h-[250px] flex items-end justify-between gap-2 px-2 pb-4">
                                 {[1,2,3,4,5,6,7].map((i) => (
-                                    <div key={i} className="w-full bg-muted/50 rounded-t-md animate-pulse" style={{ height: `${Math.random() * 60 + 20}%`, animationDelay: `${i * 0.1}s` }}></div>
+                                    <div key={i} className="w-full bg-muted/50 rounded-t-md animate-pulse" style={{ height: `${((i * 17) % 60) + 20}%`, animationDelay: `${i * 0.1}s` }}></div>
                                 ))}
                             </div>
                         ) : !stats?.historyData || stats.historyData.length < 2 ? (

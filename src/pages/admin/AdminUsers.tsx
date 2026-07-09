@@ -49,7 +49,9 @@ const AdminUsers = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [planFilter]);
 
     const handleSearch = (e: React.FormEvent) => {

@@ -66,7 +66,7 @@ export default function Login({ state }: { state: string }) {
                     toast.error(res.message || t("auth.login.regFailed"));
                 }
             }
-        } catch (err: any) {
+        } catch {
             toast.error(t("auth.login.error"));
         } finally {
             setLoading(false);

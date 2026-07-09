@@ -25,8 +25,9 @@ export default function ForgotPassword() {
             if (data.resetUrl) {
                 console.log("Development Password Reset Link:", data.resetUrl);
             }
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || t("auth.login.error"));
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            toast.error(error.response?.data?.message || t("auth.login.error"));
         } finally {
             setLoading(false);
         }
