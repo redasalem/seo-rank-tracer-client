@@ -68,6 +68,8 @@ interface AnalysisRecord {
     status: string;
     createdAt: string;
     categories?: Record<string, number>;
+    issues?: Array<{ severity: string, category: string, message: string, recommendation: string }>;
+    aiInsights?: string;
 }
 
 interface CompetitorData {
@@ -94,6 +96,7 @@ interface AppContextType {
     refreshKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
     startAnalysis: (url: string) => Promise<{ success: boolean; message?: string; analysisId?: string }>;
     getAnalysis: (id: string) => Promise<{ success: boolean; data?: AnalysisRecord; message?: string }>;
+    generateAiInsights: (id: string, language?: string) => Promise<{ success: boolean; aiInsights?: string; message?: string }>;
     getAnalysisHistory: (params?: { page?: number, limit?: number }) => Promise<{ success: boolean; data?: AnalysisRecord[]; totalPages?: number; total?: number; page?: number; message?: string }>;
     updateProfile: (name: string, email: string) => Promise<{ success: boolean; message?: string }>;
     updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
@@ -357,6 +360,15 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const generateAiInsights = async (id: string, language: string = "en") => {
+        try {
+            const { data } = await api.post(`/api/analysis/${id}/ai-insights`, { language });
+            return { success: true, aiInsights: data.aiInsights };
+        } catch (error: unknown) {
+            return { success: false, message: getAxiosErrorMessage(error, "Failed to generate AI insights") };
+        }
+    };
+
     const getAnalysisHistory = async (params?: { page?: number, limit?: number }) => {
         try {
             const queryParams = new URLSearchParams();
@@ -475,6 +487,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
         refreshKeyword,
         startAnalysis,
         getAnalysis,
+        generateAiInsights,
         getAnalysisHistory,
         updateProfile,
         updatePassword,

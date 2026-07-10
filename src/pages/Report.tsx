@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, T
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
+import Markdown from 'react-markdown';
 
 interface AnalysisData {
     _id: string;
@@ -13,6 +14,7 @@ interface AnalysisData {
     overallScore: number;
     status: string;
     createdAt: string;
+    aiInsights?: string;
     loadTime: number;
     pageSize: number;
     wordCount: number;
@@ -69,9 +71,10 @@ export default function Report() {
     const contentRef = useRef<HTMLDivElement>(null);
     const { t, i18n } = useTranslation();
     const { id } = useParams();
-    const { getAnalysis } = useApp();
+    const { getAnalysis, generateAiInsights } = useApp();
     const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [generatingAi, setGeneratingAi] = useState(false);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -93,6 +96,16 @@ export default function Report() {
         setLoading(false);
     };
 
+    const handleGenerateAi = async () => {
+        if (!id || !analysis) return;
+        setGeneratingAi(true);
+        const res = await generateAiInsights(id, i18n.language);
+        if (res.success && res.aiInsights) {
+            setAnalysis({ ...analysis, aiInsights: res.aiInsights });
+        }
+        setGeneratingAi(false);
+    };
+
     const getScoreClass = (s: number) => {
         if (s >= 80) return "score-good";
         if (s >= 50) return "score-medium";
@@ -111,6 +124,7 @@ export default function Report() {
         { id: "content", label: t("report.tabs.content") },
         { id: "advanced", label: t("report.tabs.advanced") },
         { id: "issues", label: t("report.tabs.issues") },
+        { id: "ai", label: "AI Insights 🤖" },
     ];
 
     useEffect(() => {
@@ -603,6 +617,50 @@ export default function Report() {
                                     </div>
                                     <h3 className="text-lg font-semibold text-foreground mb-2">{t("report.issues.noIssues")}</h3>
                                     <p className="text-sm text-muted-foreground">{t("report.issues.noIssuesDesc")}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={activeTab === "ai" ? "block" : "hidden"}>
+                        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-3 bg-primary/10 rounded-xl text-primary">
+                                    <Bot size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-foreground">AI SEO Consultant</h2>
+                                    <p className="text-sm text-muted-foreground">Personalized recommendations powered by Gemini AI</p>
+                                </div>
+                            </div>
+                            
+                            {analysis.aiInsights ? (
+                                <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:text-foreground prose-a:text-primary">
+                                    <Markdown>{analysis.aiInsights}</Markdown>
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <Bot size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
+                                    <h3 className="text-lg font-semibold text-foreground mb-2">No AI Insights Yet</h3>
+                                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">Generate a comprehensive, easy-to-understand SEO action plan tailored specifically for your website using Google Gemini AI.</p>
+                                    <button 
+                                        onClick={handleGenerateAi}
+                                        disabled={generatingAi}
+                                        className="bg-primary hover:bg-primary-dark text-primary-foreground font-semibold py-2.5 px-6 rounded-xl transition-colors inline-flex items-center gap-2"
+                                        style={{ color: "var(--background)" }}
+                                    >
+                                        {generatingAi ? (
+                                            <>
+                                                <div className="size-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Bot size={18} />
+                                                Generate AI Report
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
                             )}
                         </div>
