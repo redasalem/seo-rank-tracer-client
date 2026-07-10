@@ -75,11 +75,16 @@ export default function Report() {
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("overview");
 
+    const handleExportPdf = useReactToPrint({
+        contentRef,
+        documentTitle: `RankBoost_Report_${analysis?.url ? new URL(analysis.url).hostname : 'SEO'}`
+    });
+
     const fetchAnalysis = async () => {
         if (!id) return;
         setLoading(true);
         const res = await getAnalysis(id);
-        
+
         if (res.success && res.data) {
             setAnalysis(res.data as unknown as AnalysisData);
         } else {
@@ -158,10 +163,7 @@ export default function Report() {
     const warningCount = analysis.issues.filter((i) => i.severity === "warning").length;
     const infoCount = analysis.issues.filter((i) => i.severity === "info").length;
 
-    const handleExportPdf = useReactToPrint({
-        contentRef,
-        documentTitle: `RankBoost_Report_${analysis?.url ? new URL(analysis.url).hostname : 'SEO'}`
-    });
+
 
     return (
         <div className="min-h-screen pt-16 md:pt-24 bg-background print:bg-white print:pt-0">
