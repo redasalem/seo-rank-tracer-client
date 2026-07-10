@@ -110,19 +110,38 @@
     "sections": [
       {
         "title": "Product",
-        "links": ["Features", "Pricing", "API", "Browser Extension"]
+        "links": [
+          "Features",
+          "Pricing",
+          "API",
+          "Browser Extension"
+        ]
       },
       {
         "title": "Resources",
-        "links": ["Documentation", "Blog", "SEO Guide", "Support"]
+        "links": [
+          "Documentation",
+          "Blog",
+          "SEO Guide",
+          "Support"
+        ]
       },
       {
         "title": "Company",
-        "links": ["About Us", "Careers", "Contact", "Press"]
+        "links": [
+          "About Us",
+          "Careers",
+          "Contact",
+          "Press"
+        ]
       },
       {
         "title": "Legal",
-        "links": ["Privacy Policy", "Terms of Service", "Cookie Policy"]
+        "links": [
+          "Privacy Policy",
+          "Terms of Service",
+          "Cookie Policy"
+        ]
       }
     ]
   },
@@ -591,6 +610,9 @@
       "infoCount": "{{count}} Info",
       "noIssues": "No Issues Found!",
       "noIssuesDesc": "Your website is following SEO best practices."
+    },
+    "ai": {
+      "error": "Error generating response. Please try again."
     }
   },
   "admin": {
