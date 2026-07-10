@@ -96,7 +96,7 @@ interface AppContextType {
     refreshKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
     startAnalysis: (url: string) => Promise<{ success: boolean; message?: string; analysisId?: string }>;
     getAnalysis: (id: string) => Promise<{ success: boolean; data?: AnalysisRecord; message?: string }>;
-    sendAiChatMessage: (id: string, message: string, history?: any[], language?: string) => Promise<{ success: boolean; reply?: string; message?: string }>;
+    sendAiChatMessage: (id: string, message: string, history?: { role: string; content: string }[], language?: string) => Promise<{ success: boolean; reply?: string; message?: string }>;
     getAnalysisHistory: (params?: { page?: number, limit?: number }) => Promise<{ success: boolean; data?: AnalysisRecord[]; totalPages?: number; total?: number; page?: number; message?: string }>;
     updateProfile: (name: string, email: string) => Promise<{ success: boolean; message?: string }>;
     updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
@@ -360,7 +360,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const sendAiChatMessage = async (id: string, message: string, history: any[] = [], language: string = "en") => {
+    const sendAiChatMessage = async (id: string, message: string, history: { role: string; content: string }[] = [], language: string = "en") => {
         try {
             const { data } = await api.post(`/api/analysis/${id}/ai-chat`, { message, history, language });
             return { success: true, reply: data.reply };
