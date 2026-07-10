@@ -96,7 +96,7 @@ interface AppContextType {
     refreshKeyword: (id: string) => Promise<{ success: boolean; message?: string }>;
     startAnalysis: (url: string) => Promise<{ success: boolean; message?: string; analysisId?: string }>;
     getAnalysis: (id: string) => Promise<{ success: boolean; data?: AnalysisRecord; message?: string }>;
-    generateAiInsights: (id: string, language?: string) => Promise<{ success: boolean; aiInsights?: string; message?: string }>;
+    sendAiChatMessage: (id: string, message: string, history?: any[], language?: string) => Promise<{ success: boolean; reply?: string; message?: string }>;
     getAnalysisHistory: (params?: { page?: number, limit?: number }) => Promise<{ success: boolean; data?: AnalysisRecord[]; totalPages?: number; total?: number; page?: number; message?: string }>;
     updateProfile: (name: string, email: string) => Promise<{ success: boolean; message?: string }>;
     updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
@@ -360,12 +360,12 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const generateAiInsights = async (id: string, language: string = "en") => {
+    const sendAiChatMessage = async (id: string, message: string, history: any[] = [], language: string = "en") => {
         try {
-            const { data } = await api.post(`/api/analysis/${id}/ai-insights`, { language });
-            return { success: true, aiInsights: data.aiInsights };
+            const { data } = await api.post(`/api/analysis/${id}/ai-chat`, { message, history, language });
+            return { success: true, reply: data.reply };
         } catch (error: unknown) {
-            return { success: false, message: getAxiosErrorMessage(error, "Failed to generate AI insights") };
+            return { success: false, message: getAxiosErrorMessage(error, "Failed to get AI reply") };
         }
     };
 
@@ -487,7 +487,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
         refreshKeyword,
         startAnalysis,
         getAnalysis,
-        generateAiInsights,
+        sendAiChatMessage,
         getAnalysisHistory,
         updateProfile,
         updatePassword,

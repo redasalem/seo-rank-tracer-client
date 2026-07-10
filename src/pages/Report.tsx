@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import ScoreGauge from "../components/ScoreGauge";
 import IssueCard from "../components/IssueCard";
-import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map } from "lucide-react";
+import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map, Send, User } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
@@ -71,12 +71,25 @@ export default function Report() {
     const contentRef = useRef<HTMLDivElement>(null);
     const { t, i18n } = useTranslation();
     const { id } = useParams();
-    const { getAnalysis, generateAiInsights } = useApp();
+    const { getAnalysis, sendAiChatMessage } = useApp();
     const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
     const [loading, setLoading] = useState(true);
     const [generatingAi, setGeneratingAi] = useState(false);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("overview");
+    const [chatHistory, setChatHistory] = useState<{ role: "user" | "ai", content: string }[]>([]);
+    const [chatInput, setChatInput] = useState("");
+    const chatEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (activeTab === "ai") {
+            scrollToBottom();
+        }
+    }, [chatHistory, activeTab]);
 
     const handleExportPdf = useReactToPrint({
         contentRef,
@@ -96,12 +109,22 @@ export default function Report() {
         setLoading(false);
     };
 
-    const handleGenerateAi = async () => {
-        if (!id || !analysis) return;
+    const handleSendChat = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (!id || !analysis || !chatInput.trim()) return;
+        
+        const userMsg = chatInput.trim();
+        setChatInput("");
+        
+        const newHistory = [...chatHistory, { role: "user" as const, content: userMsg }];
+        setChatHistory(newHistory);
         setGeneratingAi(true);
-        const res = await generateAiInsights(id, i18n.language);
-        if (res.success && res.aiInsights) {
-            setAnalysis({ ...analysis, aiInsights: res.aiInsights });
+
+        const res = await sendAiChatMessage(id, userMsg, chatHistory, i18n.language);
+        if (res.success && res.reply) {
+            setChatHistory([...newHistory, { role: "ai" as const, content: res.reply }]);
+        } else {
+            setChatHistory([...newHistory, { role: "ai" as const, content: t("report.ai.error") || "Error generating response. Please try again." }]);
         }
         setGeneratingAi(false);
     };
@@ -634,35 +657,71 @@ export default function Report() {
                                 </div>
                             </div>
                             
-                            {analysis.aiInsights ? (
-                                <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:text-foreground prose-a:text-primary">
-                                    <Markdown>{analysis.aiInsights}</Markdown>
+                            <div className="flex flex-col h-[500px] border border-border rounded-xl bg-background/50 overflow-hidden">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                    {chatHistory.length === 0 ? (
+                                        <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                                            <Bot size={48} className="text-muted-foreground mb-4 opacity-30" />
+                                            <p className="text-muted-foreground max-w-sm">
+                                                Ask me anything about your website's SEO! For example: 
+                                                <br/>"How do I fix my broken links?" or "Why is my performance score low?"
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        chatHistory.map((msg, idx) => (
+                                            <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-accent/20 text-accent"}`}>
+                                                    {msg.role === "user" ? <User size={16} /> : <Bot size={16} />}
+                                                </div>
+                                                <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === "user" ? "bg-primary text-primary-foreground rounded-tr-sm" : "bg-card border border-border shadow-sm rounded-tl-sm"}`}>
+                                                    {msg.role === "user" ? (
+                                                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                                    ) : (
+                                                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                                                            <Markdown>{msg.content}</Markdown>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                    {generatingAi && (
+                                        <div className="flex gap-3 flex-row">
+                                            <div className="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0">
+                                                <Bot size={16} />
+                                            </div>
+                                            <div className="max-w-[80%] rounded-2xl rounded-tl-sm px-4 py-3 bg-card border border-border shadow-sm flex items-center gap-2">
+                                                <div className="flex gap-1">
+                                                    <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                                                    <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                                                    <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div ref={chatEndRef} />
                                 </div>
-                            ) : (
-                                <div className="text-center py-12">
-                                    <Bot size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-                                    <h3 className="text-lg font-semibold text-foreground mb-2">No AI Insights Yet</h3>
-                                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">Generate a comprehensive, easy-to-understand SEO action plan tailored specifically for your website using Google Gemini AI.</p>
-                                    <button 
-                                        onClick={handleGenerateAi}
-                                        disabled={generatingAi}
-                                        className="bg-primary hover:bg-primary-dark text-primary-foreground font-semibold py-2.5 px-6 rounded-xl transition-colors inline-flex items-center gap-2"
-                                        style={{ color: "var(--background)" }}
-                                    >
-                                        {generatingAi ? (
-                                            <>
-                                                <div className="size-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
-                                                Generating...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Bot size={18} />
-                                                Generate AI Report
-                                            </>
-                                        )}
-                                    </button>
+                                <div className="p-3 bg-card border-t border-border">
+                                    <form onSubmit={handleSendChat} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={chatInput}
+                                            onChange={(e) => setChatInput(e.target.value)}
+                                            placeholder="Ask a question about your SEO..."
+                                            className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors"
+                                            disabled={generatingAi}
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={generatingAi || !chatInput.trim()}
+                                            className="bg-primary hover:bg-primary-dark text-primary-foreground w-11 h-11 flex items-center justify-center rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                                            style={{ color: "var(--background)" }}
+                                        >
+                                            <Send size={18} className={i18n.language === "ar" ? "rotate-180" : ""} />
+                                        </button>
+                                    </form>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </div>
