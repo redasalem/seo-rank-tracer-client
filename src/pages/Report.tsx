@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import ScoreGauge from "../components/ScoreGauge";
 import IssueCard from "../components/IssueCard";
 import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
-import html2pdf from "html2pdf.js";
+import { useReactToPrint } from "react-to-print";
 
 interface AnalysisData {
     _id: string;
@@ -66,6 +66,7 @@ interface AnalysisData {
 }
 
 export default function Report() {
+    const contentRef = useRef<HTMLDivElement>(null);
     const { t, i18n } = useTranslation();
     const { id } = useParams();
     const { getAnalysis } = useApp();
@@ -157,35 +158,14 @@ export default function Report() {
     const warningCount = analysis.issues.filter((i) => i.severity === "warning").length;
     const infoCount = analysis.issues.filter((i) => i.severity === "info").length;
 
-    const handleExportPdf = () => {
-        const element = document.getElementById("report-content");
-        if (!element) return;
-
-        // Hide no-print elements during export
-        const noPrintElements = element.querySelectorAll(".no-print");
-        noPrintElements.forEach(el => (el as HTMLElement).style.display = "none");
-
-        const hostname = new URL(analysis.url).hostname;
-        const date = new Date(analysis.createdAt).toLocaleDateString();
-
-        const opt = {
-            margin: [10, 10, 10, 10] as [number, number, number, number],
-            filename: `RankBoost_Report_${hostname}_${date}.pdf`,
-            image: { type: "jpeg" as const, quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-            jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const },
-            pagebreak: { mode: ["avoid-all", "css", "legacy"] }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            // Restore no-print elements after export
-            noPrintElements.forEach(el => (el as HTMLElement).style.display = "");
-        });
-    };
+    const handleExportPdf = useReactToPrint({
+        contentRef,
+        documentTitle: `RankBoost_Report_${analysis?.url ? new URL(analysis.url).hostname : 'SEO'}`
+    });
 
     return (
-        <div className="min-h-screen pt-16 md:pt-24 bg-background">
-            <div id="report-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="min-h-screen pt-16 md:pt-24 bg-background print:bg-white print:pt-0">
+            <div ref={contentRef} id="report-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-8 print:p-8 print:w-[210mm] print:mx-auto print:bg-white">
                 {/* Back + Header */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
