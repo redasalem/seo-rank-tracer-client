@@ -14,7 +14,7 @@ export default function AnalysesCard({ analysis }: { analysis: any }) {
         <Link key={analysis._id} to={`/report/${analysis._id}`} className="glass rounded-2xl p-5 hover:bg-muted/50 transition-all group block">
             <div className="flex items-start justify-between mb-4">
                 <div className="flex-1 min-w-0 mr-3">
-                    <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">{new URL(analysis.url).hostname}</p>
+                    <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">{(() => { try { return new URL(analysis.url).hostname; } catch { return analysis.url || "Unknown URL"; } })()}</p>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">{analysis.url}</p>
                 </div>
                 {analysis.status === "completed" ? (
