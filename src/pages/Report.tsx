@@ -91,9 +91,17 @@ export default function Report() {
         }
     }, [chatHistory, activeTab]);
 
+    const safeHostname = (() => {
+        try {
+            return new URL(analysis?.url || "").hostname;
+        } catch {
+            return analysis?.url || "SEO";
+        }
+    })();
+
     const handleExportPdf = useReactToPrint({
         contentRef,
-        documentTitle: `RankBoost_Report_${analysis?.url ? new URL(analysis.url).hostname : 'SEO'}`
+        documentTitle: `RankBoost_Report_${safeHostname}`
     });
 
     const fetchAnalysis = async () => {
@@ -710,6 +718,7 @@ export default function Report() {
                                             placeholder="Ask a question about your SEO..."
                                             className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors"
                                             disabled={generatingAi}
+                                            maxLength={1000}
                                         />
                                         <button
                                             type="submit"
