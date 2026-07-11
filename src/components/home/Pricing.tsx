@@ -1,13 +1,19 @@
 import { Link } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useApp } from "../../context/AppContext";
 
 export default function Pricing() {
     const { t } = useTranslation();
+    const { user } = useApp();
     
     // Arrays for mapping so we don't have messy code in the return
     const freeFeatures = [0, 1, 2, 3, 4];
     const proFeatures = [0, 1, 2, 3, 4, 5];
+    
+    const freeBtnLink = user ? "/dashboard" : "/register";
+    const proBtnLink = user ? "/settings?tab=subscription" : "/register";
+
     return (
         <section className="relative md:min-h-screen flex flex-col justify-center items-center max-lg:py-24">
             <div className="bg-dot-pattern absolute inset-0 -z-1 opacity-10"></div>
@@ -34,7 +40,7 @@ export default function Pricing() {
                                 </li>
                             ))}
                         </ul>
-                        <Link to="/register" className="block w-full py-3 rounded-xl bg-primary/10 text-secondary-foreground text-center text-sm hover:opacity-90 transition-colors">
+                        <Link to={freeBtnLink} className="block w-full py-3 rounded-xl bg-primary/10 text-secondary-foreground text-center text-sm hover:opacity-90 transition-colors">
                             {t("pricing.freePlan.btn")}
                         </Link>
                     </div>
@@ -57,7 +63,7 @@ export default function Pricing() {
                                 </li>
                             ))}
                         </ul>
-                        <Link to="/register" className="block w-full py-3 rounded-xl bg-primary text-primary-foreground text-center text-sm hover:opacity-90 transition-opacity" style={{ color: "var(--background)" }}>
+                        <Link to={proBtnLink} className="block w-full py-3 rounded-xl bg-primary text-primary-foreground text-center text-sm hover:opacity-90 transition-opacity" style={{ color: "var(--background)" }}>
                             {t("pricing.proPlan.btn")}
                         </Link>
                     </div>
