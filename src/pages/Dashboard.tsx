@@ -157,14 +157,14 @@ export default function Dashboard() {
                         <div className="flex items-center gap-4 px-4">
                             <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                                 <div 
-                                    className={`h-full rounded-full transition-all ${stats!.analysisLimit!.used >= 10 ? 'bg-danger' : 'bg-primary'}`} 
-                                    style={{ width: `${Math.min(100, (stats!.analysisLimit!.used / 10) * 100)}%` }}
+                                    className={`h-full rounded-full transition-all ${stats!.analysisLimit!.used >= (stats!.analysisLimit!.max as number) ? 'bg-danger' : 'bg-primary'}`} 
+                                    style={{ width: `${Math.min(100, (stats!.analysisLimit!.used / (stats!.analysisLimit!.max as number)) * 100)}%` }}
                                 ></div>
                             </div>
                             <span className="text-xs font-medium text-muted-foreground shrink-0">
-                                {stats!.analysisLimit!.used} / 10 Daily Free Analyses Used
+                                {stats!.analysisLimit!.used} / {stats!.analysisLimit!.max} Daily Free Analyses Used
                             </span>
-                            {stats!.analysisLimit!.used >= 10 && (
+                            {stats!.analysisLimit!.used >= (stats!.analysisLimit!.max as number) && (
                                 <Link to="/settings?tab=subscription" className="text-xs font-bold text-primary hover:underline">
                                     Upgrade to Pro
                                 </Link>
