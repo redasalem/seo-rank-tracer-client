@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChartNoAxesColumnIcon } from "lucide-react";
+import { ChartNoAxesColumnIcon, Mail } from "lucide-react";
 import { homefooterLinks } from "../../assets/assets";
 import { SiX, SiInstagram, SiFacebook, SiTwitch } from "@icons-pack/react-simple-icons";
 import { useTranslation } from "react-i18next";
@@ -47,6 +47,18 @@ export default function Footer() {
                             </ul>
                         </div>
                     ))}
+
+                    <div>
+                        <h3 className="mb-4">Support</h3>
+                        <ul className="space-y-1">
+                            <li>
+                                <a href="mailto:support@rankboost.com" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5">
+                                    <Mail size={14} />
+                                    support@rankboost.com
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
