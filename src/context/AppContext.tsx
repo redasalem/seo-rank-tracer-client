@@ -103,7 +103,7 @@ interface AppContextType {
     getNotifications: () => Promise<{ success: boolean; data?: Notification[] }>;
     markNotificationAsRead: (id: string) => Promise<{ success: boolean }>;
     markAllNotificationsAsRead: () => Promise<{ success: boolean }>;
-    createCheckoutSession: () => Promise<{ success: boolean; url?: string; message?: string }>;
+    createCheckoutSession: (plan: "pro" | "max") => Promise<{ success: boolean; url?: string; message?: string }>;
     getGlobalCompetitors: () => Promise<{ success: boolean; data?: CompetitorData[]; message?: string }>;
     loadUser: () => Promise<void>;
 }
@@ -334,7 +334,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
             const { data } = await api.post("/api/analysis/start", { url });
             
             // Increment the user's local analysis count
-            if (user && user.plan === "free") {
+            if (user && user.plan !== "max") {
                 setUser({
                     ...user,
                     analysisCount: (user.analysisCount || 0) + 1
@@ -450,11 +450,11 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const createCheckoutSession = async () => {
+    const createCheckoutSession = async (plan: "pro" | "max") => {
         try {
-            const { data } = await api.post('/api/subscription/create-checkout-session');
+            const { data } = await api.post('/api/subscription/create-checkout-session', { plan });
             if (import.meta.env.PROD) {
-                ReactGA.event({ category: "Subscription", action: "Upgraded to Pro" });
+                ReactGA.event({ category: "Subscription", action: `Upgraded to ${plan.charAt(0).toUpperCase() + plan.slice(1)}` });
             }
             return { success: true, url: data.url };
         } catch (error: unknown) {

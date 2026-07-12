@@ -113,10 +113,10 @@ export default function Settings() {
         }
     };
 
-    const handleUpgrade = async () => {
+    const handleUpgrade = async (plan: "pro" | "max") => {
         setIsRedirecting(true);
         const toastId = toast.loading("Redirecting to checkout...");
-        const res = await createCheckoutSession();
+        const res = await createCheckoutSession(plan);
         if (res.success && res.url) {
             toast.success("Redirecting...", { id: toastId });
             window.location.href = res.url;
@@ -356,29 +356,63 @@ export default function Settings() {
                                         </span>
                                     </div>
                                     <p className="text-muted-foreground text-sm">
-                                        {t("settings.subscription.currentPlanDesc", { plan: user?.plan || "free" })}
+                                        {user?.plan === "free" && "Free plan — upgrade to unlock more keywords and analyses."}
+                                        {user?.plan === "pro" && "Pro plan — $4/mo. Upgrade to Max for even more power."}
+                                        {user?.plan === "max" && "Max plan — $9/mo. You have the highest tier!"}
                                     </p>
                                 </div>
-                                {user?.plan !== "pro" && (
-                                    <button 
-                                        onClick={handleUpgrade}
-                                        disabled={isRedirecting}
-                                        className="px-5 py-2.5 bg-gradient-to-r from-accent to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
-                                    >
-                                        {isRedirecting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
-                                        {t("settings.subscription.upgradeBtn")}
-                                    </button>
-                                )}
-                                {user?.plan === "pro" && (
-                                    <button 
-                                        onClick={handleManageSubscription}
-                                        disabled={isRedirecting}
-                                        className="px-5 py-2.5 bg-card border border-border text-foreground rounded-xl font-medium hover:bg-muted transition-all flex items-center gap-2 disabled:opacity-70"
-                                    >
-                                        {isRedirecting && <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>}
-                                        {t("settings.subscription.manageBtn", { defaultValue: "Manage Subscription" })}
-                                    </button>
-                                )}
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    {user?.plan === "free" && (
+                                        <>
+                                            <button 
+                                                onClick={() => handleUpgrade("pro")}
+                                                disabled={isRedirecting}
+                                                className="px-5 py-2.5 bg-gradient-to-r from-accent to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
+                                            >
+                                                {isRedirecting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                                                Upgrade to Pro — $4/mo
+                                            </button>
+                                            <button 
+                                                onClick={() => handleUpgrade("max")}
+                                                disabled={isRedirecting}
+                                                className="px-5 py-2.5 bg-card border border-border text-foreground rounded-xl font-medium hover:bg-muted transition-all flex items-center gap-2 disabled:opacity-70"
+                                            >
+                                                {isRedirecting && <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>}
+                                                Upgrade to Max — $9/mo
+                                            </button>
+                                        </>
+                                    )}
+                                    {user?.plan === "pro" && (
+                                        <>
+                                            <button 
+                                                onClick={() => handleUpgrade("max")}
+                                                disabled={isRedirecting}
+                                                className="px-5 py-2.5 bg-gradient-to-r from-accent to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
+                                            >
+                                                {isRedirecting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                                                Upgrade to Max — $9/mo
+                                            </button>
+                                            <button 
+                                                onClick={handleManageSubscription}
+                                                disabled={isRedirecting}
+                                                className="px-5 py-2.5 bg-card border border-border text-foreground rounded-xl font-medium hover:bg-muted transition-all flex items-center gap-2 disabled:opacity-70"
+                                            >
+                                                {isRedirecting && <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>}
+                                                {t("settings.subscription.manageBtn", { defaultValue: "Manage Subscription" })}
+                                            </button>
+                                        </>
+                                    )}
+                                    {user?.plan === "max" && (
+                                        <button 
+                                            onClick={handleManageSubscription}
+                                            disabled={isRedirecting}
+                                            className="px-5 py-2.5 bg-card border border-border text-foreground rounded-xl font-medium hover:bg-muted transition-all flex items-center gap-2 disabled:opacity-70"
+                                        >
+                                            {isRedirecting && <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>}
+                                            {t("settings.subscription.manageBtn", { defaultValue: "Manage Subscription" })}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -388,12 +422,14 @@ export default function Settings() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1.5">
                                         <span className="text-muted-foreground">{t("settings.subscription.dailyUsed")}</span>
-                                        <span className="font-medium text-foreground">{user?.analysisCount || 0} / {user?.plan === "pro" ? t("settings.subscription.unlimited") : "10"}</span>
+                                        <span className="font-medium text-foreground">
+                                            {user?.analysisCount || 0} / {user?.plan === "free" ? "5" : user?.plan === "pro" ? "20" : "60"}
+                                        </span>
                                     </div>
                                     <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                                         <div 
                                             className="bg-primary h-2 rounded-full transition-all duration-500" 
-                                            style={{ width: `${user?.plan === "pro" ? 100 : Math.min(((user?.analysisCount || 0) / 10) * 100, 100)}%` }}
+                                            style={{ width: `${Math.min(((user?.analysisCount || 0) / (user?.plan === "free" ? 5 : user?.plan === "pro" ? 20 : 60)) * 100, 100)}%` }}
                                         ></div>
                                     </div>
                                 </div>
@@ -401,7 +437,9 @@ export default function Settings() {
                                 <div className="pt-2">
                                     <div className="flex justify-between text-sm mb-1.5">
                                         <span className="text-muted-foreground">{t("settings.subscription.trackingLimit")}</span>
-                                        <span className="font-medium text-foreground">{user?.plan === "pro" ? t("settings.subscription.unlimited") : t("settings.subscription.max10")}</span>
+                                        <span className="font-medium text-foreground">
+                                            {user?.plan === "free" ? "5 keywords" : user?.plan === "pro" ? "50 keywords" : "200 keywords"}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
