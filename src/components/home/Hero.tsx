@@ -1,4 +1,4 @@
-import { SearchIcon, ArrowRightIcon } from "lucide-react";
+import { SearchIcon, ArrowRightIcon, Star } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HomeWave } from "../../assets/assets";
@@ -16,7 +16,8 @@ export default function Hero() {
     };
 
     return (
-        <section className="relative max-w-2xl mx-auto px-4 py-40 sm:py-44 min-h-screen text-center flex flex-col justify-center">
+        <section className="relative w-full px-4 pt-40 pb-32 sm:pt-44 min-h-screen flex flex-col items-center justify-center overflow-hidden">
+            <div className="max-w-3xl mx-auto text-center relative z-10">
             
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -79,6 +80,73 @@ export default function Hero() {
             >
                 {t("hero.disclaimer")}
             </motion.p>
+            </div>
+
+            {/* Social Proof Section */}
+            <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+                className="w-full max-w-6xl mx-auto mt-20 relative z-10"
+            >
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 border-y border-border/50 py-8">
+                    <div className="text-center">
+                        <div className="text-4xl font-bold text-foreground mb-1">500+</div>
+                        <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Websites Analyzed</div>
+                    </div>
+                    <div className="text-center md:border-x border-border/50">
+                        <div className="text-4xl font-bold text-foreground mb-1">10K+</div>
+                        <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Keywords Tracked</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-4xl font-bold text-foreground mb-1">98%</div>
+                        <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Customer Satisfaction</div>
+                    </div>
+                </div>
+
+                {/* Testimonials */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Card 1 */}
+                    <div className="glass p-6 text-left relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="flex gap-1 mb-4 text-warning">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                        </div>
+                        <p className="text-foreground text-sm leading-relaxed mb-6 italic">"RankBoost helped us climb from position 45 to top 5 in just 3 months. The AI insights are incredibly actionable."</p>
+                        <div>
+                            <div className="font-semibold text-foreground">Sarah Mitchell</div>
+                            <div className="text-xs text-muted-foreground">SEO Manager, TechFlow</div>
+                        </div>
+                    </div>
+
+                    {/* Card 2 */}
+                    <div className="glass p-6 text-left relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="flex gap-1 mb-4 text-warning">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                        </div>
+                        <p className="text-foreground text-sm leading-relaxed mb-6 italic">"Finally an SEO tool that speaks Arabic! The bilingual support and daily rank tracking have transformed our workflow."</p>
+                        <div>
+                            <div className="font-semibold text-foreground">Ahmed Al-Rashid</div>
+                            <div className="text-xs text-muted-foreground">Digital Marketing Lead, GrowthHub</div>
+                        </div>
+                    </div>
+
+                    {/* Card 3 */}
+                    <div className="glass p-6 text-left relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="flex gap-1 mb-4 text-warning">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                        </div>
+                        <p className="text-foreground text-sm leading-relaxed mb-6 italic">"At $4/month, RankBoost Pro is unbeatable value. I use it for all my clients and the competitor analysis saves hours."</p>
+                        <div>
+                            <div className="font-semibold text-foreground">Emma Rodriguez</div>
+                            <div className="text-xs text-muted-foreground">Freelance SEO Consultant</div>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
 
             {/* Animated Wave */}
             <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none -z-1">

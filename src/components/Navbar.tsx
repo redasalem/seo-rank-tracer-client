@@ -1,11 +1,10 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { Search, BarChart3, History, LogOut, Menu, X, Target, Sun, Moon, ChartNoAxesColumnIcon, Settings as SettingsIcon, Users, Languages, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import NotificationBell from "./NotificationBell";
 import { useTranslation } from "react-i18next";
-import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function Navbar() {
     const { t, i18n } = useTranslation();
@@ -15,12 +14,16 @@ export default function Navbar() {
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Scroll animation for Navbar
-    const { scrollY } = useScroll();
-    const navWidth = useTransform(scrollY, [0, 100], ["100%", "90%"]);
-    const navY = useTransform(scrollY, [0, 100], [0, 15]);
-    const navBorderRadius = useTransform(scrollY, [0, 100], ["0px", "9999px"]);
-    const navPadding = useTransform(scrollY, [0, 100], ["0px", "10px"]);
+    const [isScrolled, setIsScrolled] = useState(false);
+    
+    // Add scroll event listener
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -42,17 +45,8 @@ export default function Navbar() {
     ];
 
     return (
-        <div className="fixed top-0 left-0 w-full z-[999] flex justify-center pointer-events-none no-print">
-        <motion.nav 
-            style={{ 
-                width: navWidth, 
-                y: navY, 
-                borderRadius: navBorderRadius,
-            }}
-            className="pointer-events-auto border border-border shadow-sm transition-colors duration-300 relative"
-        >
-            <div className="absolute inset-0 bg-background/60 backdrop-blur-xl rounded-[inherit] -z-10 pointer-events-none"></div>
-            <motion.div style={{ padding: navPadding }} className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+        <nav className={`fixed top-0 left-0 w-full z-[999] transition-all duration-300 no-print ${isScrolled ? "bg-background/70 backdrop-blur-xl border-b border-border shadow-sm py-2" : "bg-transparent border-transparent py-4"}`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group">
@@ -137,7 +131,7 @@ export default function Navbar() {
                         </button>
                     </div>
                 </div>
-            </motion.div>
+            </div>
 
             {/* Mobile menu */}
             {mobileOpen && (
@@ -204,7 +198,6 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
-        </motion.nav>
-        </div>
+        </nav>
     );
 }

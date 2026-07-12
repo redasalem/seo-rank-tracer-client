@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { homeFeaturesData } from "../../assets/assets";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { Sparkles, CheckCircle } from "lucide-react";
 
 export default function Features() {
     const { t } = useTranslation();
@@ -23,6 +25,66 @@ export default function Features() {
                         </div>
                     ))}
                 </div>
+
+                {/* AI Feature Full Width Card */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="mt-20 w-full rounded-3xl p-1 bg-gradient-to-r from-primary/30 to-accent/30 overflow-hidden"
+                >
+                    <div className="glass rounded-[22px] p-8 md:p-12 w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                        {/* Left Side: Content */}
+                        <div className="text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-semibold mb-6 border border-accent/20">
+                                <Sparkles size={14} />
+                                Powered by Gemini AI
+                            </div>
+                            <h3 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground">Your Personal AI SEO Consultant</h3>
+                            <p className="text-muted-foreground mb-8 leading-relaxed">
+                                Get instant, personalized SEO recommendations powered by Google's Gemini AI. Ask questions about your site's performance, understand complex SEO issues in plain language, and get actionable steps to outrank your competition.
+                            </p>
+                            <ul className="space-y-4">
+                                <li className="flex items-center gap-3 text-sm text-foreground font-medium">
+                                    <CheckCircle size={18} className="text-accent" /> Analyzes your specific SEO report
+                                </li>
+                                <li className="flex items-center gap-3 text-sm text-foreground font-medium">
+                                    <CheckCircle size={18} className="text-accent" /> Answers questions in English & Arabic
+                                </li>
+                                <li className="flex items-center gap-3 text-sm text-foreground font-medium">
+                                    <CheckCircle size={18} className="text-accent" /> Provides step-by-step action plans
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Right Side: Chat Mockup */}
+                        <div className="bg-background/80 rounded-2xl p-6 border border-border shadow-xl backdrop-blur-sm relative">
+                            <div className="absolute top-4 right-4 flex gap-1.5">
+                                <div className="size-3 rounded-full bg-danger/80"></div>
+                                <div className="size-3 rounded-full bg-warning/80"></div>
+                                <div className="size-3 rounded-full bg-success/80"></div>
+                            </div>
+                            <div className="mt-6 space-y-6">
+                                {/* User message */}
+                                <div className="flex justify-end">
+                                    <div className="bg-muted px-4 py-3 rounded-2xl rounded-tr-sm text-sm text-foreground max-w-[85%] shadow-sm">
+                                        Why is my bounce rate so high?
+                                    </div>
+                                </div>
+                                {/* AI message */}
+                                <div className="flex justify-start items-end gap-2">
+                                    <div className="size-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shrink-0 shadow-md">
+                                        <Sparkles size={14} />
+                                    </div>
+                                    <div className="bg-primary/5 border border-primary/10 px-4 py-3 rounded-2xl rounded-bl-sm text-sm text-foreground max-w-[85%] shadow-sm leading-relaxed">
+                                        Based on your analysis, your page load time is <span className="font-semibold text-danger">4.2s</span> which is above the 3s threshold. Here are 3 immediate fixes...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
         </section>
     );

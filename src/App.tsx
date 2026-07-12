@@ -3,26 +3,27 @@ import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard";
-import Analyze from "./pages/Analyze";
-import Report from "./pages/Report";
-import History from "./pages/History";
-import RankTracker from "./pages/RankTracker";
-import RankDetail from "./pages/RankDetail";
-import Competitors from "./pages/Competitors";
-import Settings from "./pages/Settings";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import NotFound from "./pages/NotFound";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
+
+const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Analyze = lazy(() => import("./pages/Analyze"));
+const Report = lazy(() => import("./pages/Report"));
+const History = lazy(() => import("./pages/History"));
+const RankTracker = lazy(() => import("./pages/RankTracker"));
+const RankDetail = lazy(() => import("./pages/RankDetail"));
+const Competitors = lazy(() => import("./pages/Competitors"));
+const Settings = lazy(() => import("./pages/Settings"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 import { Toaster } from "react-hot-toast";
 import { useApp } from "./context/AppContext";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import ReactGA from "react-ga4";
 
 export default function App() {
@@ -51,32 +52,38 @@ export default function App() {
             <div className="mesh-bg"></div>
             <Toaster />
             {!hideNavbar && <Navbar />}
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={user ? <Navigate to='/dashboard' /> : <Login state="login" />} />
-                <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <Login state="register" />} />
-                <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
-                <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/analyze" element={<Analyze />} />
-                    <Route path="/report/:id" element={<Report />} />
-                    <Route path="/history" element={<History />} />
-                    <Route path="/rank-tracker" element={<RankTracker />} />
-                    <Route path="/rank/:id" element={<RankDetail />} />
-                    <Route path="/competitors" element={<Competitors />} />
-                    <Route path="/settings" element={<Settings />} />
-                </Route>
-                {/* Admin Routes */}
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/admin" element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/dashboard" />} />
-                    <Route path="/admin/users" element={user?.role === 'admin' ? <AdminUsers /> : <Navigate to="/dashboard" />} />
-                </Route>
-                {/* 404 Route */}
-                <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            }>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={user ? <Navigate to='/dashboard' /> : <Login state="login" />} />
+                    <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <Login state="register" />} />
+                    <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
+                    <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/terms-of-service" element={<TermsOfService />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/analyze" element={<Analyze />} />
+                        <Route path="/report/:id" element={<Report />} />
+                        <Route path="/history" element={<History />} />
+                        <Route path="/rank-tracker" element={<RankTracker />} />
+                        <Route path="/rank/:id" element={<RankDetail />} />
+                        <Route path="/competitors" element={<Competitors />} />
+                        <Route path="/settings" element={<Settings />} />
+                    </Route>
+                    {/* Admin Routes */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/admin" element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/dashboard" />} />
+                        <Route path="/admin/users" element={user?.role === 'admin' ? <AdminUsers /> : <Navigate to="/dashboard" />} />
+                    </Route>
+                    {/* 404 Route */}
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </Suspense>
         </ErrorBoundary>
     );
 }
