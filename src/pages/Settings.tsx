@@ -19,7 +19,7 @@ export default function Settings() {
 
     const profileSchema = useMemo(() => z.object({
         name: z.string().min(2, t("settings.validation.nameMin")).max(50, t("settings.validation.nameMax")),
-        email: z.string().email(t("settings.validation.emailInvalid")),
+        email: z.string().email(t("settings.validation.emailInvalid")).regex(/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, t("settings.validation.emailInvalid") || "Please enter a valid email address"),
     }), [t]);
 
     const passwordSchema = useMemo(() => z.object({

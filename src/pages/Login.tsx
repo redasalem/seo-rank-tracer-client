@@ -19,7 +19,7 @@ export default function Login({ state }: { state: string }) {
 
     const authSchema = useMemo(() => z.object({
         name: z.string().optional(),
-        email: z.string().min(1, t("settings.validation.emailInvalid")).email(t("settings.validation.emailInvalid")),
+        email: z.string().min(1, t("settings.validation.emailInvalid")).email(t("settings.validation.emailInvalid")).regex(/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, t("settings.validation.emailInvalid") || "Please enter a valid email address"),
         password: z.string().min(6, t("settings.validation.newMin")),
     }), [t]);
 
