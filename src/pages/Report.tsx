@@ -111,7 +111,7 @@ export default function Report() {
         const res = await getAnalysis(id);
 
         if (res.success && res.data) {
-            const data = res.data as any;
+            const data = res.data as unknown as AnalysisData;
             setAnalysis(data);
             if (data.chatHistory && Array.isArray(data.chatHistory)) {
                 setChatHistory(data.chatHistory);
