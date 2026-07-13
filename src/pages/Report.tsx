@@ -65,6 +65,7 @@ interface AnalysisData {
         hasSitemap: boolean;
         schemaTypes: string[];
     };
+    chatHistory?: { role: "user" | "ai"; content: string; timestamp?: string }[];
 }
 
 export default function Report() {
@@ -110,7 +111,11 @@ export default function Report() {
         const res = await getAnalysis(id);
 
         if (res.success && res.data) {
-            setAnalysis(res.data as unknown as AnalysisData);
+            const data = res.data as any;
+            setAnalysis(data);
+            if (data.chatHistory && Array.isArray(data.chatHistory)) {
+                setChatHistory(data.chatHistory);
+            }
         } else {
             setError(res.message || t("report.notFound"));
         }
