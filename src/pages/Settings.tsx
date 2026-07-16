@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslation } from "react-i18next";
 
-type ProfileFormValues = { name: string; email: string };
+type ProfileFormValues = { name: string; email: string; reportFrequency?: 'weekly' | 'monthly' | 'off'; language?: 'en' | 'ar' };
 type PasswordFormValues = { currentPassword: string; newPassword: string; confirmPassword: string };
 
 export default function Settings() {
@@ -20,6 +20,8 @@ export default function Settings() {
     const profileSchema = useMemo(() => z.object({
         name: z.string().min(2, t("settings.validation.nameMin")).max(50, t("settings.validation.nameMax")),
         email: z.string().email(t("settings.validation.emailInvalid")).regex(/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, t("settings.validation.emailInvalid") || "Please enter a valid email address"),
+        reportFrequency: z.enum(["weekly", "monthly", "off"]).optional(),
+        language: z.enum(["en", "ar"]).optional(),
     }), [t]);
 
     const passwordSchema = useMemo(() => z.object({
@@ -39,7 +41,7 @@ export default function Settings() {
         reset: resetProfile
     } = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        defaultValues: { name: "", email: "" }
+        defaultValues: { name: "", email: "", reportFrequency: "off", language: "en" }
     });
 
     // Password Form
@@ -68,7 +70,7 @@ export default function Settings() {
 
     useEffect(() => {
         if (user) {
-            resetProfile({ name: user.name, email: user.email });
+            resetProfile({ name: user.name, email: user.email, reportFrequency: user.reportFrequency || "off", language: user.language || "en" });
         }
     }, [user, resetProfile]);
 
@@ -95,7 +97,7 @@ export default function Settings() {
     }, [location]);
 
     const onProfileSubmit = async (data: ProfileFormValues) => {
-        const res = await updateProfile(data.name, data.email);
+        const res = await updateProfile(data.name, data.email, data.reportFrequency, data.language);
         if (res.success) {
             toast.success(res.message || t("settings.alerts.profileSuccess"));
         } else {
@@ -224,6 +226,38 @@ export default function Settings() {
                                     {...registerProfile("email")}
                                 />
                                 {profileErrors.email && <p className="text-danger text-xs mt-1.5 font-medium">{profileErrors.email.message}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-foreground mb-1.5">Email Report Frequency</label>
+                                <select
+                                    className={`w-full px-4 py-2.5 rounded-xl border ${profileErrors.reportFrequency ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
+                                    {...registerProfile("reportFrequency")}
+                                >
+                                    <option value="off">Off (Don't send reports)</option>
+                                    <option value="weekly">Weekly</option>
+                                    {user?.plan === "free" ? (
+                                        <option value="monthly" disabled>Monthly (Pro only)</option>
+                                    ) : (
+                                        <option value="monthly">Monthly</option>
+                                    )}
+                                </select>
+                                {user?.plan === "free" && (
+                                    <p className="text-muted-foreground text-xs mt-1.5 font-medium flex items-center gap-1">
+                                        <AlertTriangle size={12} className="text-amber-500" /> Upgrade to Pro to enable Monthly reports.
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-foreground mb-1.5">Email & Dashboard Language</label>
+                                <select
+                                    className={`w-full px-4 py-2.5 rounded-xl border ${profileErrors.language ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} bg-background/50 text-foreground focus:outline-none transition-all`}
+                                    {...registerProfile("language")}
+                                >
+                                    <option value="en">English</option>
+                                    <option value="ar">العربية (Arabic)</option>
+                                </select>
                             </div>
 
                             <button 

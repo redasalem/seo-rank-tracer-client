@@ -18,6 +18,8 @@ interface User {
     plan: string;
     role?: string;
     analysisCount?: number;
+    reportFrequency?: 'weekly' | 'monthly' | 'off';
+    language?: 'en' | 'ar';
 }
 
 interface KeywordData {
@@ -98,7 +100,7 @@ interface AppContextType {
     getAnalysis: (id: string) => Promise<{ success: boolean; data?: AnalysisRecord; message?: string }>;
     sendAiChatMessage: (id: string, message: string, history?: { role: string; content: string }[], language?: string) => Promise<{ success: boolean; reply?: string; message?: string }>;
     getAnalysisHistory: (params?: { page?: number, limit?: number }) => Promise<{ success: boolean; data?: AnalysisRecord[]; totalPages?: number; total?: number; page?: number; message?: string }>;
-    updateProfile: (name: string, email: string) => Promise<{ success: boolean; message?: string }>;
+    updateProfile: (name: string, email: string, reportFrequency?: string, language?: string) => Promise<{ success: boolean; message?: string }>;
     updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
     getNotifications: () => Promise<{ success: boolean; data?: Notification[] }>;
     markNotificationAsRead: (id: string) => Promise<{ success: boolean }>;
@@ -184,7 +186,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
                             email: data.user.email,
                             plan: data.user.plan,
                             role: data.user.role,
-                            analysisCount: data.user.analysisCount
+                            analysisCount: data.user.analysisCount,
+                            reportFrequency: data.user.reportFrequency,
+                            language: data.user.language
                         });
                     }
                 }
@@ -206,7 +210,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
                     email: data.user.email,
                     plan: data.user.plan,
                     role: data.user.role,
-                    analysisCount: data.user.analysisCount
+                    analysisCount: data.user.analysisCount,
+                    reportFrequency: data.user.reportFrequency,
+                    language: data.user.language
                 });
             }
         } catch {
@@ -237,7 +243,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
                         email: data.user.email,
                         plan: data.user.plan,
                         role: data.user.role,
-                        analysisCount: data.user.analysisCount
+                        analysisCount: data.user.analysisCount,
+                        reportFrequency: data.user.reportFrequency,
+                        language: data.user.language
                     });
                 }
                 if (import.meta.env.PROD) {
@@ -400,18 +408,17 @@ export function AddProvider({ children }: { children: ReactNode }) {
         toast.success("Logged out successfully");
     };
 
-    const updateProfile = async (name: string, email: string) => {
+    const updateProfile = async (name: string, email: string, reportFrequency?: string, language?: string): Promise<{ success: boolean; message?: string }> => {
         try {
-            const { data } = await api.put('/api/auth/profile', { name, email });
-            if (data.user) {
-                setUser({
-                    id: data.user.id || data.user._id,
-                    name: data.user.name,
+            const { data } = await api.put('/api/auth/profile', { name, email, reportFrequency, language });
+            if (data && data.user) {
+                setUser(prev => prev ? { 
+                    ...prev, 
+                    name: data.user.name, 
                     email: data.user.email,
-                    plan: data.user.plan,
-                    role: data.user.role,
-                    analysisCount: data.user.analysisCount
-                });
+                    reportFrequency: data.user.reportFrequency,
+                    language: data.user.language
+                } : null);
             }
             return { success: true, message: data.message };
         } catch (error: unknown) {
