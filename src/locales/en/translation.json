@@ -439,8 +439,10 @@
     "login": {
       "success": "Welcome back!",
       "failed": "Failed to login",
-      "regSuccess": "Account created successfully! You can now login.",
+      "regSuccess": "Registration successful! Please check your email to verify your account.",
       "regFailed": "Failed to register",
+      "resendSuccess": "Verification email resent successfully!",
+      "resendVerificationBtn": "Resend Verification Email",
       "error": "An unexpected error occurred",
       "title": "Welcome back",
       "subtitleSignIn": "Sign in to your RankBoost account",
@@ -512,6 +514,9 @@
     "failedDesc": "The AI model might be down. Please try again later.",
     "tryAgain": "Try Again",
     "exportPdf": "Export PDF",
+    "exportingPdf": "Generating PDF...",
+    "pdfSuccess": "PDF report downloaded successfully!",
+    "pdfError": "Failed to generate PDF report. Please try again.",
     "tabs": {
       "overview": "Overview",
       "meta": "Meta Tags",

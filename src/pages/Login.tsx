@@ -15,7 +15,9 @@ export default function Login({ state }: { state: string }) {
     const [isLoginState, setIsLoginState] = useState(state === "login");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const { login, register } = useApp();
+    const [unverifiedEmail, setUnverifiedEmail] = useState("");
+    const [resending, setResending] = useState(false);
+    const { login, register, resendVerificationEmail } = useApp();
 
     const authSchema = useMemo(() => z.object({
         name: z.string().optional(),
@@ -38,7 +40,21 @@ export default function Login({ state }: { state: string }) {
     // Clear validation errors when switching states
     useEffect(() => {
         clearErrors();
+        setUnverifiedEmail("");
     }, [isLoginState, clearErrors]);
+
+    const handleResend = async () => {
+        if (!unverifiedEmail) return;
+        setResending(true);
+        const res = await resendVerificationEmail(unverifiedEmail);
+        if (res.success) {
+            toast.success(t("auth.login.resendSuccess") || "Verification email resent!");
+            setUnverifiedEmail("");
+        } else {
+            toast.error(res.message || "Failed to resend");
+        }
+        setResending(false);
+    };
 
     const onSubmit = async (data: AuthFormValues) => {
         if (!isLoginState && (!data.name || data.name.length < 2)) {
@@ -47,6 +63,7 @@ export default function Login({ state }: { state: string }) {
         }
 
         setLoading(true);
+        setUnverifiedEmail("");
 
         try {
             if (isLoginState) {
@@ -55,11 +72,14 @@ export default function Login({ state }: { state: string }) {
                     toast.success(t("auth.login.success"));
                 } else {
                     toast.error(res.message || t("auth.login.failed"));
+                    if (res.notVerified) {
+                        setUnverifiedEmail(data.email);
+                    }
                 }
             } else {
                 const res = await register(data.name || "", data.email, data.password);
                 if (res.success) {
-                    toast.success(t("auth.login.regSuccess"));
+                    toast.success(res.message || t("auth.login.regSuccess"));
                     setIsLoginState(true);
                     reset({ name: "", email: data.email, password: "" });
                 } else {
@@ -161,6 +181,18 @@ export default function Login({ state }: { state: string }) {
                         >
                             {loading ? <Loader2 size={18} className="animate-spin" /> : isLoginState ? t("auth.login.signInBtn") : t("auth.login.createBtn")}
                         </button>
+                        
+                        {unverifiedEmail && (
+                            <button
+                                type="button"
+                                onClick={handleResend}
+                                disabled={resending}
+                                className="w-full py-3 mt-3 rounded-lg border border-border bg-card text-sm font-semibold text-foreground flex items-center justify-center gap-2 hover:bg-muted transition-colors disabled:opacity-50"
+                            >
+                                {resending ? <Loader2 size={18} className="animate-spin" /> : <Mail size={18} />}
+                                {t("auth.login.resendVerificationBtn") || "Resend Verification Email"}
+                            </button>
+                        )}
                     </form>
                 </div>
 

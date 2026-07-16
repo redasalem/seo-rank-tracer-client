@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import ScoreGauge from "../components/ScoreGauge";
 import IssueCard from "../components/IssueCard";
-import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map, Send, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map, Send, User, Loader2 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
-import { useReactToPrint } from "react-to-print";
+import toast from 'react-hot-toast';
 import Markdown from 'react-markdown';
 
 interface AnalysisData {
@@ -72,10 +72,11 @@ export default function Report() {
     const contentRef = useRef<HTMLDivElement>(null);
     const { t, i18n } = useTranslation();
     const { id } = useParams();
-    const { getAnalysis, sendAiChatMessage } = useApp();
+    const { getAnalysis, sendAiChatMessage, exportAnalysisPdf } = useApp();
     const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
     const [loading, setLoading] = useState(true);
     const [generatingAi, setGeneratingAi] = useState(false);
+    const [exportingPdf, setExportingPdf] = useState(false);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("overview");
     const [chatHistory, setChatHistory] = useState<{ role: "user" | "ai", content: string }[]>([]);
@@ -92,18 +93,17 @@ export default function Report() {
         }
     }, [chatHistory, activeTab]);
 
-    const safeHostname = (() => {
-        try {
-            return new URL(analysis?.url || "").hostname;
-        } catch {
-            return analysis?.url || "SEO";
+    const handleExportPdf = async () => {
+        if (!id || exportingPdf) return;
+        setExportingPdf(true);
+        const res = await exportAnalysisPdf(id, i18n.language);
+        if (res.success) {
+            toast.success(t("report.pdfSuccess"));
+        } else {
+            toast.error(res.message || t("report.pdfError"));
         }
-    })();
-
-    const handleExportPdf = useReactToPrint({
-        contentRef,
-        documentTitle: `RankBoost_Report_${safeHostname}`
-    });
+        setExportingPdf(false);
+    };
 
     const fetchAnalysis = async () => {
         if (!id) return;
@@ -240,9 +240,9 @@ export default function Report() {
                             </div>
                         </div>
                     </div>
-                    <button onClick={handleExportPdf} className="bg-card border border-border px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-colors flex items-center gap-2 self-start no-print">
-                        <Download size={18} />
-                        {t("report.exportPdf")}
+                    <button onClick={handleExportPdf} disabled={exportingPdf} className="bg-card border border-border px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-colors flex items-center gap-2 self-start no-print disabled:opacity-50 disabled:cursor-not-allowed">
+                        {exportingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                        {exportingPdf ? t("report.exportingPdf") : t("report.exportPdf")}
                     </button>
                 </div>
 

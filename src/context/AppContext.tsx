@@ -85,7 +85,7 @@ interface AppContextType {
     token: string | null;
     loading: boolean;
     api: AxiosInstance;
-    login: (email: string, password: string) => Promise<{ success: boolean, message?: string }>
+    login: (email: string, password: string) => Promise<{ success: boolean, message?: string, notVerified?: boolean }>
     register: (name: string, email: string, password: string) => Promise<{ success: boolean, message?: string }>
     logout: () => void;
     addKeyword: (data: KeywordData) => Promise<{ success: boolean; message?: string; tracking?: KeywordTracking }>;
@@ -105,6 +105,9 @@ interface AppContextType {
     markAllNotificationsAsRead: () => Promise<{ success: boolean }>;
     createCheckoutSession: (plan: "pro" | "max") => Promise<{ success: boolean; url?: string; message?: string }>;
     getGlobalCompetitors: () => Promise<{ success: boolean; data?: CompetitorData[]; message?: string }>;
+    exportAnalysisPdf: (id: string, language: string) => Promise<{ success: boolean; message?: string }>;
+    verifyEmail: (token: string) => Promise<{ success: boolean; message?: string }>;
+    resendVerificationEmail: (email: string) => Promise<{ success: boolean; message?: string }>;
     loadUser: () => Promise<void>;
 }
 
@@ -221,7 +224,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     }, [loadUser]);
 
-    const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+    const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; notVerified?: boolean }> => {
         try {
             const { data } = await api.post('/api/auth/login', { email, password });
             if (data && data.token) {
@@ -243,9 +246,10 @@ export function AddProvider({ children }: { children: ReactNode }) {
                 return { success: true, message: data.message };
             }
             return { success: false, message: data.message || "Failed to login" };
-        } catch (error: unknown) {
-            const msg = getAxiosErrorMessage(error, "An error occurred during login");
-            return { success: false, message: msg };
+        } catch (error: any) {
+            const notVerified = error.response?.data?.notVerified;
+            const msg = error.response?.data?.message || "An error occurred during login";
+            return { success: false, message: msg, notVerified };
         }
     };
 
@@ -471,6 +475,56 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     }, [api]);
 
+    const verifyEmail = async (token: string) => {
+        try {
+            const { data } = await api.get(`/api/auth/verify-email/${token}`);
+            return { success: true, message: data.message };
+        } catch (error: unknown) {
+            return { success: false, message: getAxiosErrorMessage(error, "Verification failed") };
+        }
+    };
+
+    const resendVerificationEmail = async (email: string) => {
+        try {
+            const { data } = await api.post('/api/auth/resend-verification', { email });
+            return { success: true, message: data.message };
+        } catch (error: unknown) {
+            return { success: false, message: getAxiosErrorMessage(error, "Failed to resend verification email") };
+        }
+    };
+
+    const exportAnalysisPdf = async (id: string, language: string) => {
+        try {
+            const response = await api.get(`/api/analysis/${id}/export-pdf?lang=${language}`, {
+                responseType: 'blob',
+                timeout: 60000, // 60s timeout for PDF generation
+            });
+
+            // Extract filename from Content-Disposition header or use default
+            const disposition = response.headers['content-disposition'];
+            let filename = `RankBoost_Report.pdf`;
+            if (disposition) {
+                const match = disposition.match(/filename="?([^"]+)"?/);
+                if (match) filename = match[1];
+            }
+
+            // Create download link
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            return { success: true };
+        } catch (error: unknown) {
+            return { success: false, message: getAxiosErrorMessage(error, "Failed to export PDF") };
+        }
+    };
+
     const value = { 
         user, 
         token, 
@@ -496,6 +550,9 @@ export function AddProvider({ children }: { children: ReactNode }) {
         markAllNotificationsAsRead,
         createCheckoutSession,
         getGlobalCompetitors,
+        exportAnalysisPdf,
+        verifyEmail,
+        resendVerificationEmail,
         loadUser
     };
 

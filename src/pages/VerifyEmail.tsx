@@ -1,87 +1,76 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { CheckCircle2, XCircle, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { useApp } from "../context/AppContext";
-import { useTranslation } from "react-i18next";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
-// INTENTIONALLY UNUSED: This page is dead code. The verify-email endpoint 
-// does not exist in the backend and email verification is intentionally skipped.
 export default function VerifyEmail() {
-    const { t, i18n } = useTranslation();
-    const { token } = useParams<{ token: string }>();
+    const { token } = useParams();
+    const { verifyEmail } = useApp();
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
     const [message, setMessage] = useState("");
-    const { api } = useApp();
-    const calledRef = useRef(false);
+    const isVerifying = useRef(false);
 
     useEffect(() => {
-        if (!token) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setStatus("error");
-            setMessage(t("auth.verify.noToken"));
-            return;
-        }
-
-        if (calledRef.current) return;
-        calledRef.current = true;
+        if (!token || isVerifying.current) return;
+        isVerifying.current = true;
 
         const verify = async () => {
-            try {
-                const { data } = await api.get(`/api/auth/verify-email/${token}`);
+            const res = await verifyEmail(token);
+            if (res.success) {
                 setStatus("success");
-                setMessage(data.message);
-            } catch (err: unknown) {
-                const error = err as { response?: { data?: { message?: string } } };
+                setMessage(res.message || "Email verified successfully!");
+            } else {
                 setStatus("error");
-                setMessage(error.response?.data?.message || t("auth.verify.failedAlert"));
+                setMessage(res.message || "Failed to verify email. The link might be expired or invalid.");
             }
         };
 
         verify();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, api]);
+    }, [token, verifyEmail]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background px-4">
-            <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 text-center shadow-sm">
-                
+        <div className="min-h-screen flex items-center justify-center px-4">
+            <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-sm text-center">
                 {status === "loading" && (
-                    <div className="flex flex-col items-center">
-                        <Loader2 size={48} className="text-primary animate-spin mb-4" />
-                        <h2 className="text-xl font-bold text-foreground">{t("auth.verify.loadingTitle")}</h2>
-                        <p className="text-muted-foreground mt-2 text-sm">{t("auth.verify.loadingDesc")}</p>
+                    <div className="flex flex-col items-center justify-center py-8">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                        <h2 className="text-xl font-bold text-foreground">Verifying Email...</h2>
+                        <p className="text-muted-foreground mt-2">Please wait while we confirm your email address.</p>
                     </div>
                 )}
 
                 {status === "success" && (
-                    <div className="flex flex-col items-center animate-fade-in">
-                        <CheckCircle2 size={56} className="text-emerald-500 mb-4" />
-                        <h2 className="text-2xl font-bold text-foreground">{t("auth.verify.successTitle")}</h2>
-                        <p className="text-muted-foreground mt-2 text-sm px-4">{message}</p>
+                    <div className="flex flex-col items-center justify-center py-4">
+                        <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+                            <CheckCircle2 className="w-8 h-8 text-green-500" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Verification Successful!</h2>
+                        <p className="text-muted-foreground mb-8">{message}</p>
                         <Link 
-                            to="/login" 
-                            className="mt-8 bg-primary text-primary-foreground px-8 py-3 rounded-xl font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity"
+                            to="/login"
+                            className="bg-primary text-primary-foreground font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity"
                             style={{ color: "var(--background)" }}
                         >
-                            {t("auth.verify.continueBtn")} {i18n.language === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
+                            Continue to Login
                         </Link>
                     </div>
                 )}
 
                 {status === "error" && (
-                    <div className="flex flex-col items-center animate-fade-in">
-                        <XCircle size={56} className="text-danger mb-4" />
-                        <h2 className="text-2xl font-bold text-foreground">{t("auth.verify.failTitle")}</h2>
-                        <p className="text-muted-foreground mt-2 text-sm px-4">{message}</p>
+                    <div className="flex flex-col items-center justify-center py-4">
+                        <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mb-6">
+                            <XCircle className="w-8 h-8 text-danger" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Verification Failed</h2>
+                        <p className="text-muted-foreground mb-8">{message}</p>
                         <Link 
-                            to="/login" 
-                            className="mt-8 bg-muted text-foreground px-8 py-3 rounded-xl font-semibold hover:bg-muted/80 transition-opacity"
+                            to="/login"
+                            className="bg-secondary text-secondary-foreground font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity border border-border"
                         >
-                            {t("auth.verify.backBtn")}
+                            Back to Login
                         </Link>
                     </div>
                 )}
-
             </div>
         </div>
     );
