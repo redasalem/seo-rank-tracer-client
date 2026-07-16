@@ -246,9 +246,10 @@ export function AddProvider({ children }: { children: ReactNode }) {
                 return { success: true, message: data.message };
             }
             return { success: false, message: data.message || "Failed to login" };
-        } catch (error: any) {
-            const notVerified = error.response?.data?.notVerified;
-            const msg = error.response?.data?.message || "An error occurred during login";
+        } catch (error) {
+            const err = error as { response?: { data?: { notVerified?: boolean; message?: string } } };
+            const notVerified = err.response?.data?.notVerified;
+            const msg = err.response?.data?.message || "An error occurred during login";
             return { success: false, message: msg, notVerified };
         }
     };

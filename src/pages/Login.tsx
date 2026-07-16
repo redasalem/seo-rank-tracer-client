@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Lock, Loader2, ChartNoAxesColumnIcon, User2Icon, Eye, EyeOff } from "lucide-react";
 import { useApp } from "../context/AppContext";
@@ -37,11 +37,7 @@ export default function Login({ state }: { state: string }) {
         defaultValues: { name: "", email: "", password: "" }
     });
 
-    // Clear validation errors when switching states
-    useEffect(() => {
-        clearErrors();
-        setUnverifiedEmail("");
-    }, [isLoginState, clearErrors]);
+
 
     const handleResend = async () => {
         if (!unverifiedEmail) return;
@@ -198,7 +194,15 @@ export default function Login({ state }: { state: string }) {
 
                 <p className="text-center text-sm text-muted-foreground mt-6">
                     {isLoginState ? t("auth.login.noAccount") : t("auth.login.hasAccount")}
-                    <button onClick={() => setIsLoginState((prev) => !prev)} className="text-primary hover:underline font-medium pl-1">
+                    <button 
+                        type="button" 
+                        onClick={() => {
+                            setIsLoginState((prev) => !prev);
+                            clearErrors();
+                            setUnverifiedEmail("");
+                        }} 
+                        className="text-primary hover:underline font-medium pl-1"
+                    >
                         {isLoginState ? t("auth.login.signUp") : t("auth.login.signIn")}
                     </button>
                 </p>
