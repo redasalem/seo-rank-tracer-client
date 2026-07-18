@@ -13,22 +13,22 @@ export default function Footer() {
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-12 mb-12">
                     <div className="col-span-2">
                         <div className="flex items-center gap-2 mb-4">
-                            <ChartNoAxesColumnIcon className="text-primary" />
+                            <ChartNoAxesColumnIcon className="text-primary" aria-hidden="true" />
                             <span className="text-xl">RankBoost</span>
                         </div>
                         <p className="text-sm text-muted-foreground mb-6 w-5/6">{t("footer.desc")}</p>
                         <div className="flex items-center gap-4">
-                            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                                <SiX size={20} />
+                            <a href="#" aria-label="Follow us on X (Twitter)" className="text-muted-foreground hover:text-primary transition-colors">
+                                <SiX size={20} aria-hidden="true" />
                             </a>
-                            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                                <SiInstagram size={20} />
+                            <a href="#" aria-label="Follow us on Instagram" className="text-muted-foreground hover:text-primary transition-colors">
+                                <SiInstagram size={20} aria-hidden="true" />
                             </a>
-                            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                                <SiFacebook size={20} />
+                            <a href="#" aria-label="Follow us on Facebook" className="text-muted-foreground hover:text-primary transition-colors">
+                                <SiFacebook size={20} aria-hidden="true" />
                             </a>
-                            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                                <SiTwitch size={20} />
+                            <a href="#" aria-label="Follow us on Twitch" className="text-muted-foreground hover:text-primary transition-colors">
+                                <SiTwitch size={20} aria-hidden="true" />
                             </a>
                         </div>
                     </div>

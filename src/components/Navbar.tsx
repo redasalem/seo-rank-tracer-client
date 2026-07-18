@@ -50,7 +50,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group">
-                        <ChartNoAxesColumnIcon />
+                        <ChartNoAxesColumnIcon aria-hidden="true" />
                         <span className="text-xl tracking-tight text-foreground">RankBoost</span>
                     </Link>
 
@@ -120,13 +120,13 @@ export default function Navbar() {
                     {/* Mobile toggle container */}
                     <div className="flex items-center gap-1 md:hidden">
                         {user && <NotificationBell />}
-                        <button onClick={toggleLanguage} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors font-medium text-sm flex items-center justify-center">
+                        <button onClick={toggleLanguage} aria-label={i18n.language === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors font-medium text-sm flex items-center justify-center">
                             {i18n.language === 'ar' ? 'En' : 'ع'}
                         </button>
-                        <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors">
+                        <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors">
                             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
-                        <button className="text-muted-foreground hover:text-foreground p-2" onClick={() => setMobileOpen(!mobileOpen)}>
+                        <button className="text-muted-foreground hover:text-foreground p-2" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation menu" aria-expanded={mobileOpen} aria-controls="mobile-nav">
                             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
@@ -135,7 +135,7 @@ export default function Navbar() {
 
             {/* Mobile menu */}
             {mobileOpen && (
-                <div className="md:hidden border-b border-border bg-background origin-top">
+                <div id="mobile-nav" className="md:hidden border-b border-border bg-background origin-top">
                     <div className="px-4 py-3 space-y-1">
                         {user ? (
                             <>

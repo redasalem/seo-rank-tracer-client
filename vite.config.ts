@@ -6,6 +6,29 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id: string) {
+                    if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+                        return 'vendor-react';
+                    }
+                    if (id.includes('node_modules/react-router')) {
+                        return 'vendor-router';
+                    }
+                    if (id.includes('node_modules/framer-motion')) {
+                        return 'vendor-motion';
+                    }
+                    if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+                        return 'vendor-i18n';
+                    }
+                    if (id.includes('node_modules/lucide-react') || id.includes('node_modules/@icons-pack')) {
+                        return 'vendor-icons';
+                    }
+                }
+            }
+        }
+    },
     plugins: [
         react(),
         tailwindcss(),
@@ -23,23 +46,38 @@ export default defineConfig({
                     {
                         src: "icons/icon-192x192.png",
                         sizes: "192x192",
-                        type: "image/png"
+                        type: "image/png",
+                        purpose: "any"
                     },
                     {
-                        src: "icons/icon-512x512.png",
-                        sizes: "512x512",
-                        type: "image/png"
+                        src: "icons/icon-192x192.png",
+                        sizes: "192x192",
+                        type: "image/png",
+                        purpose: "maskable"
                     },
                     {
                         src: "icons/icon-512x512.png",
                         sizes: "512x512",
                         type: "image/png",
-                        purpose: "any maskable"
+                        purpose: "any"
+                    },
+                    {
+                        src: "icons/icon-512x512.png",
+                        sizes: "512x512",
+                        type: "image/png",
+                        purpose: "maskable"
                     }
                 ]
             },
             workbox: {
-                maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 3 MiB
+                globPatterns: ['**/*.{html,css}', 'assets/index-*.js'],
+                maximumFileSizeToCacheInBytes: 500 * 1024,
+                runtimeCaching: [
+                    {
+                        urlPattern: /assets\/.*\.js$/,
+                        handler: 'StaleWhileRevalidate'
+                    }
+                ]
             }
         })
     ],

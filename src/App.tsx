@@ -46,7 +46,7 @@ export default function App() {
     }, [i18n.language]);
 
     useEffect(() => {
-        if (import.meta.env.PROD) {
+        if (import.meta.env.PROD && import.meta.env.VITE_GA_MEASUREMENT_ID) {
             ReactGA.send({ 
                 hitType: "pageview", 
                 page: location.pathname 
