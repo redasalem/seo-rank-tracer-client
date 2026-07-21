@@ -616,6 +616,33 @@
       "noIssues": "لم يتم العثور على مشكلات!",
       "noIssuesDesc": "موقعك يتبع أفضل ممارسات السيو."
     },
+    "lighthouse": {
+      "title": "تحليل Google Lighthouse",
+      "subtitle": "بيانات أداء حقيقية من Google PageSpeed Insights API",
+      "performance": "الأداء",
+      "accessibility": "إمكانية الوصول",
+      "bestPractices": "أفضل الممارسات",
+      "seo": "تحسين محركات البحث",
+      "coreWebVitals": "مؤشرات أداء الويب الأساسية",
+      "metrics": {
+        "fcp": "أول رسم للمحتوى",
+        "lcp": "أكبر رسم للمحتوى",
+        "tbt": "إجمالي وقت الحجب",
+        "cls": "تحول التخطيط التراكمي",
+        "si": "مؤشر السرعة",
+        "tti": "وقت التفاعل"
+      },
+      "good": "جيد",
+      "needsWork": "يحتاج تحسين",
+      "poor": "ضعيف",
+      "auditsTitle": "التدقيقات التفصيلية",
+      "filterAll": "الكل",
+      "filterFailed": "فشل",
+      "filterPassed": "نجح",
+      "filterManual": "يدوي",
+      "noData": "بيانات Lighthouse غير متاحة",
+      "noDataDesc": "تحليل Lighthouse لم يكن متاحاً لهذا التقرير. قد يحدث هذا إذا كان PageSpeed API غير قابل للوصول أثناء التحليل."
+    },
     "ai": {
       "error": "حدث خطأ أثناء توليد الرد. يرجى المحاولة مرة أخرى."
     }

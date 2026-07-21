@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import ScoreGauge from "../components/ScoreGauge";
 import IssueCard from "../components/IssueCard";
-import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map, Send, User, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Globe, Clock, FileText, Image, Link2, Heading, Tag, AlertCircle, ExternalLink, Type, Search, Download, Shield, FileCode, Bot, Map, Send, User, Loader2, Zap, Eye, CheckCircle2, XCircle, ChevronDown, ChevronUp, Activity } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import toast from 'react-hot-toast';
@@ -65,6 +65,29 @@ interface AnalysisData {
         hasSitemap: boolean;
         schemaTypes: string[];
     };
+    lighthouse?: {
+        performance: number | null;
+        accessibility: number | null;
+        bestPractices: number | null;
+        seo: number | null;
+        metrics: {
+            fcp: number | null;
+            lcp: number | null;
+            tbt: number | null;
+            cls: number | null;
+            si: number | null;
+            tti: number | null;
+        };
+        audits: {
+            id: string;
+            title: string;
+            description: string;
+            score: number | null;
+            scoreDisplayMode: string;
+            displayValue: string;
+            category: string;
+        }[];
+    };
     chatHistory?: { role: "user" | "ai"; content: string; timestamp?: string }[];
 }
 
@@ -82,6 +105,8 @@ export default function Report() {
     const [chatHistory, setChatHistory] = useState<{ role: "user" | "ai", content: string }[]>([]);
     const [chatInput, setChatInput] = useState("");
     const chatEndRef = useRef<HTMLDivElement>(null);
+    const [lighthouseFilter, setLighthouseFilter] = useState<string>("all");
+    const [expandedAudits, setExpandedAudits] = useState<Set<string>>(new Set());
 
     const scrollToBottom = () => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -156,6 +181,7 @@ export default function Report() {
 
     const tabs = [
         { id: "overview", label: t("report.tabs.overview") },
+        { id: "lighthouse", label: "⚡ Lighthouse" },
         { id: "meta", label: t("report.tabs.meta") },
         { id: "content", label: t("report.tabs.content") },
         { id: "advanced", label: t("report.tabs.advanced") },
@@ -627,6 +653,183 @@ export default function Report() {
                                 )}
                             </div>
                         </div>
+                    </div>
+
+                    {/* Lighthouse Tab */}
+                    <div className={activeTab === "lighthouse" ? "block" : "hidden"}>
+                        {analysis.lighthouse && analysis.lighthouse.performance !== null ? (
+                            <div className="space-y-6">
+                                {/* Lighthouse Score Gauges */}
+                                <div className="bg-card border border-border rounded-2xl p-6 sm:p-8">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-500">
+                                            <Zap size={22} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-foreground">{t("report.lighthouse.title")}</h3>
+                                            <p className="text-xs text-muted-foreground">{t("report.lighthouse.subtitle")}</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 justify-items-center">
+                                        {[
+                                            { label: t("report.lighthouse.performance"), value: analysis.lighthouse.performance, icon: <Activity size={16} /> },
+                                            { label: t("report.lighthouse.accessibility"), value: analysis.lighthouse.accessibility, icon: <Eye size={16} /> },
+                                            { label: t("report.lighthouse.bestPractices"), value: analysis.lighthouse.bestPractices, icon: <CheckCircle2 size={16} /> },
+                                            { label: t("report.lighthouse.seo"), value: analysis.lighthouse.seo, icon: <Search size={16} /> },
+                                        ].map((cat) => (
+                                            <div key={cat.label} className="flex flex-col items-center">
+                                                <ScoreGauge score={cat.value ?? 0} size={110} strokeWidth={8} />
+                                                <div className="flex items-center gap-1.5 mt-2">
+                                                    <span className="text-muted-foreground">{cat.icon}</span>
+                                                    <span className="text-xs font-medium text-muted-foreground">{cat.label}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Core Web Vitals */}
+                                <div className="bg-card border border-border rounded-2xl p-6">
+                                    <h3 className="text-lg font-semibold text-foreground mb-5 flex items-center gap-2">
+                                        <Activity size={20} className="text-primary" />
+                                        {t("report.lighthouse.coreWebVitals")}
+                                    </h3>
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {[
+                                            {
+                                                label: "FCP", fullName: t("report.lighthouse.metrics.fcp"),
+                                                value: analysis.lighthouse.metrics?.fcp,
+                                                format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
+                                                good: 1800, poor: 3000
+                                            },
+                                            {
+                                                label: "LCP", fullName: t("report.lighthouse.metrics.lcp"),
+                                                value: analysis.lighthouse.metrics?.lcp,
+                                                format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
+                                                good: 2500, poor: 4000
+                                            },
+                                            {
+                                                label: "TBT", fullName: t("report.lighthouse.metrics.tbt"),
+                                                value: analysis.lighthouse.metrics?.tbt,
+                                                format: (v: number) => `${Math.round(v)} ms`,
+                                                good: 200, poor: 600
+                                            },
+                                            {
+                                                label: "CLS", fullName: t("report.lighthouse.metrics.cls"),
+                                                value: analysis.lighthouse.metrics?.cls,
+                                                format: (v: number) => v.toFixed(3),
+                                                good: 0.1, poor: 0.25
+                                            },
+                                            {
+                                                label: "SI", fullName: t("report.lighthouse.metrics.si"),
+                                                value: analysis.lighthouse.metrics?.si,
+                                                format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
+                                                good: 3400, poor: 5800
+                                            },
+                                            {
+                                                label: "TTI", fullName: t("report.lighthouse.metrics.tti"),
+                                                value: analysis.lighthouse.metrics?.tti,
+                                                format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
+                                                good: 3800, poor: 7300
+                                            },
+                                        ].map((metric) => {
+                                            const val = metric.value;
+                                            const statusColor = val == null ? "text-muted-foreground" : val <= metric.good ? "text-emerald-500" : val <= metric.poor ? "text-amber-500" : "text-red-500";
+                                            const statusBg = val == null ? "bg-muted/50" : val <= metric.good ? "bg-emerald-500/5 border-emerald-500/20" : val <= metric.poor ? "bg-amber-500/5 border-amber-500/20" : "bg-red-500/5 border-red-500/20";
+                                            return (
+                                                <div key={metric.label} className={`rounded-xl p-4 border ${statusBg}`}>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-xs font-bold text-muted-foreground tracking-wider">{metric.label}</span>
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${val == null ? "bg-muted text-muted-foreground" : val <= metric.good ? "bg-emerald-500/10 text-emerald-500" : val <= metric.poor ? "bg-amber-500/10 text-amber-500" : "bg-red-500/10 text-red-500"}`}>
+                                                            {val == null ? "N/A" : val <= metric.good ? t("report.lighthouse.good") : val <= metric.poor ? t("report.lighthouse.needsWork") : t("report.lighthouse.poor")}
+                                                        </span>
+                                                    </div>
+                                                    <p className={`text-2xl font-bold ${statusColor}`}>
+                                                        {val != null ? metric.format(val) : "—"}
+                                                    </p>
+                                                    <p className="text-[10px] text-muted-foreground mt-1">{metric.fullName}</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Detailed Audits */}
+                                {analysis.lighthouse.audits && analysis.lighthouse.audits.length > 0 && (
+                                    <div className="bg-card border border-border rounded-2xl p-6">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                                            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                                                <FileText size={20} className="text-secondary" />
+                                                {t("report.lighthouse.auditsTitle")}
+                                            </h3>
+                                            <div className="flex gap-1.5 flex-wrap">
+                                                {["all", "failed", "passed", "manual"].map((f) => (
+                                                    <button
+                                                        key={f}
+                                                        onClick={() => setLighthouseFilter(f)}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${lighthouseFilter === f ? "bg-primary text-primary-foreground" : "bg-muted/50 border border-border text-muted-foreground hover:text-foreground"}`}
+                                                        style={lighthouseFilter === f ? { color: "var(--background)" } : {}}
+                                                    >
+                                                        {f === "all" ? t("report.lighthouse.filterAll") : f === "failed" ? `❌ ${t("report.lighthouse.filterFailed")}` : f === "passed" ? `✅ ${t("report.lighthouse.filterPassed")}` : `🔍 ${t("report.lighthouse.filterManual")}`}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+                                            {analysis.lighthouse.audits
+                                                .filter((audit) => {
+                                                    if (lighthouseFilter === "all") return true;
+                                                    if (lighthouseFilter === "failed") return audit.score !== null && audit.score < 0.9;
+                                                    if (lighthouseFilter === "passed") return audit.score !== null && audit.score >= 0.9;
+                                                    if (lighthouseFilter === "manual") return audit.scoreDisplayMode === "manual" || audit.scoreDisplayMode === "informative";
+                                                    return true;
+                                                })
+                                                .map((audit) => {
+                                                    const isExpanded = expandedAudits.has(audit.id);
+                                                    const toggleExpand = () => {
+                                                        setExpandedAudits(prev => {
+                                                            const next = new Set(prev);
+                                                            if (next.has(audit.id)) next.delete(audit.id);
+                                                            else next.add(audit.id);
+                                                            return next;
+                                                        });
+                                                    };
+                                                    const scoreIcon = audit.score === null || audit.scoreDisplayMode === "manual" || audit.scoreDisplayMode === "informative"
+                                                        ? <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-[10px] font-bold">—</span>
+                                                        : audit.score >= 0.9
+                                                            ? <CheckCircle2 size={18} className="text-emerald-500" />
+                                                            : audit.score >= 0.5
+                                                                ? <AlertCircle size={18} className="text-amber-500" />
+                                                                : <XCircle size={18} className="text-red-500" />;
+                                                    return (
+                                                        <div key={audit.id} className="border border-border rounded-xl overflow-hidden">
+                                                            <button onClick={toggleExpand} className="w-full flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors text-left">
+                                                                {scoreIcon}
+                                                                <span className="flex-1 text-sm font-medium text-foreground">{audit.title}</span>
+                                                                {audit.displayValue && <span className="text-xs text-muted-foreground font-mono">{audit.displayValue}</span>}
+                                                                {isExpanded ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
+                                                            </button>
+                                                            {isExpanded && audit.description && (
+                                                                <div className="px-4 pb-3 pt-0 border-t border-border/50">
+                                                                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                                                                        {audit.description.replace(/\[.*?\]\(.*?\)/g, '').substring(0, 300)}
+                                                                    </p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="bg-card border border-border rounded-2xl p-12 text-center">
+                                <Zap size={48} className="mx-auto text-muted-foreground mb-4 opacity-30" />
+                                <h3 className="text-lg font-semibold text-foreground mb-2">{t("report.lighthouse.noData")}</h3>
+                                <p className="text-sm text-muted-foreground">{t("report.lighthouse.noDataDesc")}</p>
+                            </div>
+                        )}
                     </div>
 
                     <div className={activeTab === "issues" ? "block" : "hidden"}>

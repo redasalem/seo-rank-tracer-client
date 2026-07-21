@@ -616,6 +616,33 @@
       "noIssues": "No Issues Found!",
       "noIssuesDesc": "Your website is following SEO best practices."
     },
+    "lighthouse": {
+      "title": "Google Lighthouse Analysis",
+      "subtitle": "Real performance data powered by Google PageSpeed Insights API",
+      "performance": "Performance",
+      "accessibility": "Accessibility",
+      "bestPractices": "Best Practices",
+      "seo": "SEO",
+      "coreWebVitals": "Core Web Vitals",
+      "metrics": {
+        "fcp": "First Contentful Paint",
+        "lcp": "Largest Contentful Paint",
+        "tbt": "Total Blocking Time",
+        "cls": "Cumulative Layout Shift",
+        "si": "Speed Index",
+        "tti": "Time to Interactive"
+      },
+      "good": "Good",
+      "needsWork": "Needs Work",
+      "poor": "Poor",
+      "auditsTitle": "Detailed Audits",
+      "filterAll": "All",
+      "filterFailed": "Failed",
+      "filterPassed": "Passed",
+      "filterManual": "Manual",
+      "noData": "Lighthouse Data Not Available",
+      "noDataDesc": "Lighthouse analysis was not available for this report. This may happen if the PageSpeed API was unreachable during the analysis."
+    },
     "ai": {
       "error": "Error generating response. Please try again."
     }
