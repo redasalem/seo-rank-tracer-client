@@ -74,6 +74,36 @@
     "title1": "Simple",
     "title2": "Pricing",
     "subtitle": "Start free. Upgrade when you need more.",
+    "free": {
+      "features": [
+        "5 keywords tracked",
+        "5 SEO analyses/day",
+        "Basic rank history",
+        "In-app notifications",
+        "PDF reports"
+      ]
+    },
+    "pro": {
+      "features": [
+        "50 keywords tracked",
+        "20 SEO analyses/day",
+        "Full rank history & charts",
+        "Competitor analysis",
+        "AI SEO Consultant",
+        "PDF reports",
+        "Priority support"
+      ]
+    },
+    "max": {
+      "features": [
+        "200 keywords tracked",
+        "60 SEO analyses/day",
+        "Everything in Pro",
+        "Advanced competitor insights",
+        "Bulk keyword management",
+        "Ideal for agencies"
+      ]
+    },
     "freePlan": {
       "title": "Free",
       "price": "$0",

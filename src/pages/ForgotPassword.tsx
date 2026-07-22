@@ -20,11 +20,6 @@ export default function ForgotPassword() {
             const { data } = await api.post("/api/auth/forgot-password", { email });
             toast.success(data.message || t("auth.forgot.success"));
             setSubmitted(true);
-            
-            // In development mode, we log the reset link returned by the server to console for easy access
-            if (data.resetUrl) {
-                console.log("Development Password Reset Link:", data.resetUrl);
-            }
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };
             toast.error(error.response?.data?.message || t("auth.login.error"));

@@ -11,31 +11,9 @@ export default function Pricing() {
     const proBtnLink = user ? "/settings?tab=subscription" : "/register";
     const maxBtnLink = user ? "/settings?tab=subscription" : "/register";
 
-    const freeFeatures = [
-        "5 keywords tracked",
-        "5 SEO analyses/day",
-        "Basic rank history",
-        "In-app notifications",
-    ];
-
-    const proFeatures = [
-        "50 keywords tracked",
-        "20 SEO analyses/day",
-        "Full rank history & charts",
-        "Competitor analysis",
-        "AI SEO Consultant",
-        "PDF reports",
-        "Priority support",
-    ];
-
-    const maxFeatures = [
-        "200 keywords tracked",
-        "60 SEO analyses/day",
-        "Everything in Pro",
-        "Advanced competitor insights",
-        "Bulk keyword management",
-        "Ideal for agencies",
-    ];
+    const freeFeatures = (t("pricing.free.features", { returnObjects: true }) as string[]) || [];
+    const proFeatures = (t("pricing.pro.features", { returnObjects: true }) as string[]) || [];
+    const maxFeatures = (t("pricing.max.features", { returnObjects: true }) as string[]) || [];
 
     return (
         <section className="relative md:min-h-screen flex flex-col justify-center items-center max-lg:py-24">
