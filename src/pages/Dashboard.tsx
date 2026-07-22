@@ -357,7 +357,7 @@ export default function Dashboard() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-semibold text-foreground truncate" title={analysis.url}>{analysis.url.replace(/^https?:\/\//, '')}</p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">{new Date(analysis.createdAt).toLocaleDateString()}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5" dir="ltr">{new Date(analysis.createdAt).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
                                         </div>
                                         <div className="text-xs font-medium px-2 py-1 rounded-full bg-muted text-muted-foreground capitalize">
                                             {analysis.status}

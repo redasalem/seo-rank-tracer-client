@@ -47,7 +47,7 @@ export default function AnalysesCard({ analysis }: { analysis: any }) {
             )}
 
             <div className="flex items-center gap-1 mt-4 text-xs text-muted-foreground">
-                <ClockIcon size={12} /> {new Date(analysis.createdAt).toLocaleDateString()}
+                <ClockIcon size={12} /> <span dir="ltr">{new Date(analysis.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
             </div>
         </Link>
     );
