@@ -150,10 +150,10 @@ export default function Report() {
     const handleSendChat = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (!id || !analysis || !chatInput.trim()) return;
-        
+
         const userMsg = chatInput.trim();
         setChatInput("");
-        
+
         const newHistory = [...chatHistory, { role: "user" as const, content: userMsg }];
         setChatHistory(newHistory);
         setGeneratingAi(true);
@@ -282,10 +282,10 @@ export default function Report() {
                         <div className="flex-1 w-full">
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {[
-                                    { label: t("report.score.seo"), value: analysis.categories.seo, icon: <Search size={18} /> },
-                                    { label: t("report.score.performance"), value: analysis.categories.performance, icon: <Clock size={18} /> },
-                                    { label: t("report.score.accessibility"), value: analysis.categories.accessibility, icon: <Globe size={18} /> },
-                                    { label: t("report.score.bestPractices"), value: analysis.categories.bestPractices, icon: <Tag size={18} /> },
+                                    { label: t("report.score.seo"), value: (analysis.lighthouse?.seo ?? analysis.categories.seo) as number, icon: <Search size={18} /> },
+                                    { label: t("report.score.performance"), value: (analysis.lighthouse?.performance ?? analysis.categories.performance) as number, icon: <Clock size={18} /> },
+                                    { label: t("report.score.accessibility"), value: (analysis.lighthouse?.accessibility ?? analysis.categories.accessibility) as number, icon: <Globe size={18} /> },
+                                    { label: t("report.score.bestPractices"), value: (analysis.lighthouse?.bestPractices ?? analysis.categories.bestPractices) as number, icon: <Tag size={18} /> },
                                 ].map((cat) => (
                                     <div key={cat.label} className={`rounded-xl p-4 border text-center ${getScoreBgClass(cat.value)}`}>
                                         <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground/80">
@@ -587,7 +587,7 @@ export default function Report() {
                                     </div>
                                     {analysis.advancedSEO?.hasSSL && analysis.advancedSEO?.sslValidTo && (
                                         <p className="text-sm text-muted-foreground ml-2 flex items-center gap-2">
-                                            <Clock size={14} /> {t("report.advanced.validUntil")} {new Date(analysis.advancedSEO.sslValidTo).toLocaleDateString()}
+                                            <Clock size={14} /> {t("report.advanced.validUntil")} {new Date(analysis.advancedSEO?.sslValidTo).toLocaleDateString()}
                                         </p>
                                     )}
                                 </div>
@@ -630,13 +630,13 @@ export default function Report() {
                                     <FileCode size={20} className="text-accent" />
                                     {t("report.advanced.schema")}
                                 </h3>
-                                {analysis.advancedSEO?.schemaTypes && analysis.advancedSEO.schemaTypes.length > 0 ? (
+                                {analysis.advancedSEO?.schemaTypes && analysis.advancedSEO?.schemaTypes.length > 0 ? (
                                     <div>
                                         <p className="text-sm text-muted-foreground mb-4">
                                             {t("report.advanced.schemaDesc")}
                                         </p>
                                         <div className="flex flex-wrap gap-2">
-                                            {analysis.advancedSEO.schemaTypes.map((type, idx) => (
+                                            {analysis.advancedSEO?.schemaTypes.map((type, idx) => (
                                                 <span key={idx} className="px-3 py-1.5 bg-accent/10 border border-accent/20 text-accent rounded-lg text-sm font-medium flex items-center gap-2">
                                                     <FileCode size={14} />
                                                     {type}
@@ -657,7 +657,7 @@ export default function Report() {
 
                     {/* Lighthouse Tab */}
                     <div className={activeTab === "lighthouse" ? "block" : "hidden"}>
-                        {analysis.lighthouse && analysis.lighthouse.performance !== null ? (
+                        {analysis.lighthouse && analysis.lighthouse?.performance !== null ? (
                             <div className="space-y-6">
                                 {/* Lighthouse Score Gauges */}
                                 <div className="bg-card border border-border rounded-2xl p-6 sm:p-8">
@@ -672,10 +672,10 @@ export default function Report() {
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 justify-items-center">
                                         {[
-                                            { label: t("report.lighthouse.performance"), value: analysis.lighthouse.performance, icon: <Activity size={16} /> },
-                                            { label: t("report.lighthouse.accessibility"), value: analysis.lighthouse.accessibility, icon: <Eye size={16} /> },
-                                            { label: t("report.lighthouse.bestPractices"), value: analysis.lighthouse.bestPractices, icon: <CheckCircle2 size={16} /> },
-                                            { label: t("report.lighthouse.seo"), value: analysis.lighthouse.seo, icon: <Search size={16} /> },
+                                            { label: t("report.lighthouse.performance"), value: analysis.lighthouse?.performance, icon: <Activity size={16} /> },
+                                            { label: t("report.lighthouse.accessibility"), value: analysis.lighthouse?.accessibility, icon: <Eye size={16} /> },
+                                            { label: t("report.lighthouse.bestPractices"), value: analysis.lighthouse?.bestPractices, icon: <CheckCircle2 size={16} /> },
+                                            { label: t("report.lighthouse.seo"), value: analysis.lighthouse?.seo, icon: <Search size={16} /> },
                                         ].map((cat) => (
                                             <div key={cat.label} className="flex flex-col items-center">
                                                 <ScoreGauge score={cat.value ?? 0} size={110} strokeWidth={8} />
@@ -698,37 +698,37 @@ export default function Report() {
                                         {[
                                             {
                                                 label: "FCP", fullName: t("report.lighthouse.metrics.fcp"),
-                                                value: analysis.lighthouse.metrics?.fcp,
+                                                value: analysis.lighthouse?.metrics?.fcp,
                                                 format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
                                                 good: 1800, poor: 3000
                                             },
                                             {
                                                 label: "LCP", fullName: t("report.lighthouse.metrics.lcp"),
-                                                value: analysis.lighthouse.metrics?.lcp,
+                                                value: analysis.lighthouse?.metrics?.lcp,
                                                 format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
                                                 good: 2500, poor: 4000
                                             },
                                             {
                                                 label: "TBT", fullName: t("report.lighthouse.metrics.tbt"),
-                                                value: analysis.lighthouse.metrics?.tbt,
+                                                value: analysis.lighthouse?.metrics?.tbt,
                                                 format: (v: number) => `${Math.round(v)} ms`,
                                                 good: 200, poor: 600
                                             },
                                             {
                                                 label: "CLS", fullName: t("report.lighthouse.metrics.cls"),
-                                                value: analysis.lighthouse.metrics?.cls,
+                                                value: analysis.lighthouse?.metrics?.cls,
                                                 format: (v: number) => v.toFixed(3),
                                                 good: 0.1, poor: 0.25
                                             },
                                             {
                                                 label: "SI", fullName: t("report.lighthouse.metrics.si"),
-                                                value: analysis.lighthouse.metrics?.si,
+                                                value: analysis.lighthouse?.metrics?.si,
                                                 format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
                                                 good: 3400, poor: 5800
                                             },
                                             {
                                                 label: "TTI", fullName: t("report.lighthouse.metrics.tti"),
-                                                value: analysis.lighthouse.metrics?.tti,
+                                                value: analysis.lighthouse?.metrics?.tti,
                                                 format: (v: number) => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`,
                                                 good: 3800, poor: 7300
                                             },
@@ -755,7 +755,7 @@ export default function Report() {
                                 </div>
 
                                 {/* Detailed Audits */}
-                                {analysis.lighthouse.audits && analysis.lighthouse.audits.length > 0 && (
+                                {analysis.lighthouse?.audits && analysis.lighthouse?.audits.length > 0 && (
                                     <div className="bg-card border border-border rounded-2xl p-6">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                                             <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -776,7 +776,7 @@ export default function Report() {
                                             </div>
                                         </div>
                                         <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-                                            {analysis.lighthouse.audits
+                                            {analysis.lighthouse?.audits
                                                 .filter((audit) => {
                                                     if (lighthouseFilter === "all") return true;
                                                     if (lighthouseFilter === "failed") return audit.score !== null && audit.score < 0.9;
@@ -872,15 +872,15 @@ export default function Report() {
                                     <p className="text-sm text-muted-foreground">Personalized recommendations powered by Gemini AI</p>
                                 </div>
                             </div>
-                            
+
                             <div className="flex flex-col h-[500px] border border-border rounded-xl bg-background/50 overflow-hidden">
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                     {chatHistory.length === 0 ? (
                                         <div className="h-full flex flex-col items-center justify-center text-center p-6">
                                             <Bot size={48} className="text-muted-foreground mb-4 opacity-30" />
                                             <p className="text-muted-foreground max-w-sm">
-                                                Ask me anything about your website's SEO! For example: 
-                                                <br/>"How do I fix my broken links?" or "Why is my performance score low?"
+                                                Ask me anything about your website's SEO! For example:
+                                                <br />"How do I fix my broken links?" or "Why is my performance score low?"
                                             </p>
                                         </div>
                                     ) : (

@@ -88,7 +88,8 @@ interface AppContextType {
     loading: boolean;
     api: AxiosInstance;
     login: (email: string, password: string) => Promise<{ success: boolean, message?: string, notVerified?: boolean }>
-    register: (name: string, email: string, password: string) => Promise<{ success: boolean, message?: string }>
+    requestRegistration: (email: string) => Promise<{ success: boolean, message?: string }>
+    completeRegistration: (token: string, name: string, password: string) => Promise<{ success: boolean, message?: string }>
     logout: () => void;
     addKeyword: (data: KeywordData) => Promise<{ success: boolean; message?: string; tracking?: KeywordTracking }>;
     getKeywords: (params?: { page?: number, limit?: number, search?: string, status?: string, sortBy?: string }) => Promise<{ success: boolean; data?: KeywordTracking[]; totalPages?: number; total?: number; page?: number; message?: string }>;
@@ -262,15 +263,41 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+    const requestRegistration = async (email: string): Promise<{ success: boolean; message?: string }> => {
         try {
-            const { data } = await api.post('/api/auth/register', { name, email, password });
-            if (import.meta.env.PROD) {
-                ReactGA.event({ category: "Auth", action: "Register" });
+            const { data } = await api.post('/api/auth/request-registration', { email });
+            return { success: true, message: data.message };
+        } catch (error: unknown) {
+            const msg = getAxiosErrorMessage(error, "An error occurred during registration request");
+            return { success: false, message: msg };
+        }
+    };
+
+    const completeRegistration = async (token: string, name: string, password: string): Promise<{ success: boolean; message?: string }> => {
+        try {
+            const { data } = await api.post('/api/auth/complete-registration', { token, name, password });
+            if (data && data.token) {
+                localStorage.setItem("token", data.token);
+                settoken(data.token);
+                if (data.user) {
+                    setUser({
+                        id: data.user.id || data.user._id,
+                        name: data.user.name,
+                        email: data.user.email,
+                        plan: data.user.plan,
+                        role: data.user.role,
+                        analysisCount: data.user.analysisCount,
+                        reportFrequency: data.user.reportFrequency,
+                        language: data.user.language
+                    });
+                }
+                if (import.meta.env.PROD) {
+                    ReactGA.event({ category: "Auth", action: "Register" });
+                }
             }
             return { success: true, message: data.message };
         } catch (error: unknown) {
-            const msg = getAxiosErrorMessage(error, "An error occurred during registration");
+            const msg = getAxiosErrorMessage(error, "An error occurred during registration completion");
             return { success: false, message: msg };
         }
     };
@@ -533,41 +560,43 @@ export function AddProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const value = { 
-        user, 
-        token, 
-        loading, 
-        api, 
-        login, 
-        register, 
-        logout, 
-        addKeyword, 
-        getKeywords, 
-        getDashboardStats,
-        deleteKeyword, 
-        toggleKeyword, 
-        refreshKeyword,
-        startAnalysis,
-        getAnalysis,
-        sendAiChatMessage,
-        getAnalysisHistory,
-        updateProfile,
-        updatePassword,
-        getNotifications,
-        markNotificationAsRead,
-        markAllNotificationsAsRead,
-        createCheckoutSession,
-        getGlobalCompetitors,
-        exportAnalysisPdf,
-        verifyEmail,
-        resendVerificationEmail,
-        loadUser
-    };
-
-    return <AppContext.Provider value={value}>
-        {children}
-    </AppContext.Provider>
-
+    return (
+        <AppContext.Provider
+            value={{
+                user,
+                token,
+                loading,
+                api,
+                login,
+                requestRegistration,
+                completeRegistration,
+                logout,
+                addKeyword,
+                getKeywords,
+                getDashboardStats,
+                deleteKeyword,
+                toggleKeyword,
+                refreshKeyword,
+                startAnalysis,
+                getAnalysis,
+                getAnalysisHistory,
+                sendAiChatMessage,
+                updateProfile,
+                updatePassword,
+                getNotifications,
+                markNotificationAsRead,
+                markAllNotificationsAsRead,
+                createCheckoutSession,
+                getGlobalCompetitors,
+                exportAnalysisPdf,
+                verifyEmail,
+                resendVerificationEmail,
+                loadUser,
+            }}
+        >
+            {children}
+        </AppContext.Provider>
+    );
 };
 
 export function useApp() {

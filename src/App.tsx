@@ -15,6 +15,7 @@ const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const CompleteRegistration = lazy(() => import("./pages/CompleteRegistration"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Analyze = lazy(() => import("./pages/Analyze"));
 const Report = lazy(() => import("./pages/Report"));
@@ -54,7 +55,7 @@ export default function App() {
         }
     }, [location]);
 
-    const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/verify-email") || location.pathname.startsWith("/admin");
+    const hideNavbar = ["/login", "/register", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/reset-password") || location.pathname.startsWith("/verify-email") || location.pathname.startsWith("/register/complete") || location.pathname.startsWith("/admin");
 
     return (
         <ErrorBoundary>
@@ -70,6 +71,7 @@ export default function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={user ? <Navigate to='/dashboard' /> : <Login state="login" />} />
                     <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <Login state="register" />} />
+                    <Route path="/register/complete" element={user ? <Navigate to='/dashboard' /> : <CompleteRegistration />} />
                     <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
                     <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
                     <Route path="/verify-email/:token" element={user ? <Navigate to='/dashboard' /> : <VerifyEmail />} />
