@@ -18,7 +18,7 @@
     "subtitle": "Get instant AI-powered SEO audits for any website. Uncover hidden issues, optimize performance, and outrank your competition.",
     "placeholder": "Enter website URL (e.g., example.com)",
     "analyzeBtn": "Analyze",
-    "disclaimer": "Free — No credit card required • 5 analyses per day"
+    "disclaimer": "Free — No credit card required • 3 analyses per day"
   },
   "features": {
     "title1": "Everything You Need to",
@@ -77,7 +77,7 @@
     "free": {
       "features": [
         "5 keywords tracked",
-        "5 SEO analyses/day",
+        "3 SEO analyses/day",
         "Basic rank history",
         "In-app notifications",
         "PDF reports"
@@ -109,7 +109,7 @@
       "price": "$0",
       "period": "/month",
       "features": [
-        "5 analyses per day",
+        "3 analyses per day",
         "Full SEO report",
         "Keyword analysis",
         "Issue detection",
@@ -120,7 +120,7 @@
     "proPlan": {
       "badge": "Popular",
       "title": "Pro",
-      "price": "$3",
+      "price": "$9",
       "period": "/month",
       "features": [
         "Unlimited analyses",

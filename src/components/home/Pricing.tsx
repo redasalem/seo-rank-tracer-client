@@ -54,7 +54,7 @@ export default function Pricing() {
                         </div>
                         <h3 className="text-xl font-semibold mb-1 text-foreground">Pro</h3>
                         <div className="flex items-baseline gap-1 mb-1">
-                            <span className="text-5xl font-bold text-primary">$4</span>
+                            <span className="text-5xl font-bold text-primary">$9</span>
                             <span className="text-muted-foreground">/ month</span>
                         </div>
                         <div className="text-xs text-primary/70 font-medium mb-6">Most chosen by freelancers</div>
@@ -76,7 +76,7 @@ export default function Pricing() {
                     <div className="relative rounded-3xl p-8 flex flex-col glass border border-border hover:scale-[1.02] transition-transform duration-300">
                         <h3 className="text-xl font-semibold mb-1 text-foreground">Max</h3>
                         <div className="flex items-baseline gap-1 mb-1">
-                            <span className="text-4xl font-bold text-foreground">$9</span>
+                            <span className="text-4xl font-bold text-foreground">$19</span>
                             <span className="text-muted-foreground">/ month</span>
                         </div>
                         <div className="text-xs text-purple-500 font-medium mb-6">Best for agencies</div>
