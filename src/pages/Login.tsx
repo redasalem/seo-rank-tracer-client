@@ -18,6 +18,7 @@ export default function Login({ state }: { state: string }) {
     const [showPassword, setShowPassword] = useState(false);
     const [unverifiedEmail, setUnverifiedEmail] = useState("");
     const [resending, setResending] = useState(false);
+    const [serverError, setServerError] = useState("");
     const { login, register: registerUser, resendVerificationEmail } = useApp();
 
     const authSchema = useMemo(() => z.object({
@@ -54,6 +55,7 @@ export default function Login({ state }: { state: string }) {
     const onSubmit = async (data: AuthFormValues) => {
         setLoading(true);
         setUnverifiedEmail("");
+        setServerError("");
 
         try {
             if (isLoginState) {
@@ -68,6 +70,7 @@ export default function Login({ state }: { state: string }) {
                     navigate("/dashboard");
                 } else {
                     toast.error(res.message || t("auth.login.failed"));
+                    setServerError(res.message || t("auth.login.failed") || "Login failed");
                     if (res.notVerified) {
                         setUnverifiedEmail(data.email);
                     }
@@ -96,10 +99,12 @@ export default function Login({ state }: { state: string }) {
                     reset({ name: "", email: "", password: "" });
                 } else {
                     toast.error(res.message || "Failed to create account.");
+                    setServerError(res.message || "Failed to create account.");
                 }
             }
         } catch {
             toast.error(t("auth.login.error"));
+            setServerError(t("auth.login.error") || "An unexpected error occurred");
         } finally {
             setLoading(false);
         }
@@ -125,6 +130,12 @@ export default function Login({ state }: { state: string }) {
                             <h1 className="text-2xl font-bold text-foreground">{t("auth.login.title")}</h1>
                             <p className="text-muted-foreground text-sm mt-1">{isLoginState ? t("auth.login.subtitleSignIn") : t("auth.login.subtitleCreate")}</p>
                         </div>
+
+                        {serverError && (
+                            <div className="bg-danger/10 border border-danger/20 text-danger text-sm p-3 rounded-lg">
+                                <span className="font-medium">{serverError}</span>
+                            </div>
+                        )}
 
                         {!isLoginState && (
                             <div>
@@ -195,15 +206,26 @@ export default function Login({ state }: { state: string }) {
                         </button>
                         
                         {unverifiedEmail && (
-                            <button
-                                type="button"
-                                onClick={handleResend}
-                                disabled={resending}
-                                className="w-full py-3 mt-3 rounded-lg border border-border bg-card text-sm font-semibold text-foreground flex items-center justify-center gap-2 hover:bg-muted transition-colors disabled:opacity-50"
-                            >
-                                {resending ? <Loader2 size={18} className="animate-spin" /> : <Mail size={18} />}
-                                {t("auth.login.resendVerificationBtn") || "Resend Verification Email"}
-                            </button>
+                            <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg mt-4 flex flex-col gap-3">
+                                <div className="flex items-start gap-3">
+                                    <Mail className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                    <div>
+                                        <h4 className="text-primary font-bold text-sm">Action Required</h4>
+                                        <p className="text-primary/90 text-xs mt-1 leading-relaxed">
+                                            Please verify your email address to log in. We've sent a link to <strong className="font-semibold">{unverifiedEmail}</strong>. (Check your spam folder too).
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleResend}
+                                    disabled={resending}
+                                    className="w-full py-2.5 rounded-md border border-primary/30 bg-background/50 text-xs font-semibold text-primary flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors disabled:opacity-50 mt-1"
+                                >
+                                    {resending ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
+                                    {t("auth.login.resendVerificationBtn") || "Resend Verification Email"}
+                                </button>
+                            </div>
                         )}
                     </form>
                 </div>
@@ -216,6 +238,7 @@ export default function Login({ state }: { state: string }) {
                             setIsLoginState((prev) => !prev);
                             clearErrors();
                             setUnverifiedEmail("");
+                            setServerError("");
                         }} 
                         className="text-primary hover:underline font-medium pl-1"
                     >
