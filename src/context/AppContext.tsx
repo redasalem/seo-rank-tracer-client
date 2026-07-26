@@ -88,6 +88,7 @@ interface AppContextType {
     loading: boolean;
     api: AxiosInstance;
     login: (email: string, password: string) => Promise<{ success: boolean, message?: string, notVerified?: boolean }>
+    register: (name: string, email: string, password: string) => Promise<{ success: boolean; message?: string; notVerified?: boolean }>
     requestRegistration: (email: string) => Promise<{ success: boolean, message?: string }>
     completeRegistration: (token: string, name: string, password: string) => Promise<{ success: boolean, message?: string }>
     logout: () => void;
@@ -259,6 +260,37 @@ export function AddProvider({ children }: { children: ReactNode }) {
             const err = error as { response?: { data?: { notVerified?: boolean; message?: string } } };
             const notVerified = err.response?.data?.notVerified;
             const msg = err.response?.data?.message || "An error occurred during login";
+            return { success: false, message: msg, notVerified };
+        }
+    };
+
+    const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message?: string; notVerified?: boolean }> => {
+        try {
+            const { data } = await api.post('/api/auth/register', { name, email, password });
+            if (data && data.token) {
+                localStorage.setItem("token", data.token);
+                settoken(data.token);
+                if (data.user) {
+                    setUser({
+                        id: data.user.id || data.user._id,
+                        name: data.user.name,
+                        email: data.user.email,
+                        plan: data.user.plan,
+                        role: data.user.role,
+                        analysisCount: data.user.analysisCount,
+                        reportFrequency: data.user.reportFrequency,
+                        language: data.user.language
+                    });
+                }
+                if (import.meta.env.PROD) {
+                    ReactGA.event({ category: "Auth", action: "Register" });
+                }
+            }
+            return { success: true, message: data.message, notVerified: data.notVerified };
+        } catch (error: unknown) {
+            const err = error as { response?: { data?: { notVerified?: boolean; message?: string } } };
+            const notVerified = err.response?.data?.notVerified;
+            const msg = getAxiosErrorMessage(error, "An error occurred during registration");
             return { success: false, message: msg, notVerified };
         }
     };
@@ -568,6 +600,7 @@ export function AddProvider({ children }: { children: ReactNode }) {
                 loading,
                 api,
                 login,
+                register,
                 requestRegistration,
                 completeRegistration,
                 logout,

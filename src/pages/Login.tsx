@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Mail, Lock, Loader2, ChartNoAxesColumnIcon, Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, Loader2, ChartNoAxesColumnIcon, Eye, EyeOff, User2Icon } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
@@ -8,18 +8,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslation } from "react-i18next";
 
-type AuthFormValues = { email: string; password?: string };
+type AuthFormValues = { name?: string; email: string; password?: string };
 
 export default function Login({ state }: { state: string }) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [isLoginState, setIsLoginState] = useState(state === "login");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [unverifiedEmail, setUnverifiedEmail] = useState("");
     const [resending, setResending] = useState(false);
-    const { login, requestRegistration, resendVerificationEmail } = useApp();
+    const { login, register: registerUser, resendVerificationEmail } = useApp();
 
     const authSchema = useMemo(() => z.object({
+        name: z.string().optional(),
         email: z.string().min(1, t("settings.validation.emailInvalid")).email(t("settings.validation.emailInvalid")).regex(/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, t("settings.validation.emailInvalid") || "Please enter a valid email address"),
         password: z.string().optional(),
     }), [t]);
@@ -33,10 +35,8 @@ export default function Login({ state }: { state: string }) {
         clearErrors
     } = useForm<AuthFormValues>({
         resolver: zodResolver(authSchema),
-        defaultValues: { email: "", password: "" }
+        defaultValues: { name: "", email: "", password: "" }
     });
-
-
 
     const handleResend = async () => {
         if (!unverifiedEmail) return;
@@ -58,13 +58,14 @@ export default function Login({ state }: { state: string }) {
         try {
             if (isLoginState) {
                 if (!data.password || data.password.length < 6) {
-                    setError("password", { type: "manual", message: t("settings.validation.newMin") || "Password is required" });
+                    setError("password", { type: "manual", message: t("settings.validation.newMin") || "Password must be at least 6 characters" });
                     setLoading(false);
                     return;
                 }
                 const res = await login(data.email, data.password);
                 if (res.success) {
-                    toast.success(t("auth.login.success"));
+                    toast.success(t("auth.login.success") || "Login successful!");
+                    navigate("/dashboard");
                 } else {
                     toast.error(res.message || t("auth.login.failed"));
                     if (res.notVerified) {
@@ -72,12 +73,29 @@ export default function Login({ state }: { state: string }) {
                     }
                 }
             } else {
-                const res = await requestRegistration(data.email);
+                if (!data.name || data.name.trim().length < 2) {
+                    setError("name", { type: "manual", message: "Name must be at least 2 characters long" });
+                    setLoading(false);
+                    return;
+                }
+                if (!data.password || data.password.length < 6) {
+                    setError("password", { type: "manual", message: "Password must be at least 6 characters long" });
+                    setLoading(false);
+                    return;
+                }
+
+                const res = await registerUser(data.name.trim(), data.email, data.password);
                 if (res.success) {
-                    toast.success(res.message || "Registration link sent. Please check your email.");
-                    reset({ email: "", password: "" });
+                    if (res.notVerified) {
+                        toast.success(res.message || "Account created! Please check your email to verify.");
+                        setUnverifiedEmail(data.email);
+                    } else {
+                        toast.success("Account created successfully! Welcome to RankBoost 🎉");
+                        navigate("/dashboard");
+                    }
+                    reset({ name: "", email: "", password: "" });
                 } else {
-                    toast.error(res.message || "Failed to send registration link.");
+                    toast.error(res.message || "Failed to create account.");
                 }
             }
         } catch {
@@ -103,13 +121,29 @@ export default function Login({ state }: { state: string }) {
                 {/* Form Card */}
                 <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                        <div className="text-center py-5">
+                        <div className="text-center py-3">
                             <h1 className="text-2xl font-bold text-foreground">{t("auth.login.title")}</h1>
                             <p className="text-muted-foreground text-sm mt-1">{isLoginState ? t("auth.login.subtitleSignIn") : t("auth.login.subtitleCreate")}</p>
                         </div>
 
+                        {!isLoginState && (
+                            <div>
+                                <div className="block text-sm font-medium text-foreground mb-1.5 mt-2">{t("auth.login.nameLabel") || "Name"}</div>
+                                <div className="relative">
+                                    <User2Icon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                    <input
+                                        type="text"
+                                        placeholder={t("auth.login.namePlaceholder") || "John Doe"}
+                                        className={`w-full pl-11 pr-4 py-3 rounded-lg bg-muted/60 border ${errors.name ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} text-foreground placeholder-muted-foreground outline-none transition-colors text-sm`}
+                                        {...registerForm("name")}
+                                    />
+                                </div>
+                                {errors.name && <p className="text-danger text-xs mt-1.5 font-medium">{errors.name.message}</p>}
+                            </div>
+                        )}
+
                         <div>
-                            <div className="block text-sm font-medium text-foreground mb-1.5 mt-4">{t("auth.login.emailLabel")}</div>
+                            <div className="block text-sm font-medium text-foreground mb-1.5 mt-2">{t("auth.login.emailLabel")}</div>
                             <div className="relative">
                                 <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                 <input
@@ -122,33 +156,33 @@ export default function Login({ state }: { state: string }) {
                             {errors.email && <p className="text-danger text-xs mt-1.5 font-medium">{errors.email.message}</p>}
                         </div>
 
-                        {isLoginState && (
-                            <div>
-                                <div className="flex justify-between items-center mb-1.5 mt-4">
-                                    <span className="block text-sm font-medium text-foreground">{t("auth.login.passwordLabel")}</span>
+                        <div>
+                            <div className="flex justify-between items-center mb-1.5 mt-2">
+                                <span className="block text-sm font-medium text-foreground">{t("auth.login.passwordLabel")}</span>
+                                {isLoginState && (
                                     <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">
                                         {t("auth.login.forgotBtn")}
                                     </Link>
-                                </div>
-                                <div className="relative">
-                                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder={t("auth.login.passwordPlaceholder")}
-                                        className={`w-full pl-11 pr-11 py-3 rounded-lg bg-muted/60 border ${errors.password ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} text-foreground placeholder-muted-foreground outline-none transition-colors text-sm`}
-                                        {...registerForm("password")}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
-                                    >
-                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                    </button>
-                                </div>
-                                {errors.password && <p className="text-danger text-xs mt-1.5 font-medium">{errors.password.message}</p>}
+                                )}
                             </div>
-                        )}
+                            <div className="relative">
+                                <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder={t("auth.login.passwordPlaceholder")}
+                                    className={`w-full pl-11 pr-11 py-3 rounded-lg bg-muted/60 border ${errors.password ? 'border-danger focus:border-danger' : 'border-border focus:border-primary/50'} text-foreground placeholder-muted-foreground outline-none transition-colors text-sm`}
+                                    {...registerForm("password")}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                            {errors.password && <p className="text-danger text-xs mt-1.5 font-medium">{errors.password.message}</p>}
+                        </div>
 
                         <button
                             type="submit"
