@@ -180,17 +180,17 @@ export default function Dashboard() {
                     animate="show"
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
                 >
-                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4 group cursor-pointer hover:border-accent/40 transition-colors">
+                        <div className="w-12 h-12 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all">
                             <Target size={22} />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-foreground">{stats?.totalKeywords || 0}</p>
+                            <p className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">{stats?.totalKeywords || 0}</p>
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.keywordsTracked")}</p>
                         </div>
                     </motion.div>
-                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4 group cursor-pointer hover:border-emerald-500/40 transition-colors">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">
                             <TrendingUpIcon size={22} />
                         </div>
                         <div>
@@ -198,8 +198,8 @@ export default function Dashboard() {
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.inTop10")}</p>
                         </div>
                     </motion.div>
-                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4 group cursor-pointer hover:border-accent/40 transition-colors">
+                        <div className="w-12 h-12 rounded-xl bg-accent/5 border border-accent/10 flex items-center justify-center text-accent shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all">
                             <Trophy size={22} />
                         </div>
                         <div>
@@ -207,8 +207,8 @@ export default function Dashboard() {
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.bestRanking")}</p>
                         </div>
                     </motion.div>
-                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4 group cursor-pointer hover:border-blue-500/40 transition-colors">
+                        <div className="w-12 h-12 rounded-xl bg-blue-500/5 border border-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all">
                             <Activity size={22} />
                         </div>
                         <div>
@@ -216,8 +216,8 @@ export default function Dashboard() {
                             <p className="text-xs text-muted-foreground">{t("dashboard.stats.averageRank")}</p>
                         </div>
                     </motion.div>
-                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                    <motion.div variants={itemVariants} className="glass rounded-2xl p-5 flex items-center gap-4 group cursor-pointer hover:border-emerald-500/40 transition-colors">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">
                             <ArrowUpCircle size={22} />
                         </div>
                         <div className="min-w-0">

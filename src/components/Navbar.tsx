@@ -45,20 +45,22 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className={`fixed top-0 left-0 w-full z-[999] transition-all duration-300 no-print ${isScrolled ? "bg-background/70 backdrop-blur-xl border-b border-border shadow-sm py-2" : "bg-transparent border-transparent py-4"}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+        <nav className={`fixed top-0 left-0 right-0 z-[999] transition-all duration-500 ease-in-out no-print mx-auto ${isScrolled ? "pt-4 px-4 sm:px-6 max-w-7xl" : "pt-0 max-w-7xl"}`}>
+            <div className={`transition-all duration-500 ${isScrolled ? "glass-strong px-4 sm:px-6" : "bg-transparent px-4 sm:px-6 py-2"}`}>
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <ChartNoAxesColumnIcon aria-hidden="true" />
-                        <span className="text-xl tracking-tight text-foreground">RankBoost</span>
+                    <Link to="/" className="flex items-center gap-2.5 group">
+                        <div className="p-1.5 rounded-xl bg-accent/10 border border-accent/20 group-hover:border-accent/40 group-hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all">
+                            <ChartNoAxesColumnIcon size={20} className="text-accent group-hover:scale-110 transition-transform" aria-hidden="true" />
+                        </div>
+                        <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-accent transition-colors">RankBoost</span>
                     </Link>
 
                     {/* Desktop nav */}
                     {user && (
-                        <div className="hidden md:flex items-center gap-1">
+                        <div className="hidden md:flex items-center gap-1.5">
                             {navLinks.map((link) => (
-                                <Link key={link.path} to={link.path} data-tour={link.tour} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${isActive(link.path) ? "bg-accent/5 text-accent font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/80"}`}>
+                                <Link key={link.path} to={link.path} data-tour={link.tour} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${isActive(link.path) ? "bg-accent/15 text-accent border border-accent/30 shadow-[0_0_12px_rgba(139,92,246,0.2)]" : "text-muted-foreground hover:text-foreground hover:bg-card/60"}`}>
                                     {link.icon}
                                     {link.label}
                                 </Link>

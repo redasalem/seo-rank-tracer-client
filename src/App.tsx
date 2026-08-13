@@ -10,6 +10,8 @@ import { Toaster } from "react-hot-toast";
 import { useApp } from "./context/AppContext";
 import { useTranslation } from "react-i18next";
 import ReactGA from "react-ga4";
+import { AnimatePresence } from "framer-motion";
+import PageTransition from "./components/PageTransition";
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -67,42 +69,44 @@ export default function App() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
             }>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={user ? <Navigate to='/dashboard' /> : <Login state="login" />} />
-                    <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <Login state="register" />} />
-                    <Route path="/register/complete" element={user ? <Navigate to='/dashboard' /> : <CompleteRegistration />} />
-                    <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <ForgotPassword />} />
-                    <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <ResetPassword />} />
-                    <Route path="/verify-email/:token" element={user ? <Navigate to='/dashboard' /> : <VerifyEmail />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/terms-of-service" element={<TermsOfService />} />
+            <AnimatePresence mode="wait">
+                <Routes location={location} key={location.pathname}>
+                    <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+                    <Route path="/login" element={user ? <Navigate to='/dashboard' /> : <PageTransition><Login state="login" /></PageTransition>} />
+                    <Route path="/register" element={user ? <Navigate to='/dashboard' /> : <PageTransition><Login state="register" /></PageTransition>} />
+                    <Route path="/register/complete" element={user ? <Navigate to='/dashboard' /> : <PageTransition><CompleteRegistration /></PageTransition>} />
+                    <Route path="/forgot-password" element={user ? <Navigate to='/dashboard' /> : <PageTransition><ForgotPassword /></PageTransition>} />
+                    <Route path="/reset-password/:token" element={user ? <Navigate to='/dashboard' /> : <PageTransition><ResetPassword /></PageTransition>} />
+                    <Route path="/verify-email/:token" element={user ? <Navigate to='/dashboard' /> : <PageTransition><VerifyEmail /></PageTransition>} />
+                    <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+                    <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
                     <Route element={<ProtectedRoute />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/analyze" element={<Analyze />} />
-                        <Route path="/report/:id" element={<Report />} />
-                        <Route path="/history" element={<History />} />
-                        <Route path="/rank-tracker" element={<RankTracker />} />
-                        <Route path="/rank/:id" element={<RankDetail />} />
-                        <Route path="/competitors" element={<Competitors />} />
-                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+                        <Route path="/analyze" element={<PageTransition><Analyze /></PageTransition>} />
+                        <Route path="/report/:id" element={<PageTransition><Report /></PageTransition>} />
+                        <Route path="/history" element={<PageTransition><History /></PageTransition>} />
+                        <Route path="/rank-tracker" element={<PageTransition><RankTracker /></PageTransition>} />
+                        <Route path="/rank/:id" element={<PageTransition><RankDetail /></PageTransition>} />
+                        <Route path="/competitors" element={<PageTransition><Competitors /></PageTransition>} />
+                        <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
                     </Route>
                     {/* Admin Routes */}
                     <Route element={<AdminRoute />}>
                         <Route element={<AdminLayout />}>
-                            <Route path="/admin" element={<AdminDashboard />} />
-                            <Route path="/admin/users" element={<AdminUsers />} />
-                            <Route path="/admin/users/:id" element={<AdminUserDetail />} />
-                            <Route path="/admin/analyses" element={<AdminAnalyses />} />
-                            <Route path="/admin/keywords" element={<AdminKeywords />} />
-                            <Route path="/admin/notifications" element={<AdminNotifications />} />
-                            <Route path="/admin/settings" element={<AdminSettings />} />
-                            <Route path="/admin/activity" element={<AdminAuditLog />} />
+                            <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
+                            <Route path="/admin/users" element={<PageTransition><AdminUsers /></PageTransition>} />
+                            <Route path="/admin/users/:id" element={<PageTransition><AdminUserDetail /></PageTransition>} />
+                            <Route path="/admin/analyses" element={<PageTransition><AdminAnalyses /></PageTransition>} />
+                            <Route path="/admin/keywords" element={<PageTransition><AdminKeywords /></PageTransition>} />
+                            <Route path="/admin/notifications" element={<PageTransition><AdminNotifications /></PageTransition>} />
+                            <Route path="/admin/settings" element={<PageTransition><AdminSettings /></PageTransition>} />
+                            <Route path="/admin/activity" element={<PageTransition><AdminAuditLog /></PageTransition>} />
                         </Route>
                     </Route>
                     {/* 404 Route */}
-                    <Route path="*" element={<NotFound />} />
+                    <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                 </Routes>
+            </AnimatePresence>
             </Suspense>
         </ErrorBoundary>
     );

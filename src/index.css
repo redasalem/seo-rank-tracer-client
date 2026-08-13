@@ -29,67 +29,67 @@
 }
 
 :root {
-    /* Light Mode Premium */
-    --background: #fdfdfd;
-    --foreground: #0f172a;
-    --card: rgba(255, 255, 255, 0.7);
-    --border: rgba(226, 232, 240, 0.8);
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
+    /* Ultra-Minimalist Light (Inverted Deep Space) */
+    --background: #fafafa;
+    --foreground: #09090b;
+    --card: rgba(255, 255, 255, 0.8);
+    --border: rgba(228, 228, 231, 0.6);
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
 
-    --primary: #0f172a;
-    --primary-foreground: #ffffff;
-    --primary-dark: #020617;
-    --accent: #3b82f6;
+    --primary: #09090b;
+    --primary-foreground: #fafafa;
+    --primary-dark: #18181b;
+    --accent: #0ea5e9; /* Deep Space Cyan */
 
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
 
-    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 1);
-    --glass-hover: rgba(255, 255, 255, 0.85);
+    --glass-hover: rgba(255, 255, 255, 0.9);
 
     --scroll-track: transparent;
-    --scroll-thumb: #cbd5e1;
-    --scroll-thumb-hover: #94a3b8;
+    --scroll-thumb: #d4d4d8;
+    --scroll-thumb-hover: #a1a1aa;
     
     /* Light Mesh Colors */
     --mesh-1: #e0f2fe;
-    --mesh-2: #ede9fe;
-    --mesh-3: #fce7f3;
+    --mesh-2: #f3e8ff;
+    --mesh-3: #fae8ff;
 }
 
 .dark {
-    /* Dark Mode Premium */
-    --background: #020617;
+    /* Deep Space SaaS (Premium) */
+    --background: #020617; /* Very deep blue-black */
     --foreground: #f8fafc;
-    --card: rgba(15, 23, 42, 0.6);
-    --border: rgba(51, 65, 85, 0.5);
-    --muted: #1e293b;
+    --card: rgba(15, 23, 42, 0.4); /* Dark glass */
+    --border: rgba(56, 189, 248, 0.15); /* Subtle glowing cyan border */
+    --muted: #0f172a;
     --muted-foreground: #94a3b8;
 
     --primary: #ffffff;
-    --primary-foreground: #0f172a;
+    --primary-foreground: #020617;
     --primary-dark: #f1f5f9;
-    --accent: #3b82f6;
+    --accent: #8b5cf6; /* Deep Space Purple/Cyan mix */
 
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
 
-    --glass-bg: rgba(15, 23, 42, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-hover: rgba(30, 41, 59, 0.6);
+    --glass-bg: rgba(2, 6, 23, 0.5); /* Deep dark background */
+    --glass-border: rgba(139, 92, 246, 0.15); /* Purple hint */
+    --glass-hover: rgba(15, 23, 42, 0.6);
 
     --scroll-track: transparent;
-    --scroll-thumb: #334155;
-    --scroll-thumb-hover: #475569;
+    --scroll-thumb: #1e293b;
+    --scroll-thumb-hover: #334155;
     
-    /* Dark Mesh Colors */
-    --mesh-1: #0f172a;
-    --mesh-2: #1e1b4b;
-    --mesh-3: #020617;
+    /* Deep Space Mesh Colors */
+    --mesh-1: #0f172a; /* Slate 900 */
+    --mesh-2: #2e1065; /* Deep purple */
+    --mesh-3: #172554; /* Deep blue */
 }
 
 html {
@@ -118,48 +118,54 @@ button {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 1.5rem;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .glass:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
     background: var(--glass-hover);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.1); /* Glow effect on hover */
+    border-color: rgba(139, 92, 246, 0.3);
 }
 
 .dark .glass {
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 .dark .glass:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
 }
 
 .glass-strong {
     background: var(--glass-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
     border: 1px solid var(--glass-border);
     border-radius: 9999px; /* Pill shape commonly */
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 .dark .glass-strong {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
+.dark .glass-strong:hover {
+    border-color: rgba(56, 189, 248, 0.4); /* Cyan glow for strong glass */
+    box-shadow: 0 4px 30px rgba(56, 189, 248, 0.15);
+}
 
 /* gradients */
 .gradient-text {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #0ea5e9, #8b5cf6); /* Deep Space gradient cyan to purple */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .gradient-bg {
-    background: var(--primary);
+    background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
 }
 
 /* Mesh Gradient Background */
