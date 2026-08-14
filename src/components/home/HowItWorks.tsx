@@ -1,7 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { homeHowItWorksData } from "../../assets/assets";
 import { useTranslation } from "react-i18next";
 import { motion, type Variants } from "framer-motion";
+import { type ReactNode } from "react";
+
+interface HowItWorksStep {
+    num: string;
+    icon: ReactNode;
+    title: string;
+    desc: string;
+}
 
 const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -22,6 +29,8 @@ const stepVariants: Variants = {
 
 export default function HowItWorks() {
     const { t } = useTranslation();
+    const steps = homeHowItWorksData as HowItWorksStep[];
+
     return (
         <section className="relative max-w-5xl md:min-h-[80vh] mx-auto px-4 py-24 overflow-hidden">
             <motion.div
@@ -56,7 +65,7 @@ export default function HowItWorks() {
                     }}
                 />
 
-                {homeHowItWorksData.map((step: any, i: number) => (
+                {steps.map((step: HowItWorksStep, i: number) => (
                     <motion.div
                         key={step.num}
                         variants={stepVariants}

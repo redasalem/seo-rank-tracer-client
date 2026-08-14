@@ -5,14 +5,14 @@ import { HomeWave } from "../../assets/assets";
 import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion, useInView } from "framer-motion";
 
-// Animated counter hook
-function useAnimatedCounter(end: number, duration = 2000, startOnView = true) {
+// Isolated Animated Counter Component (Pure and clean)
+function AnimatedStat({ end, duration = 2000, suffix = "", formatK = false }: { end: number; duration?: number; suffix?: string; formatK?: boolean }) {
     const [count, setCount] = useState(0);
     const ref = useRef<HTMLSpanElement>(null);
     const inView = useInView(ref, { once: true });
 
     useEffect(() => {
-        if (!startOnView || !inView) return;
+        if (!inView) return;
         let start = 0;
         const increment = end / (duration / 16);
         const timer = setInterval(() => {
@@ -25,25 +25,42 @@ function useAnimatedCounter(end: number, duration = 2000, startOnView = true) {
             }
         }, 16);
         return () => clearInterval(timer);
-    }, [end, duration, inView, startOnView]);
+    }, [end, duration, inView]);
 
-    return { count, ref };
-}
-
-// Particle effect component
-function FloatingParticles() {
-    const particles = Array.from({ length: 20 }, (_, i) => ({
-        id: i,
-        size: Math.random() * 4 + 2,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        delay: Math.random() * 8,
-        duration: Math.random() * 6 + 6,
-    }));
+    const formatted = formatK
+        ? (count >= 1000 ? `${Math.floor(count / 1000)}K` : count.toString())
+        : count.toLocaleString();
 
     return (
+        <span ref={ref} className="text-2xl font-bold text-foreground animate-count-up">
+            {formatted}{suffix}
+        </span>
+    );
+}
+
+// Predefined static particle coordinates (100% pure, no Math.random during render)
+const STATIC_PARTICLES = [
+    { id: 0, size: 3.2, x: 12, y: 18, delay: 0.5, duration: 8.4 },
+    { id: 1, size: 4.8, x: 84, y: 22, delay: 2.1, duration: 9.1 },
+    { id: 2, size: 2.4, x: 35, y: 75, delay: 1.2, duration: 7.3 },
+    { id: 3, size: 5.1, x: 68, y: 64, delay: 3.4, duration: 11.2 },
+    { id: 4, size: 3.6, x: 22, y: 45, delay: 4.0, duration: 8.8 },
+    { id: 5, size: 2.8, x: 90, y: 80, delay: 1.8, duration: 9.5 },
+    { id: 6, size: 4.2, x: 50, y: 15, delay: 2.9, duration: 10.4 },
+    { id: 7, size: 3.0, x: 8, y: 88, delay: 0.8, duration: 7.9 },
+    { id: 8, size: 5.0, x: 78, y: 42, delay: 3.1, duration: 8.2 },
+    { id: 9, size: 2.2, x: 42, y: 92, delay: 4.5, duration: 11.8 },
+    { id: 10, size: 3.8, x: 60, y: 30, delay: 1.5, duration: 9.0 },
+    { id: 11, size: 4.5, x: 28, y: 62, delay: 2.4, duration: 8.6 },
+    { id: 12, size: 2.6, x: 95, y: 10, delay: 3.8, duration: 10.1 },
+    { id: 13, size: 3.4, x: 15, y: 35, delay: 0.2, duration: 7.6 },
+    { id: 14, size: 4.0, x: 82, y: 90, delay: 2.7, duration: 9.8 }
+];
+
+function FloatingParticles() {
+    return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-            {particles.map((p) => (
+            {STATIC_PARTICLES.map((p) => (
                 <div
                     key={p.id}
                     className="particle"
@@ -67,10 +84,6 @@ export default function Hero() {
     const [url, setUrl] = useState("");
     const navigate = useNavigate();
     const shouldReduce = useReducedMotion();
-
-    const stat1 = useAnimatedCounter(2500);
-    const stat2 = useAnimatedCounter(150000);
-    const stat3 = useAnimatedCounter(98);
 
     const handleQuickAnalyze = (e: React.FormEvent) => {
         e.preventDefault();
@@ -170,7 +183,7 @@ export default function Hero() {
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-1.5 mb-1">
                             <BarChart3 size={16} className="text-accent" />
-                            <span ref={stat1.ref} className="text-2xl font-bold text-foreground animate-count-up">{stat1.count.toLocaleString()}+</span>
+                            <AnimatedStat end={2500} suffix="+" />
                         </div>
                         <p className="text-xs text-muted-foreground font-medium">{t("hero.stat_users", "Active Users")}</p>
                     </div>
@@ -178,7 +191,7 @@ export default function Hero() {
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-1.5 mb-1">
                             <TrendingUp size={16} className="text-accent" />
-                            <span ref={stat2.ref} className="text-2xl font-bold text-foreground animate-count-up">{stat2.count >= 1000 ? `${Math.floor(stat2.count / 1000)}K+` : stat2.count}</span>
+                            <AnimatedStat end={150000} suffix="+" formatK={true} />
                         </div>
                         <p className="text-xs text-muted-foreground font-medium">{t("hero.stat_analyses", "SEO Analyses Run")}</p>
                     </div>
@@ -186,7 +199,7 @@ export default function Hero() {
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-1.5 mb-1">
                             <Star size={16} className="text-accent" />
-                            <span ref={stat3.ref} className="text-2xl font-bold text-foreground animate-count-up">{stat3.count}%</span>
+                            <AnimatedStat end={98} suffix="%" />
                         </div>
                         <p className="text-xs text-muted-foreground font-medium">{t("hero.stat_satisfaction", "Satisfaction Rate")}</p>
                     </div>

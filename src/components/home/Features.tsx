@@ -1,9 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { homeFeaturesData } from "../../assets/assets";
 import { useTranslation } from "react-i18next";
 import { motion, type Variants } from "framer-motion";
 import { Sparkles, CheckCircle } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
+
+interface FeatureItem {
+    icon: ReactNode;
+    title: string;
+    desc: string;
+}
 
 // Typing animation component for AI chat mockup
 function TypingText({ text, speed = 30 }: { text: string; speed?: number }) {
@@ -63,6 +68,8 @@ const itemVariants: Variants = {
 
 export default function Features() {
     const { t } = useTranslation();
+    const features = homeFeaturesData as FeatureItem[];
+
     return (
         <section className="relative md:min-h-screen flex flex-col justify-center items-center max-lg:py-24">
             <div className="bg-dot-pattern absolute inset-0 -z-1 opacity-10"></div>
@@ -88,7 +95,7 @@ export default function Features() {
                     viewport={{ once: true, margin: "-50px" }}
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-7"
                 >
-                    {homeFeaturesData.map((f: any, i: number) => (
+                    {features.map((f: FeatureItem, i: number) => (
                         <motion.div
                             key={f.title}
                             variants={itemVariants}

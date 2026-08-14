@@ -4,6 +4,16 @@ import { SiX, SiInstagram, SiFacebook } from "@icons-pack/react-simple-icons";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+interface FooterLinkItem {
+    name: string;
+    path: string;
+}
+
+interface FooterSectionItem {
+    title: string;
+    links: FooterLinkItem[];
+}
+
 function LinkedInIcon({ size = 18 }: { size?: number }) {
     return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -14,6 +24,8 @@ function LinkedInIcon({ size = 18 }: { size?: number }) {
 
 export default function Footer() {
     const { t } = useTranslation();
+    const sections = homefooterLinks as FooterSectionItem[];
+
     return (
         <footer className="border-t border-border py-12 bg-card text-foreground">
             <div className="max-w-7xl mx-auto px-4">
@@ -42,11 +54,11 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {homefooterLinks.map((section: any, i: number) => (
+                    {sections.map((section: FooterSectionItem, i: number) => (
                         <div key={section.title}>
                             <h3 className="mb-4 font-semibold text-sm text-foreground">{t(`footer.sections.${i}.title`)}</h3>
                             <ul className="space-y-2">
-                                {section.links.map((link: any, j: number) => (
+                                {section.links.map((link: FooterLinkItem, j: number) => (
                                     <li key={link.name}>
                                         <Link to={link.path} className="text-sm text-muted-foreground hover:text-accent transition-colors">
                                             {t(`footer.sections.${i}.links.${j}`)}
