@@ -25,7 +25,7 @@ export default function Analyze() {
 
     const navigate = useNavigate();
 
-    const isLimitReached = user?.plan === "free" && (user?.analysisCount || 0) >= 10;
+    const isLimitReached = user?.plan === "free" && (user?.analysisCount || 0) >= 3;
 
     const handleAnalyze = async (submitUrl?: string) => {
         const targetUrl = submitUrl || url;

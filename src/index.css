@@ -336,3 +336,195 @@ button {
     outline-offset: 2px;
     border-radius: 4px;
 }
+
+/* ═══════════════════════════════════════════════════ */
+/*  Premium Animation Utilities                        */
+/* ═══════════════════════════════════════════════════ */
+
+/* Shimmer sweep — for CTA buttons */
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+.shimmer {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Glow pulse — subtle breathing glow */
+@keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.15); }
+    50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.35); }
+}
+
+.glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Rotating gradient border */
+@keyframes gradient-rotate {
+    0% { --gradient-angle: 0deg; }
+    100% { --gradient-angle: 360deg; }
+}
+
+@property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.gradient-border {
+    position: relative;
+    border-radius: 1.5rem;
+    isolation: isolate;
+}
+
+.gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: conic-gradient(
+        from var(--gradient-angle),
+        #8b5cf6,
+        #0ea5e9,
+        #8b5cf6
+    );
+    animation: gradient-rotate 4s linear infinite;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.gradient-border::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--card);
+    z-index: -1;
+}
+
+/* Skeleton loading shimmer */
+@keyframes skeleton-pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.4; }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--muted) 25%,
+        var(--border) 50%,
+        var(--muted) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 0.75rem;
+}
+
+/* Staggered fade-in for lists (used with Framer Motion) */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.stagger-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Counter number animation */
+@keyframes count-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count-up {
+    animation: count-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Typing cursor for AI chat mockup */
+@keyframes blink-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.typing-cursor::after {
+    content: "▋";
+    animation: blink-cursor 0.8s ease-in-out infinite;
+    color: var(--accent);
+    font-size: 0.875rem;
+}
+
+/* Glass card with inner glow on hover — premium variant */
+.glass-premium {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.glass-premium:hover {
+    background: var(--glass-hover);
+    transform: translateY(-4px);
+    box-shadow:
+        0 20px 50px rgba(139, 92, 246, 0.15),
+        0 0 0 1px rgba(139, 92, 246, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.dark .glass-premium {
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.dark .glass-premium:hover {
+    box-shadow:
+        0 20px 50px rgba(139, 92, 246, 0.2),
+        0 0 0 1px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Particle dots floating (for Hero background) */
+@keyframes particle-float {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+    25% { transform: translate(10px, -20px) scale(1.1); opacity: 0.5; }
+    50% { transform: translate(-5px, -40px) scale(0.9); opacity: 0.4; }
+    75% { transform: translate(15px, -20px) scale(1.05); opacity: 0.35; }
+}
+
+.particle {
+    position: absolute;
+    border-radius: 9999px;
+    background: var(--accent);
+    pointer-events: none;
+    animation: particle-float 8s ease-in-out infinite;
+}
+
+/* Slide down animation for mobile nav */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scaleY(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+}

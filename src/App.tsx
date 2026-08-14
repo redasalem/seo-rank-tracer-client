@@ -62,7 +62,25 @@ export default function App() {
     return (
         <ErrorBoundary>
             <div className="mesh-bg"></div>
-            <Toaster />
+            <Toaster 
+                position="top-center"
+                toastOptions={{
+                    className: "!bg-card !text-foreground !border !border-border !shadow-2xl !backdrop-blur-xl !rounded-2xl !px-4 !py-3 !text-sm font-medium",
+                    duration: 4000,
+                    success: {
+                        iconTheme: {
+                            primary: "var(--success)",
+                            secondary: "white",
+                        },
+                    },
+                    error: {
+                        iconTheme: {
+                            primary: "var(--danger)",
+                            secondary: "white",
+                        },
+                    },
+                }}
+            />
             {!hideNavbar && <Navbar />}
             <Suspense fallback={
                 <div className="min-h-screen flex items-center justify-center">

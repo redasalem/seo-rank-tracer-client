@@ -137,7 +137,7 @@ export default function Navbar() {
 
             {/* Mobile menu */}
             {mobileOpen && (
-                <div id="mobile-nav" className="md:hidden border-b border-border bg-background origin-top">
+                <div id="mobile-nav" className="md:hidden border-b border-border bg-background/95 backdrop-blur-xl origin-top animate-[slideDown_0.3s_ease-out]" style={{ animation: "slideDown 0.3s cubic-bezier(0.25, 1, 0.5, 1)" }}>
                     <div className="px-4 py-3 space-y-1">
                         {user ? (
                             <>

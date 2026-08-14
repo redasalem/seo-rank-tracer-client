@@ -11,7 +11,7 @@ function getAxiosErrorMessage(error: unknown, fallback: string): string {
     return axiosErr?.response?.data?.message || fallback;
 }
 
-interface User {
+export interface User {
     id: string;
     name: string;
     email: string;
@@ -22,7 +22,7 @@ interface User {
     language?: 'en' | 'ar';
 }
 
-interface KeywordData {
+export interface KeywordData {
     keyword: string;
     domain?: string;
     url?: string;
@@ -30,7 +30,7 @@ interface KeywordData {
     country?: string;
 }
 
-interface KeywordTracking {
+export interface KeywordTracking {
     _id: string;
     keyword: string;
     domain: string;
@@ -39,7 +39,7 @@ interface KeywordTracking {
     status: string;
 }
 
-interface Notification {
+export interface Notification {
     _id: string;
     title: string;
     message: { key: string; data?: Record<string, string | number> } | string;
@@ -49,7 +49,7 @@ interface Notification {
     createdAt: string;
 }
 
-interface DashboardStats {
+export interface DashboardStats {
     totalKeywords: number;
     inTop10: number;
     bestPosition: number | null;
@@ -62,7 +62,7 @@ interface DashboardStats {
     analysisLimit: { plan: string; used: number; max: number | string } | null;
 }
 
-interface AnalysisRecord {
+export interface AnalysisRecord {
     _id: string;
     url: string;
     domain: string;
@@ -74,7 +74,7 @@ interface AnalysisRecord {
     aiInsights?: string;
 }
 
-interface CompetitorData {
+export interface CompetitorData {
     domain: string;
     keywordCount: number;
     avgPosition: number;
@@ -82,7 +82,7 @@ interface CompetitorData {
     topKeywords: { keyword: string; position: number; url: string }[];
 }
 
-interface AppContextType {
+export interface AppContextType {
     user: User | null;
     token: string | null;
     loading: boolean;

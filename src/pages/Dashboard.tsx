@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SearchIcon, ArrowRightIcon, TrendingUpIcon, Target, Trophy, Activity, ArrowUpCircle, FileSearchIcon, Zap, Loader2, AlertCircle } from "lucide-react";
-import { useApp } from "../context/AppContext";
+import { useApp, type DashboardStats } from "../context/AppContext";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useOnboardingTour } from "../components/OnboardingTour";
@@ -9,38 +9,6 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
 } from "recharts";
-
-// TypeScript Interfaces for strict typing
-interface KeywordStat {
-    _id: string;
-    keyword: string;
-    domain: string;
-    currentPosition: number | null;
-    positionChange: number;
-    status: string;
-}
-
-interface AnalysisStat {
-    _id: string;
-    url: string;
-    domain: string;
-    overallScore: number;
-    status: string;
-    createdAt: string;
-}
-
-interface DashboardStats {
-    totalKeywords: number;
-    inTop10: number;
-    bestPosition: number | null;
-    averageRank: number | null;
-    biggestImprover: { keyword: string; positionChange: number } | null;
-    rankDistribution: { name: string; value: number; color: string }[];
-    historyData: { date: string; averageRank: number }[];
-    recentKeywords: KeywordStat[];
-    recentAnalyses: AnalysisStat[];
-    analysisLimit: { plan: string; used: number; max: number | 'unlimited' } | null;
-}
 
 // Custom Tooltip for Recharts
 const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: { value: number }[], label?: string }) => {
