@@ -102,19 +102,6 @@ export default function Hero() {
 
             <div className="max-w-3xl mx-auto text-center relative z-10">
 
-            {/* Badge */}
-            <motion.div
-                initial={shouldReduce ? {} : { opacity: 0, y: 20, scale: 0.95 }}
-                animate={shouldReduce ? {} : { opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 bg-card/80 backdrop-blur-md rounded-full text-xs font-semibold text-accent mb-8 border border-accent/30 shadow-[0_0_15px_rgba(139,92,246,0.3)]"
-            >
-                <div className="relative flex items-center justify-center">
-                    <div className="absolute bg-accent size-2 rounded-full animate-ping"></div>
-                    <div className="bg-accent size-1.5 rounded-full"></div>
-                </div>
-                {t("hero.badge")}
-            </motion.div>
 
             {/* Title */}
             <motion.h1
